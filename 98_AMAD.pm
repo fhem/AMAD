@@ -17,10 +17,11 @@ sub AMAD_Initialize($) {
 
     my ($hash) = @_;
 
-    $hash->{DefFn}      = 'AMAD_Define';
-    $hash->{UndefFn}    = 'AMAD_Undef';
-    $hash->{AttrFn}     = 'AMAD_Attr';
-    $hash->{ReadFn}     = 'AMAD_Read';
+    $hash->{SetFn}     	= "AMAD_Set";
+    $hash->{DefFn}      = "AMAD_Define";
+    $hash->{UndefFn}    = "AMAD_Undef";
+    $hash->{AttrFn}     = "AMAD_Attr";
+    $hash->{ReadFn}     = "AMAD_Read";
     $hash->{AttrList} =
           "interval disable:0,1 nonblocking:0,1 "
          . $readingFnAttributes;
@@ -137,6 +138,32 @@ sub AMAD_GetUpdateTimer($)
 
 ##########################################################################
 
+sub
+AMAD_Set($@)
+{
+  my ($hash, @a) = @_;
+  my $name = shift @a;
+
+  return "no set value specified" if(int(@a) < 1);
+  my $setList = AttrVal($name, "setList", " ");
+  return "Unknown argument ?, choose one of $setList" if($a[0] eq "?");
+
+  my @rl = split(" ", AttrVal($name, "readingList", ""));
+  if(@rl && grep /\b$a[0]\b/, @rl) {
+    my $v = shift @a;
+    readingsSingleUpdate($hash, $v, join(" ",@a), 1);
+    return;
+  }
+
+  my $v = join(" ", @a);
+  Log3 $name, 4, "AMAD ($name) set $name $v";
+
+  readingsSingleUpdate($hash,"state",$v,1);
+  return undef;
+}
+
+###########################################################################
+
 sub AMAD_Define($$) {
 
     my ( $hash, $def ) = @_;
@@ -161,15 +188,12 @@ sub AMAD_Define($$) {
     $hash->{INTERVAL} 	= $interval;
 
     Log3 $name, 3, "AMAD ($name) - defined with host $hash->{HOST} and interval $hash->{INTERVAL} (sec)";
-    
-    $hash->{READINGS}{current_date_time}{TIME}= TimeNow();
-    $hash->{READINGS}{current_date_time}{VAL}= "none";
 
     AMAD_GetUpdateLocal($hash);
 
     InternalTimer(gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 0);
     
-    $hash->{STATE} = 'active';
+    $hash->{STATE} = "active";
 
     return undef;
 }
