@@ -27,143 +27,6 @@ sub AMAD_Initialize($) {
          . $readingFnAttributes;
 }
 
-##########################################################################
-
-sub AMAD_RetrieveAutomagicInfo
-{
-    my ($name, $blocking) = @_;
-    my $hash = $defs{$name};
-  # my $name = $hash->{NAME};
-    my $host = $hash->{HOST};
-    my $port = $hash->{PORT};
-
-    my $url = "http://" . $host . ":" . $port . "/automagic/test";
-  
-    if ($blocking) {
-  	#my $response = GetFileFromURL($url, 5, undef, 0);
-  	my $response = HttpUtils_BlockingGet(
-			{
-			  url        => $url,
-			  timeout    => 5,
-			  #noshutdown => 0,
-			}
-			);
-	my %param = (hash => $hash, doTrigger => 0);
-	AMAD_RetrieveAutomagicInfoFinished(\%param, undef, $response);
-	Log3 $name, 3, "AMAD ($name) - BlockingGet get URL ";
-    }
-    else {
-	HttpUtils_NonblockingGet(
-	  {
-	      url        => $url,
-	      timeout    => 5,
-	      #noshutdown => 0,
-	      hash       => $hash,
-	      doTrigger  => 1,
-	      callback   => \&AMAD_RetrieveAutomagicInfoFinished,
-	  }
-	);
-	Log3 $name, 3, "AMAD ($name) - NonblockingGet get URL";
-    }
-}
-
-sub AMAD_RetrieveAutomagicInfoFinished($$$)
-{
-    my ( $param, $err, $data ) = @_;
-    my $hash = $param->{hash};
-    my $doTrigger = $param->{doTrigger};
-    my $name = $hash->{NAME};
-    my $host = $hash->{HOST};
-
-    Log3 $name, 3, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: calling Host: $host";
-
-    if (defined($err)) {
-      if ($err ne "")
-      {
-	  Log3 $name, 3, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: error while requesting AutomagicInfo: $err";
-	  return;
-      }
-    }
-
-    if($data eq "" and exists($param->{code}))
-    {
-        Log3 $name, 3, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: received http code ".$param->{code}." without any data after requesting AMAD AutomagicInfo";
-        return;
-    }
-    
-    $hash->{RETRIEVECACHE} = $data;
-    
-    my @valuestring = split('@@',  $data);
-    my %buffer;
-    foreach (@valuestring) {
-	my @values = split(' ', $_);
-	$buffer{$values[0]} = $values[1];
-    }
-
-    readingsBeginUpdate($hash);
-    my $t;
-    my $v;
-    while (($t, $v) = each %buffer) {
-	readingsBulkUpdate($hash, $t, $v) if (defined($v));
-    }
-    readingsEndUpdate($hash, 1);
-}
-
-########################################################################################
-
-sub AMAD_GetUpdateLocal($)
-{
-  my ($hash) = @_;
-  my $name = $hash->{NAME};
-
-  AMAD_RetrieveAutomagicInfo($name, 1);
-
-  return 1;
-}
-
-############################################################################
-
-sub AMAD_GetUpdateTimer($)
-{
-  my ($hash) = @_;
-  my $name = $hash->{NAME};
- 
-  AMAD_RetrieveAutomagicInfo($name, 0);
-  
-  InternalTimer(gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 1);
-  Log3 $name, 3, "AMAD ($name) - Call AMAD_GetUpdateTimer";
-
-  return 1;
-}
-
-##########################################################################
-
-sub
-AMAD_Set($@)
-{
-  my ($hash, @a) = @_;
-  my $name = shift @a;
-
-  return "no set value specified" if(int(@a) < 1);
-  my $setList = AttrVal($name, "setList", " ");
-  return "Unknown argument ?, choose one of $setList" if($a[0] eq "?");
-
-  my @rl = split(" ", AttrVal($name, "readingList", ""));
-  if(@rl && grep /\b$a[0]\b/, @rl) {
-    my $v = shift @a;
-    readingsSingleUpdate($hash, $v, join(" ",@a), 1);
-    return;
-  }
-
-  my $v = join(" ", @a);
-  Log3 $name, 4, "AMAD ($name) set $name $v";
-
-  readingsSingleUpdate($hash,"state",$v,1);
-  return undef;
-}
-
-###########################################################################
-
 sub AMAD_Define($$) {
 
     my ( $hash, $def ) = @_;
@@ -239,6 +102,171 @@ sub AMAD_Attr(@) {
         return undef;
 }
 
-################################################################################
+sub AMAD_GetUpdateLocal($)
+{
+  my ($hash) = @_;
+  my $name = $hash->{NAME};
+
+  AMAD_RetrieveAutomagicInfo($name, 1);
+
+  return 1;
+}
+
+sub AMAD_GetUpdateTimer($)
+{
+  my ($hash) = @_;
+  my $name = $hash->{NAME};
+ 
+  AMAD_RetrieveAutomagicInfo($name, 0) if ($hash->{STATE} eq "online" || $hash->{STATE} eq "active");
+  
+  InternalTimer(gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 1);
+  Log3 $name, 3, "AMAD ($name) - Call AMAD_GetUpdateTimer";
+
+  return 1;
+}
+
+sub AMAD_Set($$@)
+{
+  my ($hash, $name, $cmd, @val) = @_;
+  my $resultStr = "";
+  
+  my $list = "screenMsg"
+	   . " ttsMsg"
+	   . " setVolume"
+	   . " MediaPlayer:play,stop,next,back";
+  
+ # set screenMsg
+  if ( lc $cmd eq 'screenmsg') {
+      Log3 $name, 3, "AMAD ($name) - set $name $cmd ".join(" ", @val);
+      return AMAD_SetScreenMsg ($hash, @val);
+  }
+ # set ttsMsg
+  elsif ( lc $cmd eq 'ttsmsg') {
+      Log3 $name, 3, "AMAD ($name) - set $name $cmd ".join(" ", @val);
+      return AMAD_SetTtsMsg ($hash, @val);
+  }
+ # set setVolume
+  elsif ( lc $cmd eq 'setvolume') {
+      Log3 $name, 3, "AMAD ($name) - set $name $cmd ".join(" ", @val);
+      return AMAD_SetVolume ($hash, @val);
+  }
+ # set mediaplayer
+  elsif ( lc $cmd eq 'mediaplayer') {
+      Log3 $name, 3, "AMAD ($name) - set $name $cmd ".join(" ", @val);
+      return AMAD_mediaplayer ($hash, @val);
+  }
+      
+  return "Unknown argument $cmd or wrong parameter(s), choose one of $list";
+}
+
+sub AMAD_RetrieveAutomagicInfo
+{
+    my ($name, $blocking) = @_;
+    my $hash = $defs{$name};
+    my $host = $hash->{HOST};
+    my $port = $hash->{PORT};
+
+    my $url = "http://" . $host . ":" . $port . "/automagic/test";
+  
+    if ($blocking) {
+  	my $response = HttpUtils_BlockingGet(
+			{
+			  url        => $url,
+			  timeout    => 5,
+			  #noshutdown => 0,
+			}
+			);
+	my %param = (hash => $hash, doTrigger => 0);
+	AMAD_RetrieveAutomagicInfoFinished(\%param, undef, $response);
+	Log3 $name, 3, "AMAD ($name) - BlockingGet get URL ";
+    }
+    else {
+	HttpUtils_NonblockingGet(
+	  {
+	      url        => $url,
+	      timeout    => 5,
+	      #noshutdown => 0,
+	      hash       => $hash,
+	      doTrigger  => 1,
+	      callback   => \&AMAD_RetrieveAutomagicInfoFinished,
+	  }
+	);
+	Log3 $name, 3, "AMAD ($name) - NonblockingGet get URL";
+    }
+}
+
+sub AMAD_RetrieveAutomagicInfoFinished($$$)
+{
+    my ( $param, $err, $data ) = @_;
+    my $hash = $param->{hash};
+    my $doTrigger = $param->{doTrigger};
+    my $name = $hash->{NAME};
+    my $host = $hash->{HOST};
+
+    Log3 $name, 3, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: calling Host: $host";
+
+    if (defined($err)) {
+      if ($err ne "")
+      {
+	  Log3 $name, 3, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: error while requesting AutomagicInfo: $err";
+	  return;
+      }
+    }
+
+    if($data eq "" and exists($param->{code}))
+    {
+        Log3 $name, 3, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: received http code ".$param->{code}." without any data after requesting AMAD AutomagicInfo";
+        return;
+    }
+    
+    $hash->{RETRIEVECACHE} = $data;
+    
+    my @valuestring = split('@@',  $data);
+    my %buffer;
+    foreach (@valuestring) {
+	my @values = split(' ', $_);
+	$buffer{$values[0]} = $values[1];
+    }
+
+    readingsBeginUpdate($hash);
+    my $t;
+    my $v;
+    while (($t, $v) = each %buffer) {
+	readingsBulkUpdate($hash, $t, $v) if (defined($v));
+    }
+    readingsEndUpdate($hash, 1);
+}
+
+sub AMAD_SetScreenMsg($@)
+{
+    my ($hash, @msg) = @_;
+    my $name = $hash->{NAME};
+    my $host = $hash->{HOST};
+    my $port = $hash->{PORT};
+    my $url = "http://" . $host . ":" . $port . "/automagic/screenMsg?message=@msg";
+    
+    my $response = HttpUtils_BlockingGet(
+			{
+			  url        => $url,
+			  timeout    => 5,
+			  #noshutdown => 0,
+			}
+			);
+	Log3 $name, 3, "AMAD ($name) - Send http Request Screen Message @msg with URL $url";
+
+    return undef;
+}
+
+sub AMAD_SetTtsMsg($@) {
+
+}
+
+sub AMAD_SetVolume($@) {
+
+}
+
+sub AMAD_mediaplayer($@) {
+
+}
 
 1;
