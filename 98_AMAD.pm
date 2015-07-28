@@ -258,7 +258,22 @@ sub AMAD_SetScreenMsg($@)
 }
 
 sub AMAD_SetTtsMsg($@) {
+    my ($hash, @msg) = @_;
+    my $name = $hash->{NAME};
+    my $host = $hash->{HOST};
+    my $port = $hash->{PORT};
+    my $url = "http://" . $host . ":" . $port . "/automagic/ttsMsg?message=@msg";
+    
+    my $response = HttpUtils_BlockingGet(
+			{
+			  url        => $url,
+			  timeout    => 5,
+			  #noshutdown => 0,
+			}
+			);
+	Log3 $name, 3, "AMAD ($name) - Send http Request TTS Message @msg with URL $url";
 
+    return undef;
 }
 
 sub AMAD_SetVolume($@) {
