@@ -128,12 +128,11 @@ sub AMAD_GetUpdateTimer($)
 sub AMAD_Set($$@)
 {
   my ($hash, $name, $cmd, @val) = @_;
-  my $resultStr = "";
   
   my $list = "screenMsg"
 	   . " ttsMsg"
 	   . " setVolume"
-	   . " MediaPlayer:play,stop,next,back";
+	   . " mediaPlayer:play,stop,next,back";
   
  # set screenMsg
   if ( lc $cmd eq 'screenmsg') {
@@ -150,12 +149,12 @@ sub AMAD_Set($$@)
       Log3 $name, 3, "AMAD ($name) - set $name $cmd ".join(" ", @val);
       return AMAD_SetVolume ($hash, @val);
   }
- # set mediaplayer
+ # set mediaPlayer
   elsif ( lc $cmd eq 'mediaplayer') {
       Log3 $name, 3, "AMAD ($name) - set $name $cmd ".join(" ", @val);
       return AMAD_mediaplayer ($hash, @val);
   }
-      
+
   return "Unknown argument $cmd or wrong parameter(s), choose one of $list";
 }
 
@@ -166,7 +165,7 @@ sub AMAD_RetrieveAutomagicInfo
     my $host = $hash->{HOST};
     my $port = $hash->{PORT};
 
-    my $url = "http://" . $host . ":" . $port . "/automagic/test";
+    my $url = "http://" . $host . ":" . $port . "/automagic/deviceInfo";
   
     if ($blocking) {
   	my $response = HttpUtils_BlockingGet(
@@ -219,7 +218,7 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$)
         return;
     }
     
-    $hash->{RETRIEVECACHE} = $data;
+    # $hash->{RETRIEVECACHE} = $data;		# zu Testzwecken
     
     my @valuestring = split('@@',  $data);
     my %buffer;
@@ -235,45 +234,58 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$)
 	readingsBulkUpdate($hash, $t, $v) if (defined($v));
     }
     readingsEndUpdate($hash, 1);
+    
+    return undef;
+}
+
+sub AMAD_HTTP_Request {
+    my ($hash, $url) = @_;
+    my $name = $hash->{NAME};
+    
+    my $state = $hash->{STATE};
+    
+    $hash->{STATE} = "Send http Request";
+    HttpUtils_BlockingGet(
+	 {
+	      url        => $url,
+	      timeout    => 5,
+	      #noshutdown => 0,
+	 }
+    );
+    Log3 $name, 3, "AMAD ($name) - Send http Request with URL $url";
+
+    $hash->{STATE} = $state;
+    
+    return undef;
 }
 
 sub AMAD_SetScreenMsg($@)
 {
-    my ($hash, @msg) = @_;
+    my ($hash, @data) = @_;
     my $name = $hash->{NAME};
     my $host = $hash->{HOST};
     my $port = $hash->{PORT};
-    my $url = "http://" . $host . ":" . $port . "/automagic/screenMsg?message=@msg";
-    
-    my $response = HttpUtils_BlockingGet(
-			{
-			  url        => $url,
-			  timeout    => 5,
-			  #noshutdown => 0,
-			}
-			);
-	Log3 $name, 3, "AMAD ($name) - Send http Request Screen Message @msg with URL $url";
 
-    return undef;
+    my $msg = join(" ", @data);
+    $msg =~ s/\s/%20/g;
+    
+    my $url = "http://" . $host . ":" . $port . "/automagic/screenMsg?message=$msg";
+
+    return AMAD_HTTP_Request ($hash,$url);
 }
 
 sub AMAD_SetTtsMsg($@) {
-    my ($hash, @msg) = @_;
+    my ($hash, @data) = @_;
     my $name = $hash->{NAME};
     my $host = $hash->{HOST};
     my $port = $hash->{PORT};
-    my $url = "http://" . $host . ":" . $port . "/automagic/ttsMsg?message=@msg";
     
-    my $response = HttpUtils_BlockingGet(
-			{
-			  url        => $url,
-			  timeout    => 5,
-			  #noshutdown => 0,
-			}
-			);
-	Log3 $name, 3, "AMAD ($name) - Send http Request TTS Message @msg with URL $url";
-
-    return undef;
+    my $msg = join(" ", @data);
+    $msg =~ s/\s/%20/g;
+    
+    my $url = "http://" . $host . ":" . $port . "/automagic/ttsMsg?message=$msg";
+    
+    return AMAD_HTTP_Request ($hash,$url);
 }
 
 sub AMAD_SetVolume($@) {
