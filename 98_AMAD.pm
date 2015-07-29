@@ -70,8 +70,10 @@ sub AMAD_Undef($$) {
 }
 
 sub AMAD_Attr(@) {
-        my ( $cmd, $name, $attrName, $attrVal) = @_;
-        my $hash = $defs{$name};
+#        my ( $cmd, $name, $attrName, $attrVal) = @_;     # alt
+	my ( $cmd, $hash, $attrName, $attrVal) = @_;
+#        my $hash = $defs{$name};  # alt
+	my $name = $hash->{NAME};
 
         if ($attrName eq "disable") {
           if($cmd eq "set") {
@@ -117,7 +119,7 @@ sub AMAD_GetUpdateTimer($)
   my ($hash) = @_;
   my $name = $hash->{NAME};
  
-  AMAD_RetrieveAutomagicInfo($name, 0) if ($hash->{STATE} eq "online" || $hash->{STATE} eq "active");
+  AMAD_RetrieveAutomagicInfo($hash, 0) if ($hash->{STATE} eq "online" || $hash->{STATE} eq "active");
   
   InternalTimer(gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 1);
   Log3 $name, 3, "AMAD ($name) - Call AMAD_GetUpdateTimer";
@@ -134,34 +136,24 @@ sub AMAD_Set($$@)
 	   . " setVolume"
 	   . " mediaPlayer:play,stop,next,back";
   
- # set screenMsg
-  if ( lc $cmd eq 'screenmsg') {
-      Log3 $name, 3, "AMAD ($name) - set $name $cmd ".join(" ", @val);
-      return AMAD_SetScreenMsg ($hash, @val);
-  }
- # set ttsMsg
-  elsif ( lc $cmd eq 'ttsmsg') {
-      Log3 $name, 3, "AMAD ($name) - set $name $cmd ".join(" ", @val);
-      return AMAD_SetTtsMsg ($hash, @val);
-  }
- # set setVolume
-  elsif ( lc $cmd eq 'setvolume') {
-      Log3 $name, 3, "AMAD ($name) - set $name $cmd ".join(" ", @val);
-      return AMAD_SetVolume ($hash, @val);
-  }
- # set mediaPlayer
-  elsif ( lc $cmd eq 'mediaplayer') {
-      Log3 $name, 3, "AMAD ($name) - set $name $cmd ".join(" ", @val);
-      return AMAD_mediaplayer ($hash, @val);
-  }
+  
+  if ( lc $cmd eq 'screenmsg'
+      || lc $cmd eq 'ttsmsg'
+      || lc $cmd eq 'setvolume'
+      || lc $cmd eq 'mediaplayer') {
+				      Log3 $name, 3, "AMAD ($name) - set $name $cmd ".join(" ", @val);
+				      return AMAD_SetScreenMsg ($hash, @val);
+				    }
 
   return "Unknown argument $cmd or wrong parameter(s), choose one of $list";
 }
 
 sub AMAD_RetrieveAutomagicInfo
 {
-    my ($name, $blocking) = @_;
-    my $hash = $defs{$name};
+#    my ($name, $blocking) = @_;
+    my ($hash, $blocking) = @_;
+#    my $hash = $defs{$name};
+    my $name = $hash->{NAME};
     my $host = $hash->{HOST};
     my $port = $hash->{PORT};
 
