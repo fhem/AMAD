@@ -57,6 +57,7 @@ sub AMAD_Define($$) {
     InternalTimer(gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 0);
     
     $hash->{STATE} = "active";
+    readingsSingleUpdate  ($hash,"deviceState","online",0);
 
     return undef;
 }
@@ -70,120 +71,113 @@ sub AMAD_Undef($$) {
 }
 
 sub AMAD_Attr(@) {
-#        my ( $cmd, $name, $attrName, $attrVal) = @_;     # alt
-	my ( $cmd, $hash, $attrName, $attrVal) = @_;
-#        my $hash = $defs{$name};  # alt
-	my $name = $hash->{NAME};
+    my ( $cmd, $name, $attrName, $attrVal) = @_;
+    my $hash = $defs{$name};
 
-        if ($attrName eq "disable") {
-          if($cmd eq "set") {
-              if($attrVal eq "0") {
-                RemoveInternalTimer($hash);
-                InternalTimer(gettimeofday()+2, "AMAD_GetUpdateTimer", $hash, 0) if ($hash->{STATE} eq "disabled");
-                $hash->{STATE}='active';
-                Log3 $name, 4, "AMAD ($name) - enabled";
-             } else {
-                $hash->{STATE} = 'disabled';
-                RemoveInternalTimer($hash);
-                Log3 $name, 4, "AMAD ($name) - disabled";
-             }
-          } elsif ($cmd eq "del") {
-             RemoveInternalTimer($hash);
-             InternalTimer(gettimeofday()+2, "AMAD_GetUpdateTimer", $hash, 0) if ($hash->{STATE} eq "disabled");
-             $hash->{STATE}='active';
-             Log3 $name, 4, "AMAD ($name) - enabled";
-          }
+    if ($attrName eq "disable") {
+      if($cmd eq "set") {
+	if($attrVal eq "0") {
+	    RemoveInternalTimer($hash);
+            InternalTimer(gettimeofday()+2, "AMAD_GetUpdateTimer", $hash, 0) if ($hash->{STATE} eq "disabled");
+            $hash->{STATE}='active';
+            Log3 $name, 4, "AMAD ($name) - enabled";
         } else {
-          if($cmd eq "set") {
-             $attr{$name}{$attrName} = $attrVal;
-             Log3 $name, 4, "AMAD ($name) - $attrName : $attrVal";
-          } elsif ($cmd eq "del") {
-          }
-       }
+            $hash->{STATE} = 'disabled';
+            RemoveInternalTimer($hash);
+	    Log3 $name, 4, "AMAD ($name) - disabled";
+        }
+      } elsif ($cmd eq "del") {
+	  RemoveInternalTimer($hash);
+          InternalTimer(gettimeofday()+2, "AMAD_GetUpdateTimer", $hash, 0) if ($hash->{STATE} eq "disabled");
+          $hash->{STATE}='active';
+          Log3 $name, 4, "AMAD ($name) - enabled";
+	}
+      } else {
+	if($cmd eq "set") {
+	  $attr{$name}{$attrName} = $attrVal;
+          Log3 $name, 4, "AMAD ($name) - $attrName : $attrVal";
+        } elsif ($cmd eq "del") {
+      }
+    }
 
-        return undef;
+    return undef;
 }
 
 sub AMAD_GetUpdateLocal($)
 {
-  my ($hash) = @_;
-  my $name = $hash->{NAME};
+    my ($hash) = @_;
+    my $name = $hash->{NAME};
 
-  AMAD_RetrieveAutomagicInfo($name, 1);
 
-  return 1;
+    AMAD_RetrieveAutomagicInfo($hash);
+
+    return 1;
 }
 
 sub AMAD_GetUpdateTimer($)
 {
-  my ($hash) = @_;
-  my $name = $hash->{NAME};
+    my ($hash) = @_;
+    my $name = $hash->{NAME};
  
-  AMAD_RetrieveAutomagicInfo($hash, 0) if ($hash->{STATE} eq "online" || $hash->{STATE} eq "active");
+    AMAD_RetrieveAutomagicInfo($hash) if (ReadingsVal($name,"deviceState","online") eq "online" && $hash->{STATE} eq "active");
   
-  InternalTimer(gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 1);
-  Log3 $name, 3, "AMAD ($name) - Call AMAD_GetUpdateTimer";
+    InternalTimer(gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 1);
+    Log3 $name, 3, "AMAD ($name) - Call AMAD_GetUpdateTimer";
 
-  return 1;
+    return 1;
 }
 
 sub AMAD_Set($$@)
 {
-  my ($hash, $name, $cmd, @val) = @_;
+    my ($hash, $name, $cmd, @val) = @_;
   
-  my $list = "screenMsg"
-	   . " ttsMsg"
-	   . " setVolume"
-	   . " mediaPlayer:play,stop,next,back";
+    my $list = "screenMsg"
+	     . " ttsMsg"
+	     . " setVolume"
+	     . " deviceState:online,offline"
+	     . " mediaPlayer:play,stop,next,back";
   
   
-  if ( lc $cmd eq 'screenmsg'
-      || lc $cmd eq 'ttsmsg'
-      || lc $cmd eq 'setvolume'
-      || lc $cmd eq 'mediaplayer') {
-				      Log3 $name, 3, "AMAD ($name) - set $name $cmd ".join(" ", @val);
-				      return AMAD_SetScreenMsg ($hash, @val);
-				    }
+    if ( lc $cmd eq 'screenmsg'
+	|| lc $cmd eq 'ttsmsg'
+	|| lc $cmd eq 'setvolume'
+	|| lc $cmd eq 'mediaplayer') {
+					Log3 $name, 3, "AMAD ($name) - set $name $cmd ".join(" ", @val);
+					return AMAD_SetScreenMsg ($hash, @val);
+				      }
+    elsif ( lc $cmd eq 'devicestate') {
+	Log3 $name, 3, "AMAD ($name) - set $name $cmd ".join(" ", @val);
+	my $v = join(" ", @val);
 
-  return "Unknown argument $cmd or wrong parameter(s), choose one of $list";
+	readingsSingleUpdate ($hash,$cmd,$v,1);
+      
+	return undef;
+    }
+
+    return "Unknown argument $cmd or wrong parameter(s), choose one of $list";
 }
 
-sub AMAD_RetrieveAutomagicInfo
+sub AMAD_RetrieveAutomagicInfo($)
 {
-#    my ($name, $blocking) = @_;
-    my ($hash, $blocking) = @_;
-#    my $hash = $defs{$name};
+    my ($hash) = @_;
     my $name = $hash->{NAME};
     my $host = $hash->{HOST};
     my $port = $hash->{PORT};
 
     my $url = "http://" . $host . ":" . $port . "/automagic/deviceInfo";
   
-    if ($blocking) {
-  	my $response = HttpUtils_BlockingGet(
-			{
-			  url        => $url,
-			  timeout    => 5,
-			  #noshutdown => 0,
-			}
-			);
-	my %param = (hash => $hash, doTrigger => 0);
-	AMAD_RetrieveAutomagicInfoFinished(\%param, undef, $response);
-	Log3 $name, 3, "AMAD ($name) - BlockingGet get URL ";
-    }
-    else {
-	HttpUtils_NonblockingGet(
-	  {
-	      url        => $url,
-	      timeout    => 5,
-	      #noshutdown => 0,
-	      hash       => $hash,
-	      doTrigger  => 1,
-	      callback   => \&AMAD_RetrieveAutomagicInfoFinished,
-	  }
-	);
-	Log3 $name, 3, "AMAD ($name) - NonblockingGet get URL";
-    }
+    HttpUtils_NonblockingGet(
+	{
+	    url        => $url,
+	    timeout    => 5,
+	    #noshutdown => 0,
+	    hash       => $hash,
+	    method     => "GET",
+	    doTrigger  => 1,
+	    callback   => \&AMAD_RetrieveAutomagicInfoFinished,
+	}
+    );
+    Log3 $name, 3, "AMAD ($name) - NonblockingGet get URL";
 }
 
 sub AMAD_RetrieveAutomagicInfoFinished($$$)
@@ -230,21 +224,25 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$)
     return undef;
 }
 
-sub AMAD_HTTP_Request {
+sub AMAD_HTTP_POST($$)
+{
     my ($hash, $url) = @_;
     my $name = $hash->{NAME};
     
     my $state = $hash->{STATE};
     
-    $hash->{STATE} = "Send http Request";
-    HttpUtils_BlockingGet(
-	 {
-	      url        => $url,
-	      timeout    => 5,
-	      #noshutdown => 0,
-	 }
+    $hash->{STATE} = "Send HTTP POST";
+    
+    HttpUtils_NonblockingGet(
+	{
+	    url        => $url,
+	    timeout    => 5,
+	    #noshutdown => 0,
+	    method     => "POST",
+	    doTrigger  => 1,
+	}
     );
-    Log3 $name, 3, "AMAD ($name) - Send http Request with URL $url";
+    Log3 $name, 3, "AMAD ($name) - Send HTTP POST with URL $url";
 
     $hash->{STATE} = $state;
     
@@ -263,7 +261,7 @@ sub AMAD_SetScreenMsg($@)
     
     my $url = "http://" . $host . ":" . $port . "/automagic/screenMsg?message=$msg";
 
-    return AMAD_HTTP_Request ($hash,$url);
+    return AMAD_HTTP_POST ($hash,$url);
 }
 
 sub AMAD_SetTtsMsg($@) {
@@ -277,7 +275,7 @@ sub AMAD_SetTtsMsg($@) {
     
     my $url = "http://" . $host . ":" . $port . "/automagic/ttsMsg?message=$msg";
     
-    return AMAD_HTTP_Request ($hash,$url);
+    return AMAD_HTTP_POST ($hash,$url);
 }
 
 sub AMAD_SetVolume($@) {
