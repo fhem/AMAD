@@ -153,7 +153,10 @@ sub AMAD_Set($$@)
 	     . " ttsMsg"
 	     . " setVolume:slider,0,1,15"
 	     . " deviceState:online,offline"
-	     . " mediaPlayer:play,stop,next,back";
+	     . " mediaPlayer:play,stop,next,back"
+	     . " setBrightness:slider,0,1,255"
+	     . " setScreen:on,off"
+	     . " openURL";
   
   
     if (lc $cmd eq 'screenmsg') {
@@ -170,7 +173,7 @@ sub AMAD_Set($$@)
     }
     elsif (lc $cmd eq 'mediaplayer') {
 	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val);
-	    return AMAD_mediaplayer ($hash, @val);
+	    return AMAD_setMediaplayer ($hash, @val);
     }
     elsif (lc $cmd eq 'devicestate') {
 	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val);
@@ -180,6 +183,19 @@ sub AMAD_Set($$@)
       
 	    return undef;
     }
+    elsif (lc $cmd eq 'setbrightness') {
+	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val);
+	    return AMAD_SetBrightness ($hash, @val);
+    }
+    elsif (lc $cmd eq 'setscreen') {
+	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val);
+	    return AMAD_SetScreen ($hash, @val);
+    }
+    elsif (lc $cmd eq 'setscreen') {
+	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val);
+	    return AMAD_SetOpenURL ($hash, @val);
+    }
+    
 
     return "Unknown argument $cmd or wrong parameter(s), choose one of $list";
 }
@@ -321,15 +337,58 @@ sub AMAD_SetVolume($@) {
     return AMAD_HTTP_POST ($hash,$url);
 }
 
-sub AMAD_mediaplayer($@) {
+sub AMAD_SetBrightness($@) {
     my ($hash, @data) = @_;
     my $name = $hash->{NAME};
     my $host = $hash->{HOST};
     my $port = $hash->{PORT};
     
-    my $cmd = join(" ", @data);
+    my $bri = join(" ", @data);
 
-    my $url = "http://" . $host . ":" . $port . "/automagic/mediaPlayer?button=$cmd";
+    my $url = "http://" . $host . ":" . $port . "/automagic/setBrightness?brightness=$bri";
+    
+    AMAD_GetUpdateLocal($hash);
+    Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
+    return AMAD_HTTP_POST ($hash,$url);
+}
+
+sub AMAD_SetScreen($@) {
+    my ($hash, @data) = @_;
+    my $name = $hash->{NAME};
+    my $host = $hash->{HOST};
+    my $port = $hash->{PORT};
+    
+    my $mod = join(" ", @data);
+
+    my $url = "http://" . $host . ":" . $port . "/automagic/setScreenOnOff?screen=$mod";
+    
+    AMAD_GetUpdateLocal($hash);
+    Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
+    return AMAD_HTTP_POST ($hash,$url);
+}
+
+sub AMAD_SetOpenURL($@) {
+    my ($hash, @data) = @_;
+    my $name = $hash->{NAME};
+    my $host = $hash->{HOST};
+    my $port = $hash->{PORT};
+    
+    my $openurl = join(" ", @data);
+
+    my $url = "http://" . $host . ":" . $port . "/automagic/openURL?url=$openurl";
+    
+    return AMAD_HTTP_POST ($hash,$url);
+}
+
+sub AMAD_SetMediaplayer($@) {
+    my ($hash, @data) = @_;
+    my $name = $hash->{NAME};
+    my $host = $hash->{HOST};
+    my $port = $hash->{PORT};
+    
+    my $btn = join(" ", @data);
+
+    my $url = "http://" . $host . ":" . $port . "/automagic/mediaPlayer?button=$btn";
     
     return AMAD_HTTP_POST ($hash,$url);
 }
@@ -348,7 +407,8 @@ sub AMAD_mediaplayer($@) {
   An Informationen k&ouml;nnen alle wiedergegeben werden, welche von Automagic als Action in Form einer Variable gesammelt und als 
   HTTP Respons Text zur&uuml;ck gegeben werden.
   F&uuml;r all diese Informationen/Aktionen ist ein sogenannter Flow in Automagic auf dem entsprechenden Android Ger&auml;t n&ouml;t.
-  Als Trigger im Flow wird immer ein HTTP Request mit einem selbst vergebenen Port und einer angepassten URL verwendet.
+  Als Trigger im Flow wird immer ein HTTP Request mit einem selbst vergebenen Port und einer angepassten URL verwendet. Dieser Port 
+  muß der selbe sein welcher beim anölegen des Devices vergeben wurde!!
   <br><br>
   <a name="AMADdefine"></a>
   <b>Define</b>
