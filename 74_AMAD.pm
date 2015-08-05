@@ -41,7 +41,7 @@ sub AMAD_Initialize($) {
     $hash->{AttrFn}     = "AMAD_Attr";
     $hash->{ReadFn}     = "AMAD_Read";
     $hash->{AttrList} =
-          "interval disable:0 "
+          "interval disable:1 "
          . $readingFnAttributes;
 }
 
@@ -151,11 +151,11 @@ sub AMAD_Set($$@)
   
     my $list = "screenMsg"
 	     . " ttsMsg"
-	     . " setVolume:slider,0,1,15"
-	     . " deviceState:online,offline"
-	     . " mediaPlayer:play,stop,next,back"
-	     . " setBrightness:slider,0,1,255"
-	     . " setScreen:on,off"
+	     . " Volume:slider,0,1,15"
+	     . " DeviceState:online,offline"
+	     . " MediaPlayer:play,stop,next,back"
+	     . " Brightness:slider,0,1,255"
+	     . " Screen:on,off"
 	     . " openURL";
   
   
@@ -167,13 +167,13 @@ sub AMAD_Set($$@)
 	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val);
 	    return AMAD_SetTtsMsg ($hash, @val);
     }
-    elsif (lc $cmd eq 'setvolume') {
+    elsif (lc $cmd eq 'volume') {
 	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val);
 	    return AMAD_SetVolume ($hash, @val);
     }
     elsif (lc $cmd eq 'mediaplayer') {
 	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val);
-	    return AMAD_setMediaplayer ($hash, @val);
+	    return AMAD_SetMediaplayer ($hash, @val);
     }
     elsif (lc $cmd eq 'devicestate') {
 	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val);
@@ -183,15 +183,15 @@ sub AMAD_Set($$@)
       
 	    return undef;
     }
-    elsif (lc $cmd eq 'setbrightness') {
+    elsif (lc $cmd eq 'brightness') {
 	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val);
 	    return AMAD_SetBrightness ($hash, @val);
     }
-    elsif (lc $cmd eq 'setscreen') {
+    elsif (lc $cmd eq 'screen') {
 	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val);
 	    return AMAD_SetScreen ($hash, @val);
     }
-    elsif (lc $cmd eq 'setscreen') {
+    elsif (lc $cmd eq 'openurl') {
 	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val);
 	    return AMAD_SetOpenURL ($hash, @val);
     }
@@ -362,8 +362,6 @@ sub AMAD_SetScreen($@) {
 
     my $url = "http://" . $host . ":" . $port . "/automagic/setScreenOnOff?screen=$mod";
     
-    AMAD_GetUpdateLocal($hash);
-    Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
     return AMAD_HTTP_POST ($hash,$url);
 }
 
