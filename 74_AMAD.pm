@@ -160,22 +160,22 @@ sub AMAD_Set($$@)
   
     if (lc $cmd eq 'screenmsg') {
 	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val);
-	    return AMAD_SetScreenMsg ($hash, @val);
+	    return AMAD_SetScreenMsg ($hash, @val) if (defined(@val));
     }
     elsif (lc $cmd eq 'ttsmsg') {
-	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val);
+	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val) if (defined(@val));
 	    return AMAD_SetTtsMsg ($hash, @val);
     }
     elsif (lc $cmd eq 'volume') {
-	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val);
+	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val) if (defined(@val));
 	    return AMAD_SetVolume ($hash, @val);
     }
     elsif (lc $cmd eq 'mediaplayer') {
-	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val);
+	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val) if (defined(@val));
 	    return AMAD_SetMediaplayer ($hash, @val);
     }
     elsif (lc $cmd eq 'devicestate') {
-	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val);
+	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val) if (defined(@val));
 	    my $v = join(" ", @val);
 
 	    readingsSingleUpdate ($hash,$cmd,$v,1);
@@ -183,20 +183,20 @@ sub AMAD_Set($$@)
 	    return undef;
     }
     elsif (lc $cmd eq 'brightness') {
-	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val);
+	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val) if (defined(@val));
 	    return AMAD_SetBrightness ($hash, @val);
     }
     elsif (lc $cmd eq 'screen') {
-	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val);
+	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val) if (defined(@val));
 	    return AMAD_SetScreen ($hash, @val);
     }
     elsif (lc $cmd eq 'openurl') {
-	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val);
+	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val) if (defined(@val));
 	    return AMAD_SetOpenURL ($hash, @val);
     }
     
 
-    return "Unknown argument $cmd or wrong parameter(s), choose one of $list";
+    return "Unknown argument $cmd, bearword as argument or wrong parameter(s), choose one of $list";
 }
 
 sub AMAD_RetrieveAutomagicInfo($)
@@ -385,7 +385,7 @@ sub AMAD_SetMediaplayer($@) {
     
     my $btn = join(" ", @data);
 
-    my $url = "http://" . $host . ":" . $port . "/automagic/mediaPlayer?button=$btn";
+    my $url = "http://" . $host . ":" . $port . "/automagic/mediaPlayer?button=$btn&device=$name";
     
     return AMAD_HTTP_POST ($hash,$url);
 }
