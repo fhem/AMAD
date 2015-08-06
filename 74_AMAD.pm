@@ -29,7 +29,6 @@ use strict;
 use warnings;
 use Time::HiRes qw(gettimeofday);
 use HttpUtils;
-use Blocking;
 
 sub AMAD_Initialize($) {
 
