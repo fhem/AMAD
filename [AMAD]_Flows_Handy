@@ -1,0 +1,555 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<data version="1.28.0">
+  <trigger type="general_broadcast">
+    <useDefaultName>false</useDefaultName>
+    <name>com.android.music.metachanged</name>
+    <enabled>true</enabled>
+    <action>com.android.music.metachanged</action>
+    <categoryList></categoryList>
+    <dataSchemeList></dataSchemeList>
+    <dataAuthorityList></dataAuthorityList>
+    <dataPathLiteralList></dataPathLiteralList>
+    <dataPathPrefixList></dataPathPrefixList>
+    <dataPathGlobList></dataPathGlobList>
+    <dataTypeList></dataTypeList>
+    <extras>artist = getString("artist");
+track = getString("track");
+album = getString("album");</extras>
+    <receiveInitialStickyBroadcast>false</receiveInitialStickyBroadcast>
+  </trigger>
+  <trigger type="http_request">
+    <useDefaultName>true</useDefaultName>
+    <name>HTTP Request: /automagic/deviceInfo, Port 8089</name>
+    <enabled>true</enabled>
+    <path>/automagic/deviceInfo</path>
+    <port>8089</port>
+    <acquireWifiLock>true</acquireWifiLock>
+  </trigger>
+  <trigger type="http_request">
+    <useDefaultName>true</useDefaultName>
+    <name>HTTP Request: /automagic/mediaPlayer, Port 8089</name>
+    <enabled>true</enabled>
+    <path>/automagic/mediaPlayer</path>
+    <port>8089</port>
+    <acquireWifiLock>true</acquireWifiLock>
+  </trigger>
+  <trigger type="http_request">
+    <useDefaultName>true</useDefaultName>
+    <name>HTTP Request: /automagic/openURL, Port 8089</name>
+    <enabled>true</enabled>
+    <path>/automagic/openURL</path>
+    <port>8089</port>
+    <acquireWifiLock>true</acquireWifiLock>
+  </trigger>
+  <trigger type="http_request">
+    <useDefaultName>true</useDefaultName>
+    <name>HTTP Request: /automagic/screenMsg, Port 8089</name>
+    <enabled>true</enabled>
+    <path>/automagic/screenMsg</path>
+    <port>8089</port>
+    <acquireWifiLock>true</acquireWifiLock>
+  </trigger>
+  <trigger type="http_request">
+    <useDefaultName>true</useDefaultName>
+    <name>HTTP Request: /automagic/setBrightness, Port 8089</name>
+    <enabled>true</enabled>
+    <path>/automagic/setBrightness</path>
+    <port>8089</port>
+    <acquireWifiLock>true</acquireWifiLock>
+  </trigger>
+  <trigger type="http_request">
+    <useDefaultName>true</useDefaultName>
+    <name>HTTP Request: /automagic/setScreenOnOff, Port 8089</name>
+    <enabled>true</enabled>
+    <path>/automagic/setScreenOnOff</path>
+    <port>8089</port>
+    <acquireWifiLock>true</acquireWifiLock>
+  </trigger>
+  <trigger type="http_request">
+    <useDefaultName>true</useDefaultName>
+    <name>HTTP Request: /automagic/setVolume, Port 8089</name>
+    <enabled>true</enabled>
+    <path>/automagic/setVolume</path>
+    <port>8089</port>
+    <acquireWifiLock>true</acquireWifiLock>
+  </trigger>
+  <trigger type="http_request">
+    <useDefaultName>true</useDefaultName>
+    <name>HTTP Request: /automagic/ttsMsg, Port 8089</name>
+    <enabled>true</enabled>
+    <path>/automagic/ttsMsg</path>
+    <port>8089</port>
+    <acquireWifiLock>true</acquireWifiLock>
+  </trigger>
+  <condition type="battery_level">
+    <useDefaultName>true</useDefaultName>
+    <name>Akku Ladestand: grösser als 0%</name>
+    <levelPercentage>0</levelPercentage>
+    <batteryLevelCondition>HIGHER_THAN</batteryLevelCondition>
+  </condition>
+  <condition type="expression">
+    <useDefaultName>true</useDefaultName>
+    <name>Expression: param_button == "back"</name>
+    <expression>param_button == "back"</expression>
+  </condition>
+  <condition type="expression">
+    <useDefaultName>true</useDefaultName>
+    <name>Expression: param_button == "next"</name>
+    <expression>param_button == "next"</expression>
+  </condition>
+  <condition type="expression">
+    <useDefaultName>true</useDefaultName>
+    <name>Expression: param_button == "play"</name>
+    <expression>param_button == "play"</expression>
+  </condition>
+  <condition type="expression">
+    <useDefaultName>true</useDefaultName>
+    <name>Expression: param_button == "stop"</name>
+    <expression>param_button == "stop"</expression>
+  </condition>
+  <condition type="expression">
+    <useDefaultName>true</useDefaultName>
+    <name>Expression: param_screen=="off"</name>
+    <expression>param_screen=="off"</expression>
+  </condition>
+  <condition type="expression">
+    <useDefaultName>true</useDefaultName>
+    <name>Expression: param_screen=="on"</name>
+    <expression>param_screen=="on"</expression>
+  </condition>
+  <condition type="expression">
+    <useDefaultName>true</useDefaultName>
+    <name>Expression: trigger == "com.android.music.metachanged"</name>
+    <expression>trigger == "com.android.music.metachanged"</expression>
+  </condition>
+  <action type="control_audio_player">
+    <useDefaultName>true</useDefaultName>
+    <name>Audio Player steuern: Medienknopf Play (Google Play Musik)</name>
+    <simulateMediaButton>true</simulateMediaButton>
+    <broadcastAction>LAUNCH</broadcastAction>
+    <mediaButton>KEYCODE_MEDIA_PLAY</mediaButton>
+    <explicitComponent>true</explicitComponent>
+    <packageName>com.google.android.music</packageName>
+    <className>com.google.android.music.playback.MediaButtonIntentReceiver</className>
+    <appName>Google Play Musik</appName>
+  </action>
+  <action type="control_audio_player">
+    <useDefaultName>true</useDefaultName>
+    <name>Audio Player steuern: Medienknopf Stopp (Google Play Musik)</name>
+    <simulateMediaButton>true</simulateMediaButton>
+    <broadcastAction>LAUNCH</broadcastAction>
+    <mediaButton>KEYCODE_MEDIA_STOP</mediaButton>
+    <explicitComponent>true</explicitComponent>
+    <packageName>com.google.android.music</packageName>
+    <className>com.google.android.music.playback.MediaButtonIntentReceiver</className>
+    <appName>Google Play Musik</appName>
+  </action>
+  <action type="control_audio_player">
+    <useDefaultName>true</useDefaultName>
+    <name>Audio Player steuern: Medienknopf Weiter (Google Play Musik)</name>
+    <simulateMediaButton>true</simulateMediaButton>
+    <broadcastAction>LAUNCH</broadcastAction>
+    <mediaButton>KEYCODE_MEDIA_NEXT</mediaButton>
+    <explicitComponent>true</explicitComponent>
+    <packageName>com.google.android.music</packageName>
+    <className>com.google.android.music.playback.MediaButtonIntentReceiver</className>
+    <appName>Google Play Musik</appName>
+  </action>
+  <action type="control_audio_player">
+    <useDefaultName>true</useDefaultName>
+    <name>Audio Player steuern: Medienknopf Zurück (Google Play Musik)</name>
+    <simulateMediaButton>true</simulateMediaButton>
+    <broadcastAction>LAUNCH</broadcastAction>
+    <mediaButton>KEYCODE_MEDIA_PREVIOUS</mediaButton>
+    <explicitComponent>true</explicitComponent>
+    <packageName>com.google.android.music</packageName>
+    <className>com.google.android.music.playback.MediaButtonIntentReceiver</className>
+    <appName>Google Play Musik</appName>
+  </action>
+  <action type="notification_screen">
+    <useDefaultName>true</useDefaultName>
+    <name>Benachrichtigung auf Bildschirm: {param_message} (lange)</name>
+    <showText>true</showText>
+    <text>{param_message}</text>
+    <widgetName></widgetName>
+    <width>200</width>
+    <height>250</height>
+    <stretchToFillArea>false</stretchToFillArea>
+    <opacity>1.0</opacity>
+    <durationLong>true</durationLong>
+    <customPosition>false</customPosition>
+    <gravityType>TOP_LEFT</gravityType>
+    <xOffset>0</xOffset>
+    <yOffset>0</yOffset>
+  </action>
+  <action type="lock_device">
+    <useDefaultName>true</useDefaultName>
+    <name>Gerät sperren</name>
+  </action>
+  <action type="http_request">
+    <useDefaultName>true</useDefaultName>
+    <name>HTTP Request: GET http://YOUR_FHEM_IP:8085/fhem?cmd=setreading%20YOUR_FHEM_DEVICE_NAME%20currentPlayMusicAlbum%20{encodeURLForm(album)}   speichern in response</name>
+    <url>http://YOUR_FHEM_IP:8085/fhem?cmd=setreading%20YOUR_FHEM_DEVICE_NAME%20currentPlayMusicAlbum%20{encodeURLForm(album)}</url>
+    <verifyCertificates>true</verifyCertificates>
+    <basicAuthentication>false</basicAuthentication>
+    <username></username>
+    <httpMethod>GET</httpMethod>
+    <httpContentType>X_WWW_FORM_URLENCODED</httpContentType>
+    <contentType>text/plain</contentType>
+    <generalTextData></generalTextData>
+    <formFieldList>Lastname=XYZ,Firstname=ABC</formFieldList>
+    <timeout>60000</timeout>
+    <setCustomHTTPHeaders>false</setCustomHTTPHeaders>
+    <customHTTPHeaders></customHTTPHeaders>
+    <storeInVariable>true</storeInVariable>
+    <variable>response</variable>
+    <path>/storage/emulated/0/Download/file.bin</path>
+  </action>
+  <action type="http_request">
+    <useDefaultName>true</useDefaultName>
+    <name>HTTP Request: GET http://YOUR_FHEM_IP:8085/fhem?cmd=setreading%20YOUR_FHEM_DEVICE_NAME%20currentPlayMusicArtist%20{encodeURLForm(artist)}   speichern in response</name>
+    <url>http://YOUR_FHEM_IP:8085/fhem?cmd=setreading%20YOUR_FHEM_DEVICE_NAME%20currentPlayMusicArtist%20{encodeURLForm(artist)}</url>
+    <verifyCertificates>true</verifyCertificates>
+    <basicAuthentication>false</basicAuthentication>
+    <username></username>
+    <httpMethod>GET</httpMethod>
+    <httpContentType>X_WWW_FORM_URLENCODED</httpContentType>
+    <contentType>text/plain</contentType>
+    <generalTextData></generalTextData>
+    <formFieldList>Lastname=XYZ,Firstname=ABC</formFieldList>
+    <timeout>60000</timeout>
+    <setCustomHTTPHeaders>false</setCustomHTTPHeaders>
+    <customHTTPHeaders></customHTTPHeaders>
+    <storeInVariable>true</storeInVariable>
+    <variable>response</variable>
+    <path>/storage/emulated/0/Download/file.bin</path>
+  </action>
+  <action type="http_request">
+    <useDefaultName>true</useDefaultName>
+    <name>HTTP Request: GET http://YOUR_FHEM_IP:8085/fhem?cmd=setreading%20YOUR_FHEM_DEVICE_NAME%20currentPlayMusicTrack%20{encodeURLForm(track)}   speichern in response</name>
+    <url>http://YOUR_FHEM_IP:8085/fhem?cmd=setreading%20YOUR_FHEM_DEVICE_NAME%20currentPlayMusicTrack%20{encodeURLForm(track)}</url>
+    <verifyCertificates>true</verifyCertificates>
+    <basicAuthentication>false</basicAuthentication>
+    <username></username>
+    <httpMethod>GET</httpMethod>
+    <httpContentType>X_WWW_FORM_URLENCODED</httpContentType>
+    <contentType>text/plain</contentType>
+    <generalTextData></generalTextData>
+    <formFieldList>Lastname=XYZ,Firstname=ABC</formFieldList>
+    <timeout>60000</timeout>
+    <setCustomHTTPHeaders>false</setCustomHTTPHeaders>
+    <customHTTPHeaders></customHTTPHeaders>
+    <storeInVariable>true</storeInVariable>
+    <variable>response</variable>
+    <path>/storage/emulated/0/Download/file.bin</path>
+  </action>
+  <action type="write_http_response_text">
+    <useDefaultName>false</useDefaultName>
+    <name>HTTP Response</name>
+    <text>powerLevel {battery_percentage}@@powerPlugged {battery_plugged}@@volumeMusikSpeaker {volumeMusikSpeaker}@@networkCountryIso {network_country_iso}@@voiceMailNumber {voice_mail_number}@@screenBrightness {screenBrightness}@@nextAlarmDay {next_alarmday}@@nextAlarmTime {next_alarmtime}</text>
+    <replaceVariables>true</replaceVariables>
+    <contentType>text/html</contentType>
+  </action>
+  <action type="init_variable_next_alarm">
+    <useDefaultName>true</useDefaultName>
+    <name>Initialisiere Variable Nächster Alarm: Variable next_alarm</name>
+    <variable>next_alarm</variable>
+  </action>
+  <action type="init_variable_system_setting">
+    <useDefaultName>true</useDefaultName>
+    <name>Initialisiere Variable Systemeinstellung: System screen_brightness to screenBrightness</name>
+    <settingCategory>SYSTEM</settingCategory>
+    <settingName>screen_brightness</settingName>
+    <variable>screenBrightness</variable>
+  </action>
+  <action type="init_variable_system_setting">
+    <useDefaultName>true</useDefaultName>
+    <name>Initialisiere Variable Systemeinstellung: System volume_music_speaker to volumeMusikSpeaker</name>
+    <settingCategory>SYSTEM</settingCategory>
+    <settingName>volume_music_speaker</settingName>
+    <variable>volumeMusikSpeaker</variable>
+  </action>
+  <action type="init_variables_phone_info">
+    <useDefaultName>true</useDefaultName>
+    <name>Initialisiere Variablen Telefoninfo: network_country_iso, voice_mail_number</name>
+    <isVariableNetworkCountryIso>true</isVariableNetworkCountryIso>
+    <variableNetworkCountryIso>network_country_iso</variableNetworkCountryIso>
+    <isVariableVoiceMailNumber>true</isVariableVoiceMailNumber>
+    <variableVoiceMailNumber>voice_mail_number</variableVoiceMailNumber>
+  </action>
+  <action type="set_audio_stream_volume">
+    <useDefaultName>true</useDefaultName>
+    <name>Lautstärke einstellen: Medien auf Level 10</name>
+    <audioStreamType>MUSIC</audioStreamType>
+    <volumeIndex>10</volumeIndex>
+    <playSound>true</playSound>
+    <showUI>false</showUI>
+  </action>
+  <action type="restore_audio_stream_volume">
+    <useDefaultName>false</useDefaultName>
+    <name>Lautstärken setzen</name>
+    <restoreVolumeAlarm>false</restoreVolumeAlarm>
+    <variableVolumeAlarm>global_volume_alarm</variableVolumeAlarm>
+    <restoreVolumeDTMF>false</restoreVolumeDTMF>
+    <variableVolumeDTMF>global_volume_dtmf</variableVolumeDTMF>
+    <restoreVolumeMusic>true</restoreVolumeMusic>
+    <variableVolumeMusic>param_volume</variableVolumeMusic>
+    <restoreVolumeNotification>false</restoreVolumeNotification>
+    <variableVolumeNotification>global_volume_notification</variableVolumeNotification>
+    <restoreVolumeRing>false</restoreVolumeRing>
+    <variableVolumeRing>global_volume_ring</variableVolumeRing>
+    <restoreVolumeSystem>false</restoreVolumeSystem>
+    <variableVolumeSystem>global_volume_system</variableVolumeSystem>
+    <restoreVolumeVoiceCall>false</restoreVolumeVoiceCall>
+    <variableVolumeVoiceCall>global_volume_voice_call</variableVolumeVoiceCall>
+    <restoreRingerMode>false</restoreRingerMode>
+    <variableRingerMode>global_ringer_mode</variableRingerMode>
+    <restoreInterruptionsMode>false</restoreInterruptionsMode>
+    <variableInterruptionsMode>global_interruptions_mode</variableInterruptionsMode>
+  </action>
+  <action type="store_audio_stream_volume">
+    <useDefaultName>true</useDefaultName>
+    <name>Lautstärken Speichern</name>
+    <storeVolumeAlarm>true</storeVolumeAlarm>
+    <variableVolumeAlarm>global_volume_alarm</variableVolumeAlarm>
+    <storeVolumeDTMF>true</storeVolumeDTMF>
+    <variableVolumeDTMF>global_volume_dtmf</variableVolumeDTMF>
+    <storeVolumeMusic>true</storeVolumeMusic>
+    <variableVolumeMusic>global_volume_music</variableVolumeMusic>
+    <storeVolumeNotification>true</storeVolumeNotification>
+    <variableVolumeNotification>global_volume_notification</variableVolumeNotification>
+    <storeVolumeRing>true</storeVolumeRing>
+    <variableVolumeRing>global_volume_ring</variableVolumeRing>
+    <storeVolumeSystem>true</storeVolumeSystem>
+    <variableVolumeSystem>global_volume_system</variableVolumeSystem>
+    <storeVolumeVoiceCall>true</storeVolumeVoiceCall>
+    <variableVolumeVoiceCall>global_volume_voice_call</variableVolumeVoiceCall>
+    <storeRingerMode>false</storeRingerMode>
+    <variableRingerMode>global_ringer_mode</variableRingerMode>
+    <storeInterruptionsMode>false</storeInterruptionsMode>
+    <variableInterruptionsMode>global_interruptions_mode</variableInterruptionsMode>
+  </action>
+  <action type="restore_audio_stream_volume">
+    <useDefaultName>true</useDefaultName>
+    <name>Lautstärken Wiederherstellen</name>
+    <restoreVolumeAlarm>true</restoreVolumeAlarm>
+    <variableVolumeAlarm>global_volume_alarm</variableVolumeAlarm>
+    <restoreVolumeDTMF>true</restoreVolumeDTMF>
+    <variableVolumeDTMF>global_volume_dtmf</variableVolumeDTMF>
+    <restoreVolumeMusic>true</restoreVolumeMusic>
+    <variableVolumeMusic>global_volume_music</variableVolumeMusic>
+    <restoreVolumeNotification>true</restoreVolumeNotification>
+    <variableVolumeNotification>global_volume_notification</variableVolumeNotification>
+    <restoreVolumeRing>true</restoreVolumeRing>
+    <variableVolumeRing>global_volume_ring</variableVolumeRing>
+    <restoreVolumeSystem>true</restoreVolumeSystem>
+    <variableVolumeSystem>global_volume_system</variableVolumeSystem>
+    <restoreVolumeVoiceCall>true</restoreVolumeVoiceCall>
+    <variableVolumeVoiceCall>global_volume_voice_call</variableVolumeVoiceCall>
+    <restoreRingerMode>false</restoreRingerMode>
+    <variableRingerMode>global_ringer_mode</variableRingerMode>
+    <restoreInterruptionsMode>false</restoreInterruptionsMode>
+    <variableInterruptionsMode>global_interruptions_mode</variableInterruptionsMode>
+  </action>
+  <action type="sleep">
+    <useDefaultName>true</useDefaultName>
+    <name>Pause: 2s (Gerät wach halten)</name>
+    <duration>2s</duration>
+    <keepDeviceAwake>true</keepDeviceAwake>
+  </action>
+  <action type="turn_screen_on">
+    <useDefaultName>true</useDefaultName>
+    <name>Schalte Display ein: Hell für 60s</name>
+    <bright>true</bright>
+    <duration>60s</duration>
+    <resetUserActivityTimer>true</resetUserActivityTimer>
+  </action>
+  <action type="script">
+    <useDefaultName>true</useDefaultName>
+    <name>Script: next_alarmday = "{next_alarm,dateformat,c}"</name>
+    <script>next_alarmday = "{next_alarm,dateformat,c}"</script>
+  </action>
+  <action type="script">
+    <useDefaultName>true</useDefaultName>
+    <name>Script: next_alarmtime = "{next_alarm,dateformat,HH:mm}"</name>
+    <script>next_alarmtime = "{next_alarm,dateformat,HH:mm}"</script>
+  </action>
+  <action type="set_system_setting">
+    <useDefaultName>true</useDefaultName>
+    <name>Setze Systemeinstellung: System screen_brightness auf {param_brightness}</name>
+    <settingCategory>SYSTEM</settingCategory>
+    <settingName>screen_brightness</settingName>
+    <value>{param_brightness}</value>
+    <verified>true</verified>
+  </action>
+  <action type="speech_output">
+    <useDefaultName>true</useDefaultName>
+    <name>Sprachausgabe: {param_message}</name>
+    <audioStreamType>MUSIC</audioStreamType>
+    <text>{param_message}</text>
+    <locale>de_DE</locale>
+    <usePitch>true</usePitch>
+    <pitch>1.0</pitch>
+    <useSpeechRate>true</useSpeechRate>
+    <speechRate>1.0</speechRate>
+    <embeddedSynthesis>false</embeddedSynthesis>
+    <networkSynthesis>false</networkSynthesis>
+    <showStopSpeechNotification>false</showStopSpeechNotification>
+    <requestAudioFocus>false</requestAudioFocus>
+    <audioFocusType>TRANSIENT</audioFocusType>
+  </action>
+  <action type="open_browser_url">
+    <useDefaultName>true</useDefaultName>
+    <name>URL in Browser öffnen: {param_url} (mit Chrome)</name>
+    <url>{param_url}</url>
+    <explicitComponent>true</explicitComponent>
+    <packageName>com.android.chrome</packageName>
+    <className>com.google.android.apps.chrome.Main</className>
+    <appName>Chrome</appName>
+  </action>
+  <flow type="flow">
+    <name>Displaymessage</name>
+    <group>FHEM Info / Steuerung über AMAD Modul</group>
+    <enabled>true</enabled>
+    <executionPolicy>PARALLEL</executionPolicy>
+    <triggercontainer id="t1" x="70.0" y="-192.5">
+      <trigger>HTTP Request: /automagic/screenMsg, Port 8089</trigger>
+    </triggercontainer>
+    <actioncontainer id="t2" x="70.0" y="157.5">Benachrichtigung auf Bildschirm: {param_message} (lange)</actioncontainer>
+    <connection from="t1" to="t2" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+  </flow>
+  <flow type="flow">
+    <name>Informationen</name>
+    <group>FHEM Info / Steuerung über AMAD Modul</group>
+    <enabled>true</enabled>
+    <executionPolicy>PARALLEL</executionPolicy>
+    <actioncontainer id="t1" x="-140.00002" y="647.5">Initialisiere Variablen Telefoninfo: network_country_iso, voice_mail_number</actioncontainer>
+    <actioncontainer id="t2" x="69.99999" y="647.5">Initialisiere Variable Systemeinstellung: System volume_music_speaker to volumeMusikSpeaker</actioncontainer>
+    <conditioncontainer id="t3" x="70.0" y="402.5">Akku Ladestand: grösser als 0%</conditioncontainer>
+    <actioncontainer id="t4" x="279.99988" y="647.5">Initialisiere Variable Systemeinstellung: System screen_brightness to screenBrightness</actioncontainer>
+    <triggercontainer id="t5" x="70.0" y="192.5">
+      <trigger>HTTP Request: /automagic/deviceInfo, Port 8089</trigger>
+    </triggercontainer>
+    <actioncontainer id="t6" x="69.99997" y="1137.5">Pause: 2s (Gerät wach halten)</actioncontainer>
+    <actioncontainer id="t7" x="420.0" y="857.5">Script: next_alarmtime = "{next_alarm,dateformat,HH:mm}"</actioncontainer>
+    <actioncontainer id="t8" x="525.00006" y="647.5">Initialisiere Variable Nächster Alarm: Variable next_alarm</actioncontainer>
+    <actioncontainer id="t9" x="69.99996" y="1417.5">HTTP Response</actioncontainer>
+    <actioncontainer id="t10" x="630.0" y="857.50006">Script: next_alarmday = "{next_alarm,dateformat,c}"</actioncontainer>
+    <connection from="t1" to="t6" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t2" to="t6" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t3" to="t2" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t3" to="t1" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t3" to="t4" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t3" to="t8" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t4" to="t6" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t5" to="t3" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t6" to="t9" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t7" to="t6" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t8" to="t7" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t8" to="t10" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t10" to="t6" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+  </flow>
+  <flow type="flow">
+    <name>Mediaplayer</name>
+    <group>FHEM Info / Steuerung über AMAD Modul</group>
+    <enabled>true</enabled>
+    <executionPolicy>PARALLEL</executionPolicy>
+    <actioncontainer id="t1" x="455.0" y="437.5">Audio Player steuern: Medienknopf Zurück (Google Play Musik)</actioncontainer>
+    <actioncontainer id="t2" x="210.0" y="437.5">Audio Player steuern: Medienknopf Weiter (Google Play Musik)</actioncontainer>
+    <actioncontainer id="t3" x="-385.0" y="437.5">Audio Player steuern: Medienknopf Stopp (Google Play Musik)</actioncontainer>
+    <actioncontainer id="t4" x="-70.0" y="437.5">Audio Player steuern: Medienknopf Play (Google Play Musik)</actioncontainer>
+    <conditioncontainer id="t5" x="210.0" y="122.5">Expression: param_button == "next"</conditioncontainer>
+    <conditioncontainer id="t6" x="455.0" y="122.5">Expression: param_button == "back"</conditioncontainer>
+    <conditioncontainer id="t7" x="-385.0" y="122.5">Expression: param_button == "stop"</conditioncontainer>
+    <conditioncontainer id="t8" x="-70.0" y="122.5">Expression: param_button == "play"</conditioncontainer>
+    <conditioncontainer id="t9" x="980.0" y="122.5">WLAN Verbunden: TuxNet-AP01</conditioncontainer>
+    <conditioncontainer id="t10" x="455.00024" y="-227.50009">Expression: trigger == "com.android.music.metachanged"</conditioncontainer>
+    <triggercontainer id="t11" x="455.00003" y="-472.4999">
+      <trigger>HTTP Request: /automagic/mediaPlayer, Port 8089</trigger>
+      <trigger>com.android.music.metachanged</trigger>
+    </triggercontainer>
+    <actioncontainer id="t12" x="770.0" y="437.5">HTTP Request: GET http://fhem-tuxnet.tuxnet.local:8085/fhem?cmd=setreading%20Nexus5Marko%20currentPlayMusicTrack%20{encodeURLForm(track)}   speichern in response</actioncontainer>
+    <actioncontainer id="t13" x="980.0" y="437.5">HTTP Request: GET http://fhem-tuxnet.tuxnet.local:8085/fhem?cmd=setreading%20Nexus5Marko%20currentPlayMusicAlbum%20{encodeURLForm(album)}   speichern in response</actioncontainer>
+    <actioncontainer id="t14" x="1190.0" y="437.5">HTTP Request: GET http://fhem-tuxnet.tuxnet.local:8085/fhem?cmd=setreading%20Nexus5Marko%20currentPlayMusicArtist%20{encodeURLForm(artist)}   speichern in response</actioncontainer>
+    <connection from="t5" to="t2" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t6" to="t1" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t7" to="t3" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t8" to="t4" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t9" to="t12" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t9" to="t13" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t9" to="t14" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t10" to="t9" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t10" to="t7" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t10" to="t8" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t10" to="t5" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t10" to="t6" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t11" to="t10" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+  </flow>
+  <flow type="flow">
+    <name>openURL</name>
+    <group>FHEM Info / Steuerung über AMAD Modul</group>
+    <enabled>true</enabled>
+    <executionPolicy>PARALLEL</executionPolicy>
+    <triggercontainer id="t1" x="70.0" y="52.5">
+      <trigger>HTTP Request: /automagic/openURL, Port 8089</trigger>
+    </triggercontainer>
+    <actioncontainer id="t2" x="70.0" y="262.5">URL in Browser öffnen: {param_url} (mit Chrome)</actioncontainer>
+    <connection from="t1" to="t2" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+  </flow>
+  <flow type="flow">
+    <name>Set Brightness</name>
+    <group>FHEM Info / Steuerung über AMAD Modul</group>
+    <enabled>true</enabled>
+    <executionPolicy>PARALLEL</executionPolicy>
+    <actioncontainer id="t1" x="70.00001" y="332.50006">Setze Systemeinstellung: System screen_brightness auf {param_brightness}</actioncontainer>
+    <triggercontainer id="t2" x="70.0" y="52.5">
+      <trigger>HTTP Request: /automagic/setBrightness, Port 8089</trigger>
+    </triggercontainer>
+    <connection from="t2" to="t1" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+  </flow>
+  <flow type="flow">
+    <name>Set Screen On Off</name>
+    <group>FHEM Info / Steuerung über AMAD Modul</group>
+    <enabled>true</enabled>
+    <executionPolicy>PARALLEL</executionPolicy>
+    <actioncontainer id="t1" x="-35.0" y="542.49994">Gerät sperren</actioncontainer>
+    <actioncontainer id="t2" x="174.99994" y="542.50006">Schalte Display ein: Hell für 60s</actioncontainer>
+    <triggercontainer id="t3" x="69.99999" y="52.499996">
+      <trigger>HTTP Request: /automagic/setScreenOnOff, Port 8089</trigger>
+    </triggercontainer>
+    <conditioncontainer id="t4" x="-34.999985" y="297.49988">Expression: param_screen=="off"</conditioncontainer>
+    <conditioncontainer id="t5" x="175.00005" y="297.5">Expression: param_screen=="on"</conditioncontainer>
+    <connection from="t3" to="t5" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t3" to="t4" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t4" to="t1" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t5" to="t2" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+  </flow>
+  <flow type="flow">
+    <name>Text to Speech</name>
+    <group>FHEM Info / Steuerung über AMAD Modul</group>
+    <enabled>true</enabled>
+    <executionPolicy>PARALLEL</executionPolicy>
+    <triggercontainer id="t1" x="70.0" y="52.5">
+      <trigger>HTTP Request: /automagic/ttsMsg, Port 8089</trigger>
+    </triggercontainer>
+    <actioncontainer id="t2" x="70.0" y="332.5">Lautstärken Speichern</actioncontainer>
+    <actioncontainer id="t3" x="70.0" y="892.5">Sprachausgabe: {param_message}</actioncontainer>
+    <actioncontainer id="t4" x="70.0" y="1172.5">Lautstärken Wiederherstellen</actioncontainer>
+    <actioncontainer id="t5" x="70.0" y="612.5">Lautstärke einstellen: Medien auf Level 10</actioncontainer>
+    <connection from="t1" to="t2" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t2" to="t5" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t3" to="t4" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t5" to="t3" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+  </flow>
+  <flow type="flow">
+    <name>Volume</name>
+    <group>FHEM Info / Steuerung über AMAD Modul</group>
+    <enabled>true</enabled>
+    <executionPolicy>PARALLEL</executionPolicy>
+    <triggercontainer id="t1" x="-665.0" y="227.5">
+      <trigger>HTTP Request: /automagic/setVolume, Port 8089</trigger>
+    </triggercontainer>
+    <actioncontainer id="t2" x="-665.0" y="472.49994">Lautstärken setzen</actioncontainer>
+    <connection from="t1" to="t2" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+  </flow>
+</data>

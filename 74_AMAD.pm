@@ -22,6 +22,10 @@
 #
 ################################################################
 
+###### Version 0.2.0 ############
+
+
+
 
 package main;
 
@@ -385,7 +389,7 @@ sub AMAD_SetMediaplayer($@) {
     
     my $btn = join(" ", @data);
 
-    my $url = "http://" . $host . ":" . $port . "/automagic/mediaPlayer?button=$btn&device=$name";
+    my $url = "http://" . $host . ":" . $port . "/automagic/mediaPlayer?button=$btn";
     
     return AMAD_HTTP_POST ($hash,$url);
 }
