@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<data version="1.28.0">
+  <trigger type="http_request">
+    <useDefaultName>true</useDefaultName>
+    <name>HTTP Request: /automagic/setAlarm, Port 8089</name>
+    <enabled>true</enabled>
+    <path>/automagic/setAlarm</path>
+    <port>8089</port>
+    <acquireWifiLock>true</acquireWifiLock>
+  </trigger>
+  <action type="set_alarm">
+    <useDefaultName>true</useDefaultName>
+    <name>Setze Alarm:  um {param_hour}:{param_minute}</name>
+    <label></label>
+    <hour>{param_hour}</hour>
+    <minutes>{param_minute}</minutes>
+  </action>
+  <flow type="flow">
+    <name>Alarmtime</name>
+    <group>FHEM Info / Steuerung über AMAD Modul</group>
+    <enabled>true</enabled>
+    <executionPolicy>PARALLEL</executionPolicy>
+    <actioncontainer id="t1" x="70.0" y="332.5">Setze Alarm:  um {param_hour}:{param_minute}</actioncontainer>
+    <triggercontainer id="t2" x="70.0" y="52.5">
+      <trigger>HTTP Request: /automagic/setAlarm, Port 8089</trigger>
+    </triggercontainer>
+    <connection from="t2" to="t1" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+  </flow>
+</data>
