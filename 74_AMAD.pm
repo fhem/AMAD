@@ -22,7 +22,7 @@
 #
 ################################################################
 
-###### Version 0.2.0 ############
+###### Version 0.2.1 ############
 
 
 
@@ -77,7 +77,7 @@ sub AMAD_Define($$) {
 
     InternalTimer(gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 0);
     
-    $hash->{STATE} = "active";
+    $hash->{STATE} = "initialized";
     readingsSingleUpdate  ($hash,"deviceState","online",0);
 
     return undef;
@@ -140,7 +140,7 @@ sub AMAD_GetUpdateTimer($)
     my ($hash) = @_;
     my $name = $hash->{NAME};
  
-    AMAD_RetrieveAutomagicInfo($hash) if (ReadingsVal($name,"deviceState","online") eq "online" && $hash->{STATE} eq "active");
+    AMAD_RetrieveAutomagicInfo($hash) if (ReadingsVal($name,"deviceState","online") eq "online" && $hash->{STATE} eq "active" || $hash->{STATE} eq "error" || $hash->{STATE} eq "initialized");
   
     InternalTimer(gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 1);
     Log3 $name, 4, "AMAD ($name) - Call AMAD_GetUpdateTimer";
@@ -239,6 +239,7 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$)
     if (defined($err)) {
       if ($err ne "")
       {
+	  $hash->{STATE} = "error" if ($hash->{STATE} ne "initialized");
 	  Log3 $name, 4, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: error while requesting AutomagicInfo: $err";
 	  return;
       }
@@ -246,6 +247,7 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$)
 
     if($data eq "" and exists($param->{code}))
     {
+	$hash->{STATE} = "error" if ($hash->{STATE} ne "initialized");
         Log3 $name, 4, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: received http code ".$param->{code}." without any data after requesting AMAD AutomagicInfo";
         return;
     }
@@ -267,6 +269,8 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$)
     }
     readingsEndUpdate($hash, 1);
     
+    $hash->{STATE} = "active" if ($hash->{STATE} eq "error" || $hash->{STATE} eq "initialized");
+    
     return undef;
 }
 
@@ -276,6 +280,17 @@ sub AMAD_HTTP_POST($$)
     my $name = $hash->{NAME};
     
     my $state = $hash->{STATE};
+    
+    if ($hash->{STATE} eq "initialized")
+    {
+	Log3 $name, 4, "AMAD ($name) - AMAD_HTTP_POST: set command only works if STATE active, please wait next interval run";
+	return;
+    }
+    if ($hash->{STATE} eq "error")
+    {
+	Log3 $name, 4, "AMAD ($name) - AMAD_HTTP_POST: error while send Set command. Please check IP or PORT";
+	return;
+    }
     
     $hash->{STATE} = "Send HTTP POST";
     
