@@ -22,7 +22,7 @@
 #
 ################################################################
 
-###### Version 0.2.1 ############
+###### Version 0.3.0 ############
 
 
 
@@ -159,46 +159,31 @@ sub AMAD_Set($$@)
 	     . " MediaPlayer:play,stop,next,back"
 	     . " Brightness:slider,0,1,255"
 	     . " Screen:on,off"
-	     . " openURL";
-  
-  
-    if (lc $cmd eq 'screenmsg') {
-	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val);
-	    return AMAD_SetScreenMsg ($hash, @val) if (defined(@val));
-    }
-    elsif (lc $cmd eq 'ttsmsg') {
-	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val) if (defined(@val));
-	    return AMAD_SetTtsMsg ($hash, @val);
-    }
-    elsif (lc $cmd eq 'volume') {
-	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val) if (defined(@val));
-	    return AMAD_SetVolume ($hash, @val);
-    }
-    elsif (lc $cmd eq 'mediaplayer') {
-	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val) if (defined(@val));
-	    return AMAD_SetMediaplayer ($hash, @val);
-    }
-    elsif (lc $cmd eq 'devicestate') {
-	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val) if (defined(@val));
-	    my $v = join(" ", @val);
+	     . " openURL"
+	     . " Alarmtime:00:00,00:15,00:30,00:45,01:00,01:15,01:30,01:45,02:00,02:15,02:30,02:45,03:00,03:15,03:30,03:45,04:00,04:15,04:30,04:45,05:00,05:15,05:30,05:45,06:00,06:15,06:30,06:45,07:00,07:15,07:30,07:45,08:00,08:15,08:30,08:45,09:00,09:15,09:30,09:45,10:00,10:15,10:30,10:45,11:00,11:15,11:30,11:45,12:00,12:15,12:30,12:45,13:00,13:15,13:30,13:45,14:00,14:15,14:30,14:45,15:00,15:15,15:30,15:45,16:00,16:15,16:30,16:45,17:00,17:15,17:30,17:45,18:00,18:15,18:30,18:45,19:00,19:15,19:30,19:45,20:00,20:15,20:30,20:45,21:00,21:15,21:30,21:45,22:00,22:15,22:30,22:45,23:00,23:15,23:30,23:45";
 
-	    readingsSingleUpdate ($hash,$cmd,$v,1);
+
+  if (lc $cmd eq 'screenmsg'
+      || lc $cmd eq 'ttsmsg'
+      || lc $cmd eq 'volume'
+      || lc $cmd eq 'mediaplayer'
+      || lc $cmd eq 'devicestate'
+      || lc $cmd eq 'brightness'
+      || lc $cmd eq 'screen'
+      || lc $cmd eq 'openurl'
+      || lc $cmd eq 'alarmtime') {
       
-	    return undef;
-    }
-    elsif (lc $cmd eq 'brightness') {
-	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val) if (defined(@val));
-	    return AMAD_SetBrightness ($hash, @val);
-    }
-    elsif (lc $cmd eq 'screen') {
-	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val) if (defined(@val));
-	    return AMAD_SetScreen ($hash, @val);
-    }
-    elsif (lc $cmd eq 'openurl') {
-	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val) if (defined(@val));
-	    return AMAD_SetOpenURL ($hash, @val);
-    }
+	  Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val);
+	  return AMAD_SelectSetCmd ($hash, $cmd, @val);
+  }
     
+#    elsif (lc $cmd eq 'devicestate') {
+#	    Log3 $name, 4, "AMAD ($name) - set $name $cmd ".join(" ", @val) if (defined(@val));
+#	    my $v = join(" ", @val);
+#
+#	    readingsSingleUpdate ($hash,$cmd,$v,1);
+#      
+#	    return undef;
 
     return "Unknown argument $cmd, bearword as argument or wrong parameter(s), choose one of $list";
 }
@@ -284,12 +269,12 @@ sub AMAD_HTTP_POST($$)
     if ($hash->{STATE} eq "initialized")
     {
 	Log3 $name, 4, "AMAD ($name) - AMAD_HTTP_POST: set command only works if STATE active, please wait next interval run";
-	return;
+	return "set command only works if STATE active, please wait next interval run";
     }
     if ($hash->{STATE} eq "error")
     {
 	Log3 $name, 4, "AMAD ($name) - AMAD_HTTP_POST: error while send Set command. Please check IP or PORT";
-	return;
+	return "error while send Set command. Please check IP or PORT";
     }
     
     $hash->{STATE} = "Send HTTP POST";
@@ -310,104 +295,97 @@ sub AMAD_HTTP_POST($$)
     return undef;
 }
 
-sub AMAD_SetScreenMsg($@)
+sub AMAD_SelectSetCmd($$@)
 {
-    my ($hash, @data) = @_;
+    my ($hash, $cmd, @data) = @_;
     my $name = $hash->{NAME};
     my $host = $hash->{HOST};
     my $port = $hash->{PORT};
 
-    my $msg = join(" ", @data);
-    $msg =~ s/\s/%20/g;
-    
-    my $url = "http://" . $host . ":" . $port . "/automagic/screenMsg?message=$msg";
-    Log3 $name, 4, "AMAD ($name) - Sub AMAD_SetScreenMsg";
+    if (lc $cmd eq 'screenmsg') {
+	my $msg = join(" ", @data);
+	$msg =~ s/\s/%20/g;
+	
+	my $url = "http://" . $host . ":" . $port . "/automagic/screenMsg?message=$msg";
+	Log3 $name, 4, "AMAD ($name) - Sub AMAD_SetScreenMsg";
 
-    return AMAD_HTTP_POST ($hash,$url);
+	return AMAD_HTTP_POST ($hash,$url);
+    }
+    
+    elsif (lc $cmd eq 'ttsmsg') {
+	my $msg = join(" ", @data);
+	$msg =~ s/\s/%20/g;
+    
+	my $url = "http://" . $host . ":" . $port . "/automagic/ttsMsg?message=$msg";
+    
+	return AMAD_HTTP_POST ($hash,$url);
+    }
+    
+    elsif (lc $cmd eq 'volume') {
+	my $vol = join(" ", @data);
+
+	my $url = "http://" . $host . ":" . $port . "/automagic/setVolume?volume=$vol";
+    
+	AMAD_GetUpdateLocal($hash);
+	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
+	return AMAD_HTTP_POST ($hash,$url);
+    }
+    
+    elsif (lc $cmd eq 'mediaplayer') {
+	my $btn = join(" ", @data);
+
+	my $url = "http://" . $host . ":" . $port . "/automagic/mediaPlayer?button=$btn";
+    
+	return AMAD_HTTP_POST ($hash,$url);
+    }
+    
+    elsif (lc $cmd eq 'devicestate') {
+	my $v = join(" ", @data);
+
+	readingsSingleUpdate ($hash,$cmd,$v,1);
+      
+	return undef;
+    }
+    
+    elsif (lc $cmd eq 'brightness') {
+	my $bri = join(" ", @data);
+
+	my $url = "http://" . $host . ":" . $port . "/automagic/setBrightness?brightness=$bri";
+    
+	AMAD_GetUpdateLocal($hash);
+	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
+	return AMAD_HTTP_POST ($hash,$url);
+    }
+    
+    elsif (lc $cmd eq 'screen') {
+	my $mod = join(" ", @data);
+
+	my $url = "http://" . $host . ":" . $port . "/automagic/setScreenOnOff?screen=$mod";
+    
+	return AMAD_HTTP_POST ($hash,$url);
+    }
+    
+    elsif (lc $cmd eq 'openurl') {
+	my $openurl = join(" ", @data);
+
+	my $url = "http://" . $host . ":" . $port . "/automagic/openURL?url=$openurl";
+    
+	return AMAD_HTTP_POST ($hash,$url);
+    }
+    elsif (lc $cmd eq 'alarmtime') {
+	my $alarmTime = join(" ", @data);
+	my @alarm = split(":", $alarmTime);
+
+	my $url = "http://" . $host . ":" . $port . "/automagic/setAlarm?hour=".$alarm[0]."&minute=".$alarm[1];
+    
+	AMAD_GetUpdateLocal($hash);
+	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
+	return AMAD_HTTP_POST ($hash,$url);
+    }
+
+    return undef;
 }
 
-sub AMAD_SetTtsMsg($@) {
-    my ($hash, @data) = @_;
-    my $name = $hash->{NAME};
-    my $host = $hash->{HOST};
-    my $port = $hash->{PORT};
-    
-    my $msg = join(" ", @data);
-    $msg =~ s/\s/%20/g;
-    
-    my $url = "http://" . $host . ":" . $port . "/automagic/ttsMsg?message=$msg";
-    
-    return AMAD_HTTP_POST ($hash,$url);
-}
-
-sub AMAD_SetVolume($@) {
-    my ($hash, @data) = @_;
-    my $name = $hash->{NAME};
-    my $host = $hash->{HOST};
-    my $port = $hash->{PORT};
-    
-    my $vol = join(" ", @data);
-
-    my $url = "http://" . $host . ":" . $port . "/automagic/setVolume?volume=$vol";
-    
-    AMAD_GetUpdateLocal($hash);
-    Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
-    return AMAD_HTTP_POST ($hash,$url);
-}
-
-sub AMAD_SetBrightness($@) {
-    my ($hash, @data) = @_;
-    my $name = $hash->{NAME};
-    my $host = $hash->{HOST};
-    my $port = $hash->{PORT};
-    
-    my $bri = join(" ", @data);
-
-    my $url = "http://" . $host . ":" . $port . "/automagic/setBrightness?brightness=$bri";
-    
-    AMAD_GetUpdateLocal($hash);
-    Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
-    return AMAD_HTTP_POST ($hash,$url);
-}
-
-sub AMAD_SetScreen($@) {
-    my ($hash, @data) = @_;
-    my $name = $hash->{NAME};
-    my $host = $hash->{HOST};
-    my $port = $hash->{PORT};
-    
-    my $mod = join(" ", @data);
-
-    my $url = "http://" . $host . ":" . $port . "/automagic/setScreenOnOff?screen=$mod";
-    
-    return AMAD_HTTP_POST ($hash,$url);
-}
-
-sub AMAD_SetOpenURL($@) {
-    my ($hash, @data) = @_;
-    my $name = $hash->{NAME};
-    my $host = $hash->{HOST};
-    my $port = $hash->{PORT};
-    
-    my $openurl = join(" ", @data);
-
-    my $url = "http://" . $host . ":" . $port . "/automagic/openURL?url=$openurl";
-    
-    return AMAD_HTTP_POST ($hash,$url);
-}
-
-sub AMAD_SetMediaplayer($@) {
-    my ($hash, @data) = @_;
-    my $name = $hash->{NAME};
-    my $host = $hash->{HOST};
-    my $port = $hash->{PORT};
-    
-    my $btn = join(" ", @data);
-
-    my $url = "http://" . $host . ":" . $port . "/automagic/mediaPlayer?button=$btn";
-    
-    return AMAD_HTTP_POST ($hash,$url);
-}
 
 1;
 
