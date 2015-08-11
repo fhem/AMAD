@@ -155,10 +155,10 @@ sub AMAD_Set($$@)
     my $list = "screenMsg"
 	     . " ttsMsg"
 	     . " defaultVolume:slider,0,1,15"
-	     . " DeviceState:online,offline"
-	     . " MediaPlayer:play,stop,next,back"
+	     . " deviceState:online,offline"
+	     . " mediaPlayer:play,stop,next,back"
 	     . " screenBrightness:slider,0,1,255"
-	     . " Screen:on,off"
+	     . " screen:on,off"
 	     . " openURL"
 	     . " nextAlarmTime:time";
 
@@ -195,7 +195,7 @@ sub AMAD_RetrieveAutomagicInfo($)
     my $host = $hash->{HOST};
     my $port = $hash->{PORT};
 
-    my $url = "http://" . $host . ":" . $port . "/automagic/deviceInfo";
+    my $url = "http://" . $host . ":" . $port . "/fhem-amad/deviceInfo/";
   
     HttpUtils_NonblockingGet(
 	{
@@ -306,7 +306,7 @@ sub AMAD_SelectSetCmd($$@)
 	my $msg = join(" ", @data);
 	$msg =~ s/\s/%20/g;
 	
-	my $url = "http://" . $host . ":" . $port . "/automagic/screenMsg?message=$msg";
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/screenMsg?message=$msg";
 	Log3 $name, 4, "AMAD ($name) - Sub AMAD_SetScreenMsg";
 
 	return AMAD_HTTP_POST ($hash,$url);
@@ -316,7 +316,7 @@ sub AMAD_SelectSetCmd($$@)
 	my $msg = join(" ", @data);
 	$msg =~ s/\s/%20/g;
     
-	my $url = "http://" . $host . ":" . $port . "/automagic/ttsMsg?message=$msg";
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/ttsMsg?message=$msg";
     
 	return AMAD_HTTP_POST ($hash,$url);
     }
@@ -324,7 +324,7 @@ sub AMAD_SelectSetCmd($$@)
     elsif (lc $cmd eq 'defaultvolume') {
 	my $vol = join(" ", @data);
 
-	my $url = "http://" . $host . ":" . $port . "/automagic/setVolume?volume=$vol";
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setVolume?volume=$vol";
 
 	readingsSingleUpdate ($hash,$cmd,$vol,1);
 	
@@ -336,7 +336,7 @@ sub AMAD_SelectSetCmd($$@)
     elsif (lc $cmd eq 'mediaplayer') {
 	my $btn = join(" ", @data);
 
-	my $url = "http://" . $host . ":" . $port . "/automagic/mediaPlayer?button=$btn";
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/mediaPlayer?button=$btn";
     
 	return AMAD_HTTP_POST ($hash,$url);
     }
@@ -352,7 +352,7 @@ sub AMAD_SelectSetCmd($$@)
     elsif (lc $cmd eq 'screenbrightness') {
 	my $bri = join(" ", @data);
 
-	my $url = "http://" . $host . ":" . $port . "/automagic/setBrightness?brightness=$bri";
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setBrightness?brightness=$bri";
     
 	AMAD_GetUpdateLocal($hash);
 	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
@@ -362,7 +362,7 @@ sub AMAD_SelectSetCmd($$@)
     elsif (lc $cmd eq 'screen') {
 	my $mod = join(" ", @data);
 
-	my $url = "http://" . $host . ":" . $port . "/automagic/setScreenOnOff?screen=$mod";
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setScreenOnOff?screen=$mod";
     
 	return AMAD_HTTP_POST ($hash,$url);
     }
@@ -370,7 +370,7 @@ sub AMAD_SelectSetCmd($$@)
     elsif (lc $cmd eq 'openurl') {
 	my $openurl = join(" ", @data);
 
-	my $url = "http://" . $host . ":" . $port . "/automagic/openURL?url=$openurl";
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/openURL?url=$openurl";
     
 	return AMAD_HTTP_POST ($hash,$url);
     }
@@ -378,7 +378,7 @@ sub AMAD_SelectSetCmd($$@)
 	my $alarmTime = join(" ", @data);
 	my @alarm = split(":", $alarmTime);
 
-	my $url = "http://" . $host . ":" . $port . "/automagic/setAlarm?hour=".$alarm[0]."&minute=".$alarm[1];
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setAlarm?hour=".$alarm[0]."&minute=".$alarm[1];
     
 	AMAD_GetUpdateLocal($hash);
 	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
