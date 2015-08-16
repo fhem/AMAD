@@ -44,7 +44,7 @@ Nun müsst Ihr nur noch ein Device in FHEM anlegen.
 
 Define
 
-define <name> AMAD <IP-ADRESSE> <PORT> <INTERVAL> 
+define name AMAD ip-adresse port interval 
 
 Beispiel:
 
@@ -107,6 +107,9 @@ Mein 10" Tablet im Wohnzimmer ist Mediaplayer für das Wohnzimmer mit Bluetoothl
 
 
 Und zu guter letzt möchte ich mich noch bedanken.
+
 Der größte Dank geht an meinen Mentor Andre (justme1968), er hat mir mit hilfreichen Tips geholfen Perlcode zu verstehen und Spaß am programmieren zu haben.
+
 Auch möchte ich mich bei Jens bedanken (jensb) welcher mir ebenfalls mit hilfreichen Tips bei meinen aller ersten Gehversuchen beim Perlcode schreiben unterstützt hat.
+
 So und nun noch ein besonderer Dank an pah (Prof. Dr. Peter Henning ), ohne seine Aussage "Keine Ahnung hatten wir alle mal, das ist keine Ausrede" hätte ich bestimmt nicht angefangen Interesse an Modulentwicklung zu zeigen :-)
