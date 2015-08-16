@@ -1,4 +1,4 @@
-#AMADD - Automagic Android Device
+#AMAD - Automagic Android Device
 
 Dieses Modul liefert, in Verbindung mit der Android APP Automagic, diverse Informationen von Android Geräten. Die AndroidAPP Automagic (welche nicht von mir stammt und 2.90Euro kostet) funktioniert wie Tasker, ist aber bei weitem User freundlicher. Im Auslieferiungszustand werden folgende Zustände dargestellt:
 
