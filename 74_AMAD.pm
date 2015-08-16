@@ -231,10 +231,10 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$)
     
     # $hash->{RETRIEVECACHE} = $data;		# zu Testzwecken
     
-    my @valuestring = split('@@',  $data);
+    my @valuestring = split('@@@@',  $data);
     my %buffer;
     foreach (@valuestring) {
-	my @values = split(' ', $_);
+	my @values = split('@@', $_);
 	$buffer{$values[0]} = $values[1];
     }
 
@@ -260,13 +260,13 @@ sub AMAD_HTTP_POST($$)
     
     if ($hash->{STATE} eq "initialized")
     {
-	Log3 $name, 3, "AMAD ($name) - AMAD_HTTP_POST: set command only works if STATE active, please wait next interval run";
-	return "set command only works if STATE active, please wait next interval run";
+	Log3 $name, 3, "AMAD ($name) - AMAD_HTTP_POST: set command only works if STATE active, please wait for next interval run";
+	return "set command only works if STATE active, please wait for next interval run";
     }
     if ($hash->{STATE} eq "error")
     {
-	Log3 $name, 3, "AMAD ($name) - AMAD_HTTP_POST: error while send Set command. Please check IP or PORT";
-	return "error while send Set command. Please check IP or PORT";
+	Log3 $name, 3, "AMAD ($name) - AMAD_HTTP_POST: error while send Set command. Please check IP, PORT or wait for next interval run.";
+	return "error while send Set command. Please check IP, PORT or wait for next interval run.";
     }
     
     $hash->{STATE} = "Send HTTP POST";
@@ -355,7 +355,9 @@ sub AMAD_SelectSetCmd($$@)
 	my $mod = join(" ", @data);
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setScreenOnOff?screen=$mod";
-    
+
+	AMAD_GetUpdateLocal($hash);
+	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
 	return AMAD_HTTP_POST ($hash,$url);
     }
     
@@ -385,6 +387,13 @@ sub AMAD_SelectSetCmd($$@)
 
 
 =pod
+=begin html
+<a name="AMAD"></a>
+<h3>AMAD - Automagic Android Device</h3>
+<ul>
+  At the moment no english documentation is available
+</ul>
+=end html
 =begin html_DE
 <a name="AMAD"></a>
 <h3>AMAD - Automagic Android Device</h3>
@@ -401,8 +410,10 @@ sub AMAD_SelectSetCmd($$@)
     <li>Ladestatus - Netztei angeschlossen / nicht angeschlossen</li>
     <li>Batteriestatus in %</li>
     <li>Bildschirmhelligkeit</li>
+    <li>Bildschirnstatus An/Aus</li>
     <li>Media Lautst&auml;rke des Lautsprechers am Ger&auml;t</li>
     <li>Media Lautst&auml;rke des Bluetooth Lautsprechers</li>
+    <li>Zustand von Automagic auf dem Ger&auml;t</li>
   </ul>
   <br><br>
   Als Extra k&ouml;nnen noch aktueller Titel, Interpret und Album des verwendeten Mediaplayers angezeigt werden.
@@ -424,7 +435,7 @@ sub AMAD_SelectSetCmd($$@)
     <li>eine Nachricht senden welche <b>angesagt</b> wird (TTS)</li>
   </ul>
   <br><br> 
-  F&uuml;r all diese Aktionen und Informationen wird auf dem Androidger&auml;t Automagic und ein so genannter Flow ben&ouml;tigt. Die App m&uuml;st
+  F&uuml;r all diese Aktionen und Informationen wird auf dem Androidger&auml;t Automagic und ein so genannter Flow ben&ouml;tigt. Die App m&uuml;&szlig;t
   Ihr Euch besorgen, die Flows bekommt Ihr von mir zusammen mit dem AMAD Modul.
   <br><br>
   <b>Wie genau verwendet man nun AMAD?</b>
@@ -433,7 +444,7 @@ sub AMAD_SelectSetCmd($$@)
     <li>Installiert Euch die App "Automagic Premium" aus dem App Store oder die Testversion von <a href="https://automagic4android.com/de/testversion">hier</a></li>
     <li>ladet Euch das AMAD Modul und die Flowfiles von <a href="https://github.com/LeonGaultier/fhem-AMAD">GitHub</a> runter</li>
     <li>installiert die zwei Flows und aktiviert erstmal nur den "Information" Flow, eventuell bei den <a href="https://github.com/LeonGaultier/fhem-AMAD/tree/master/Flow_Updates">
-    FlowUpdates</a> mal schauen ob es was neueres gibt und den entsprechenden Flow updaten oder den alten l&ouml;schen und den neuen einzelnen installieren</li>
+    FlowUpdates</a> mal schauen ob es was neueres gibt und den entsprechenden Flow auf dem Ger&auml;t l&ouml;schen und den neuen Flow von GitHub installieren</li>
     <li>kopiert die Moduldatei 74_AMAD.pm nach $FHEMPATH/FHEM. Geht auf die FHEM Frontendseite und gebt dort in der Kommandozeile <i>reload 74_AMAD.pm</i> ein</li>
   </ul>
   <br><br>
@@ -453,7 +464,7 @@ sub AMAD_SelectSetCmd($$@)
     sowie den, in den Flows des Trigger HTTP Request, angegebenen Port fest.<br>INTERVAL ist der Zeitabstand in dem ein erneuter Informationsabruf stattfinden soll. Alle x Sekunden.
     Bei mir hat sich 180 gut bew&auml;hrt, also alle 3 Minuten<br>
     <u><b>Bitte gebt f&uuml;r sofortige Erfolge als Port 8090 ein, das ist der Port der in den mitgelieferten Automagic Flows als Trigger Port eingetragen ist.<br>
-    Dieser kann sp&auml;ter mit Erfahrung auch ge&auml;dert werden</b></u>
+    Dieser kann sp&auml;ter mit Erfahrung auch ge&auml;ndert werden</b></u>
   </ul>
   <br><br> 
   Fertig! Nach anlegen des Devices sollten bereits die ersten Readings reinkommen.
@@ -471,9 +482,20 @@ sub AMAD_SelectSetCmd($$@)
     <li>screenBrightness - Bildschirmhelligkeit von 0-255</li>
     <li>volumeMusikBluetooth - Media Lautst&auml;rke von angeschlossenden Bluetooth Lautsprechern</li>
     <li>volumeMusikSpeaker - Media Lautst&auml;rke der internen Lautsprecher</li>
+    <li>screen - Bildschirm An oderAus</li>
+    <li>automagicState - Statusmeldungen von der AutomagicApp</li>
     <br>
-    Die Readings volumeMusikBluetooth und volumeMusikSpeaker spiegeln die jeweilige Medialautst&auml;rke der angeschlossenden Bluetoothlautsprechern oder der internen Lautsprecher.<br>
-    Sofern man die jeweiligen Lautst&auml;rken ausschlie&szlig;lich &uuml;ber den Set Befehl setzt, wird eine der beiden immer mit dem defaultVolume Reading &uuml;ber ein stimmen.
+    Die Readings volumeMusikBluetooth und volumeMusikSpeaker spiegeln die jeweilige Medialautst&auml;rke der angeschlossenden Bluetoothlautsprechern oder der internen Lautsprecher wieder.<br>
+    Sofern man die jeweiligen Lautst&auml;rken ausschlie&szlig;lich &uuml;ber den Set Befehl setzt, wird eine der beiden immer mit dem defaultVolume Reading &uuml;ber ein stimmen.<br><br>
+    Die Readings "currentMusicAlbum", "currentMusicArtist", "currentMusicTrack" werden nicht vom Modul AMAD gesteuert, sondern ausschlie&szlig;lich vom Automagic Flow. Hierf&uuml;r ist es notwendig
+    das der Flow entsprechend Deiner Netzwerkumgebung und Deines Androidger&auml;tes angepasst wird.<br>
+    &Ouml;ffne den Flow SetCommands und folge dem Strang welcher ganz ganz links aussen lang geht. Dieser trifft auf eine Raute. Die Raute symbolisiert eine Bedingung. Es wird gefragt,
+    ob ein bestimmtes WLan Netz vorhanden ist. Tragt bitte hier Euren Router oder Access Point ein. Als n&auml;chstes folgt Ihr dem Strang weiter und trifft auf 3 Rechtecke.<br>
+    In jedem der 3 Rechtecke ist ein Befehl zum setzen eines der drei Readings eingetragen. Ihr m&uuml;sst lediglich in allen drein die IP Eures FHEM Servers eintragen, sowie den korrekte
+    DeviceNamen welchen Ihr in FHEM f&uuml;r dieses Androidger&auml;t angegeben habt.<br><br>
+    Das Reading automagicState muss explizit aktiviert werden. Hierf&uuml;r geht Ihr in den Flow Information und dann ganz nach rechts. Dort steht eine einsame Raute (Bedingung) ohne Anbuindung
+    an das Rechteck mit der Pause. Dr&uuml;ckt auf das Rechteck mit der Pause und zieht das Plus bis runter auf die Raute. Nun habt Ihr eine Verbindung. Ab der Android 5.x Version setzt Ihr
+    unter Einstellungen:Ton&Benachrichtigungen:Benachrichtigungszugriff ein Haken bei Automagic. Leider kann ich nicht sagen wie es sich bei Versionen der 4.xer Reihe verh&auml;lt.    
   </ul>
   <br><br>
   <a name="AMADset"></a>
@@ -488,6 +510,18 @@ sub AMAD_SelectSetCmd($$@)
     <li>screenBrightness - setzt die Bildschirmhelligkeit, von 0-255</li>
     <li>screenMsg - versendet eine Bildschirmnachricht</li>
     <li>ttsMsg - versendet eine Nachricht welche als Sprachnachricht ausgegeben wird</li>
+    <br>
+    Wenn Ihr das "set screenBrightness" verwenden wollt, muss eine kleine Anpassung im Flow SetCommand vorgenommen werden. &Ouml;ffnet die Aktion (eines der Vierecke ganz ganz unten)
+    SetzeSystemeinstellung:System und macht einen Haken bei "Ich habe die Einstellungen &uuml;berpr&uuml;ft, ich weiss was ich tue".
+  </ul>
+  <br><br>
+  <a name="AMADstate"></a>
+  <b>STATE</b>
+  <ul><br>
+    Es gibt drei STATE Zust&auml;nde.
+    <li>initialized - Ist der Status kurz nach einem define, ein Set Befehl ist hier noch nicht m&ouml;glich.</li>
+    <li>error - beim letzten "get Information" gab es eine Fehlermeldung daher werden die Set Befehle ausgesetzt bis der n&auml;chsten "get Information" Durchlauf ohne Fehler beendet wird.</li>
+    <li>activ - das Modul ist im aktiven Status und "Set Befehle" k&ouml;nnen gesetzt werden.</li>
   </ul>
   <br><br><br>
   <u><b>Anwendungsbeispiele:</b></u>
