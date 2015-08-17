@@ -22,7 +22,7 @@
 #
 ################################################################
 
-###### Version 0.4.0 ############
+###### Version 0.4.1 ############
 
 
 
@@ -140,7 +140,7 @@ sub AMAD_GetUpdateTimer($)
     my ($hash) = @_;
     my $name = $hash->{NAME};
  
-    AMAD_RetrieveAutomagicInfo($hash) if (ReadingsVal($name,"deviceState","online") eq "online" && $hash->{STATE} eq "active" || $hash->{STATE} eq "error" || $hash->{STATE} eq "initialized");
+    AMAD_RetrieveAutomagicInfo($hash) if (ReadingsVal($name,"deviceState","online") eq "online" && $hash->{STATE} ne "disabled");
   
     InternalTimer(gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 1);
     Log3 $name, 4, "AMAD ($name) - Call AMAD_GetUpdateTimer";
@@ -193,7 +193,6 @@ sub AMAD_RetrieveAutomagicInfo($)
 	{
 	    url        => $url,
 	    timeout    => 5,
-	    #noshutdown => 0,
 	    hash       => $hash,
 	    method     => "GET",
 	    doTrigger  => 1,
@@ -216,7 +215,7 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$)
     if (defined($err)) {
       if ($err ne "")
       {
-	  $hash->{STATE} = "error" if ($hash->{STATE} ne "initialized");
+	  $hash->{STATE} = $err if ($hash->{STATE} ne "initialized");
 	  Log3 $name, 5, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: error while requesting AutomagicInfo: $err";
 	  return;
       }
@@ -224,12 +223,12 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$)
 
     if($data eq "" and exists($param->{code}))
     {
-	$hash->{STATE} = "error" if ($hash->{STATE} ne "initialized");
+	$hash->{STATE} = $param if ($hash->{STATE} ne "initialized");
         Log3 $name, 5, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: received http code ".$param->{code}." without any data after requesting AMAD AutomagicInfo";
         return;
     }
     
-    # $hash->{RETRIEVECACHE} = $data;		# zu Testzwecken
+    $hash->{STATE} = "active" if ($hash->{STATE} eq "initialized" || $hash->{STATE} ne "active");
     
     my @valuestring = split('@@@@',  $data);
     my %buffer;
@@ -246,7 +245,7 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$)
     }
     readingsEndUpdate($hash, 1);
     
-    $hash->{STATE} = "active" if ($hash->{STATE} eq "error" || $hash->{STATE} eq "initialized");
+    $hash->{STATE} = "active" if ($hash->{STATE} eq "initialized");
     
     return undef;
 }
@@ -261,12 +260,7 @@ sub AMAD_HTTP_POST($$)
     if ($hash->{STATE} eq "initialized")
     {
 	Log3 $name, 3, "AMAD ($name) - AMAD_HTTP_POST: set command only works if STATE active, please wait for next interval run";
-	return "set command only works if STATE active, please wait for next interval run";
-    }
-    if ($hash->{STATE} eq "error")
-    {
-	Log3 $name, 3, "AMAD ($name) - AMAD_HTTP_POST: error while send Set command. Please check IP, PORT or wait for next interval run.";
-	return "error while send Set command. Please check IP, PORT or wait for next interval run.";
+	return "set command only works if STATE not equal initialized, please wait for next interval run";
     }
     
     $hash->{STATE} = "Send HTTP POST";
@@ -275,14 +269,43 @@ sub AMAD_HTTP_POST($$)
 	{
 	    url        => $url,
 	    timeout    => 5,
-	    #noshutdown => 0,
+	    hash       => $hash,
 	    method     => "POST",
 	    doTrigger  => 1,
+	    callback   => \&AMAD_HTTP_POSTerrorHandling,
 	}
     );
     Log3 $name, 4, "AMAD ($name) - Send HTTP POST with URL $url";
 
     $hash->{STATE} = $state;
+
+    return undef;
+}
+
+sub AMAD_HTTP_POSTerrorHandling($$$)
+{
+    my ( $param, $err, $data ) = @_;
+    my $hash = $param->{hash};
+    # my $doTrigger = $param->{doTrigger};
+    my $name = $hash->{NAME};
+    # my $host = $hash->{HOST};
+    
+    
+    if (defined($err)) {
+      if ($err ne "")
+      {
+	  $hash->{STATE} = $err if ($hash->{STATE} ne "initialized");
+	  Log3 $name, 5, "AMAD ($name) - AMAD_HTTP_POST: error while send SetCommand: $err";
+	  return;
+      }
+    }
+
+    if($data eq "" and exists($param->{code}))
+    {
+	$hash->{STATE} = $param if ($hash->{STATE} ne "initialized");
+        Log3 $name, 5, "AMAD ($name) - AMAD_HTTP_POST: received http code ".$param->{code}." without any data after send SetCommand";
+        return;
+    }
     
     return undef;
 }
@@ -520,7 +543,6 @@ sub AMAD_SelectSetCmd($$@)
   <ul><br>
     Es gibt drei STATE Zust&auml;nde.
     <li>initialized - Ist der Status kurz nach einem define, ein Set Befehl ist hier noch nicht m&ouml;glich.</li>
-    <li>error - beim letzten "get Information" gab es eine Fehlermeldung daher werden die Set Befehle ausgesetzt bis der n&auml;chsten "get Information" Durchlauf ohne Fehler beendet wird.</li>
     <li>activ - das Modul ist im aktiven Status und "Set Befehle" k&ouml;nnen gesetzt werden.</li>
   </ul>
   <br><br><br>
