@@ -22,7 +22,7 @@
 #
 ################################################################
 
-###### Version 0.4.1 ############
+###### Version 0.4.2 ############
 
 
 
@@ -319,8 +319,10 @@ sub AMAD_SelectSetCmd($$@)
 
     if (lc $cmd eq 'screenmsg') {
 	my $msg = join(" ", @data);
-	$msg =~ s/\s/%20/g;
 	
+	$msg =~ s/%/prozent/g;
+	
+	$msg =~ s/\s/%20/g;
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/screenMsg?message=$msg";
 	Log3 $name, 4, "AMAD ($name) - Sub AMAD_SetScreenMsg";
 
@@ -329,8 +331,11 @@ sub AMAD_SelectSetCmd($$@)
     
     elsif (lc $cmd eq 'ttsmsg') {
 	my $msg = join(" ", @data);
-	$msg =~ s/\s/%20/g;
-    
+	
+	$msg =~ s/%/prozent/g;
+	
+	
+	$msg =~ s/\s/%20/g;    
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/ttsMsg?message=$msg";
     
 	return AMAD_HTTP_POST ($hash,$url);
