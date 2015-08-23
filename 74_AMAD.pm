@@ -22,7 +22,7 @@
 #
 ################################################################
 
-###### Version 0.4.2 ############
+###### Version 0.4.3 ############
 
 
 
@@ -154,27 +154,30 @@ sub AMAD_Set($$@)
   
     my $list = "screenMsg"
 	     . " ttsMsg"
-	     . " defaultVolume:slider,0,1,15"
+	     . " volume:slider,0,1,15"
 	     . " deviceState:online,offline"
 	     . " mediaPlayer:play,stop,next,back"
 	     . " screenBrightness:slider,0,1,255"
 	     . " screen:on,off"
 	     . " openURL"
-	     . " nextAlarmTime:time";
+	     . " nextAlarmTime:time"
+	     . " statusRequest:noArg";
 
 
   if (lc $cmd eq 'screenmsg'
       || lc $cmd eq 'ttsmsg'
-      || lc $cmd eq 'defaultvolume'
+      || lc $cmd eq 'volume'
       || lc $cmd eq 'mediaplayer'
       || lc $cmd eq 'devicestate'
       || lc $cmd eq 'screenbrightness'
       || lc $cmd eq 'screen'
       || lc $cmd eq 'openurl'
-      || lc $cmd eq 'nextalarmtime') {
-      
+      || lc $cmd eq 'nextalarmtime'
+      || lc $cmd eq 'statusrequest') {
+
 	  Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
-	  return AMAD_SelectSetCmd ($hash, $cmd, @val) if (@val);
+	  return AMAD_SelectSetCmd ($hash, $cmd, @val) if (@val)
+							   || (lc $cmd eq 'statusrequest');
   }
 
     return "Unknown argument $cmd, bearword as argument or wrong parameter(s), choose one of $list";
@@ -320,9 +323,9 @@ sub AMAD_SelectSetCmd($$@)
     if (lc $cmd eq 'screenmsg') {
 	my $msg = join(" ", @data);
 	
-	$msg =~ s/%/prozent/g;
-	
+	$msg =~ s/%/%25/g;
 	$msg =~ s/\s/%20/g;
+	
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/screenMsg?message=$msg";
 	Log3 $name, 4, "AMAD ($name) - Sub AMAD_SetScreenMsg";
 
@@ -332,16 +335,15 @@ sub AMAD_SelectSetCmd($$@)
     elsif (lc $cmd eq 'ttsmsg') {
 	my $msg = join(" ", @data);
 	
-	$msg =~ s/%/prozent/g;
-	
-	
+	$msg =~ s/%/%25/g;
 	$msg =~ s/\s/%20/g;    
+	
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/ttsMsg?message=$msg";
     
 	return AMAD_HTTP_POST ($hash,$url);
     }
     
-    elsif (lc $cmd eq 'defaultvolume') {
+    elsif (lc $cmd eq 'volume') {
 	my $vol = join(" ", @data);
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setVolume?volume=$vol";
@@ -406,6 +408,10 @@ sub AMAD_SelectSetCmd($$@)
 	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
 	return AMAD_HTTP_POST ($hash,$url);
     }
+    elsif (lc $cmd eq 'statusrequest') {
+	AMAD_GetUpdateLocal($hash);
+	return undef;
+    }
 
     return undef;
 }
@@ -415,14 +421,18 @@ sub AMAD_SelectSetCmd($$@)
 
 
 =pod
+
 =begin html
+
 <a name="AMAD"></a>
 <h3>AMAD - Automagic Android Device</h3>
 <ul>
   At the moment no english documentation is available
 </ul>
 =end html
+
 =begin html_DE
+
 <a name="AMAD"></a>
 <h3>AMAD - Automagic Android Device</h3>
 <ul>
@@ -566,5 +576,7 @@ sub AMAD_SelectSetCmd($$@)
   So und nun noch ein besonderer Dank an pah (Prof. Dr. Peter Henning ), ohne seine Aussage "Keine Ahnung hatten wir alle mal, das ist keine Ausrede" h&auml;tte ich bestimmt nicht angefangen Interesse an
   Modulentwicklung zu zeigen :-)</b>
 </ul>
+
 =end html_DE
+
 =cut
