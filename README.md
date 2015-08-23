@@ -60,7 +60,7 @@ Fertig! Nach anlegen des Devices sollten bereits die ersten Readings reinkommen.
 
 Readings:
 
-- defaultVolume - Lautstärkewert welcher über "set defaultVolume" gesetzt wurde.
+- volume - Lautstärkewert welcher über "set volume" gesetzt wurde.
 - deviceState - Status des Androidgerätes, muss selbst mit setreading gesetzt werden z.B. über die Anwesenheitskontrolle.
   Ist Offline gesetzt, wird der Intervall zum Informationsabruf aus gesetzt.
 - nextAlarmDay - aktiver Alarmtag
@@ -74,7 +74,7 @@ Readings:
 - automagicState - Statusmeldungen von der AutomagicApp
 
 Die Readings volumeMusikBluetooth und volumeMusikSpeaker spiegeln die jeweilige Medialautstärke der angeschlossenden Bluetoothlautsprechern oder der internen Lautsprecher wieder.
-Sofern man die jeweiligen Lautstärken ausschließlich über den Set Befehl setzt, wird eine der beiden immer mit dem defaultVolume Reading über ein stimmen.
+Sofern man die jeweiligen Lautstärken ausschließlich über den Set Befehl setzt, wird eine der beiden immer mit dem volume Reading über ein stimmen.
 
 Die Readings "currentMusicAlbum", "currentMusicArtist", "currentMusicTrack" werden nicht vom Modul AMAD gesteuert, sondern ausschließlich vom Automagic Flow. Hierfür ist es notwendig das der Flow entsprechend Deiner Netzwerkumgebung und Deines Androidgerätes angepasst wird.
 Öffne den Flow SetCommands und folge dem Strang welcher ganz ganz links aussen lang geht. Dieser trifft auf eine Raute. Die Raute symbolisiert eine Bedingung. Es wird gefragt, ob ein bestimmtes WLan Netz vorhanden ist. Tragt bitte hier Euren Router oder Access Point ein. Als nächstes folgt Ihr dem Strang weiter und trifft auf 3 Rechtecke.
@@ -85,7 +85,7 @@ Das Reading automagicState muss explizit aktiviert werden. Hierfür geht Ihr in 
 
 Set:
 
-- defaultVolume - setzt die Medialautstärke. Entweder die internen Lautsprecher oder sofern angeschlossen die Bluetoothlautsprecher
+- volume - setzt die Medialautstärke. Entweder die internen Lautsprecher oder sofern angeschlossen die Bluetoothlautsprecher
 - deviceState - setzt den Device Status Online/Offline. Siehe Readings
 - mediaPlayer - steuert den Standard Mediaplayer. play, stop, Titel zürück, Titel vor.
 - nextAlarmTime - setzt die Alarmzeit. Geht aber nur innerhalb der nächsten 24Std.
