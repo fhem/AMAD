@@ -22,8 +22,6 @@
 #
 ################################################################
 
-###### Version 0.4.3 ############
-
 
 
 
@@ -32,20 +30,31 @@ package main;
 use strict;
 use warnings;
 use Time::HiRes qw(gettimeofday);
+
 use HttpUtils;
+
+my $VERSION = "0.5.0";
+
 
 sub AMAD_Initialize($) {
 
     my ($hash) = @_;
 
-    $hash->{SetFn}     	= "AMAD_Set";
-    $hash->{DefFn}      = "AMAD_Define";
-    $hash->{UndefFn}    = "AMAD_Undef";
-    $hash->{AttrFn}     = "AMAD_Attr";
-    $hash->{ReadFn}     = "AMAD_Read";
-    $hash->{AttrList} =
-          "interval disable:1 "
-         . $readingFnAttributes;
+    $hash->{SetFn}	= "AMAD_Set";
+    $hash->{DefFn}	= "AMAD_Define";
+    $hash->{UndefFn}	= "AMAD_Undef";
+    $hash->{AttrFn}	= "AMAD_Attr";
+    $hash->{ReadFn}	= "AMAD_Read";
+    $hash->{AttrList} 	= "setOpenApp ".
+			  "setFullscreen:0,1 ".
+			  "setScreenOrientation:0,1 ".
+			  "setScreenMsg:0,1 ".
+			  "setOpenURL:0,1 ".
+			  "setMediaPlayer:0,1 ".
+			  "setAlarmTime:0,1 ".
+			  "port ".
+			  "disable:1 ";
+    $hash->{AttrList}	.= $readingFnAttributes;
 }
 
 sub AMAD_Define($$) {
@@ -70,6 +79,7 @@ sub AMAD_Define($$) {
     $hash->{HOST} 	= $host;
     $hash->{PORT} 	= $port;
     $hash->{INTERVAL} 	= $interval;
+    $hash->{VERSION}	= $VERSION;
 
     Log3 $name, 3, "AMAD ($name) - defined with host $hash->{HOST} and interval $hash->{INTERVAL} (sec)";
 
@@ -151,17 +161,23 @@ sub AMAD_GetUpdateTimer($)
 sub AMAD_Set($$@)
 {
     my ($hash, $name, $cmd, @val) = @_;
+    my $apps = AttrVal("$name","openApp","none");
   
-    my $list = "screenMsg"
-	     . " ttsMsg"
-	     . " volume:slider,0,1,15"
-	     . " deviceState:online,offline"
-	     . " mediaPlayer:play,stop,next,back"
-	     . " screenBrightness:slider,0,1,255"
-	     . " screen:on,off"
-	     . " openURL"
-	     . " nextAlarmTime:time"
-	     . " statusRequest:noArg";
+    my $list = "";
+    
+    $list .= "screenMsg " if (AttrVal("$name","setScreenMsg","0") eq "1");
+    $list .= "ttsMsg ";
+    $list .= "volume:slider,0,1,15 ";
+    $list .= "deviceState:online,offline ";
+    $list .= "mediaPlayer:play,stop,next,back " if (AttrVal("$name","setMediaPlayer","0") eq "1");
+    $list .= "screenBrightness:slider,0,1,255 ";
+    $list .= "screen:on,off ";
+    $list .= "screenOrientation:landscape,portrait,default " if (AttrVal("$name","setScreenOrientation","0") eq "1");
+    $list .= "screenFullscreen:on,off " if (AttrVal("$name","setFullscreen","0") eq "1");
+    $list .= "openURL " if (AttrVal("$name","setOpenURL","0") eq "1");
+    $list .= "openApp:$apps " if (AttrVal("$name","setOpenApp","none") ne "none");
+    $list .= "nextAlarmTime:time " if (AttrVal("$name","setAlarmTime","0") eq "1");
+    $list .= "statusRequest:noArg ";
 
 
   if (lc $cmd eq 'screenmsg'
@@ -170,8 +186,11 @@ sub AMAD_Set($$@)
       || lc $cmd eq 'mediaplayer'
       || lc $cmd eq 'devicestate'
       || lc $cmd eq 'screenbrightness'
+      || lc $cmd eq 'screenorientation'
+      || lc $cmd eq 'screenfullscreen'
       || lc $cmd eq 'screen'
       || lc $cmd eq 'openurl'
+      || lc $cmd eq 'openApp'
       || lc $cmd eq 'nextalarmtime'
       || lc $cmd eq 'statusrequest') {
 
@@ -391,6 +410,26 @@ sub AMAD_SelectSetCmd($$@)
 	return AMAD_HTTP_POST ($hash,$url);
     }
     
+    elsif (lc $cmd eq 'screenorientation') {
+	my $mod = join(" ", @data);
+
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setScreenOrientation?orientation=$mod";
+
+	AMAD_GetUpdateLocal($hash);
+	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
+	return AMAD_HTTP_POST ($hash,$url);
+    }
+    
+    elsif (lc $cmd eq 'screenfullscreen') {
+	my $mod = join(" ", @data);
+
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setScreenFullscreen?fullscreen=$mod";
+
+	AMAD_GetUpdateLocal($hash);
+	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
+	return AMAD_HTTP_POST ($hash,$url);
+    }
+    
     elsif (lc $cmd eq 'openurl') {
 	my $openurl = join(" ", @data);
 
@@ -421,21 +460,22 @@ sub AMAD_SelectSetCmd($$@)
 
 
 =pod
-
 =begin html
 
 <a name="AMAD"></a>
-<h3>AMAD - Automagic Android Device</h3>
+<h3>AMAD</h3>
 <ul>
+  <u><b>AMAD - Automagic Android Device</b></u>
   At the moment no english documentation is available
 </ul>
-=end html
 
+=end html
 =begin html_DE
 
 <a name="AMAD"></a>
-<h3>AMAD - Automagic Android Device</h3>
+<h3>AMAD</h3>
 <ul>
+  <u><b>AMAD - Automagic Android Device</b></u>
   Dieses Modul liefert, <b><u>in Verbindung mit der Android APP Automagic</u></b>, diverse Informationen von Android Ger&auml;ten.
   Die AndroidAPP Automagic (welche nicht von mir stammt und 2.90Euro kostet) funktioniert wie Tasker, ist aber bei weitem User freundlicher.
   Im Auslieferiungszustand werden folgende Zust&auml;nde dargestellt:
@@ -578,5 +618,4 @@ sub AMAD_SelectSetCmd($$@)
 </ul>
 
 =end html_DE
-
 =cut
