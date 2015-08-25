@@ -33,7 +33,8 @@ use Time::HiRes qw(gettimeofday);
 
 use HttpUtils;
 
-my $VERSION = "0.5.0";
+my $version = "0.5.1";
+
 
 
 sub AMAD_Initialize($) {
@@ -48,10 +49,9 @@ sub AMAD_Initialize($) {
     $hash->{AttrList} 	= "setOpenApp ".
 			  "setFullscreen:0,1 ".
 			  "setScreenOrientation:0,1 ".
-			  "setScreenMsg:0,1 ".
-			  "setOpenURL:0,1 ".
+			  "setScreenBrightness:0,1 ".
 			  "setMediaPlayer:0,1 ".
-			  "setAlarmTime:0,1 ".
+			  "interval ".
 			  "port ".
 			  "disable:1 ";
     $hash->{AttrList}	.= $readingFnAttributes;
@@ -79,7 +79,7 @@ sub AMAD_Define($$) {
     $hash->{HOST} 	= $host;
     $hash->{PORT} 	= $port;
     $hash->{INTERVAL} 	= $interval;
-    $hash->{VERSION}	= $VERSION;
+    $hash->{VERSION} 	= $version;
 
     Log3 $name, 3, "AMAD ($name) - defined with host $hash->{HOST} and interval $hash->{INTERVAL} (sec)";
 
@@ -161,22 +161,22 @@ sub AMAD_GetUpdateTimer($)
 sub AMAD_Set($$@)
 {
     my ($hash, $name, $cmd, @val) = @_;
-    my $apps = AttrVal("$name","openApp","none");
+    my $apps = AttrVal("$name","setOpenApp","none");
   
     my $list = "";
     
-    $list .= "screenMsg " if (AttrVal("$name","setScreenMsg","0") eq "1");
+    $list .= "screenMsg ";
     $list .= "ttsMsg ";
     $list .= "volume:slider,0,1,15 ";
     $list .= "deviceState:online,offline ";
     $list .= "mediaPlayer:play,stop,next,back " if (AttrVal("$name","setMediaPlayer","0") eq "1");
-    $list .= "screenBrightness:slider,0,1,255 ";
+    $list .= "screenBrightness:slider,0,1,255 " if (AttrVal("$name","setScreenBrightness","0") eq "1");
     $list .= "screen:on,off ";
     $list .= "screenOrientation:landscape,portrait,default " if (AttrVal("$name","setScreenOrientation","0") eq "1");
     $list .= "screenFullscreen:on,off " if (AttrVal("$name","setFullscreen","0") eq "1");
-    $list .= "openURL " if (AttrVal("$name","setOpenURL","0") eq "1");
+    $list .= "openURL ";
     $list .= "openApp:$apps " if (AttrVal("$name","setOpenApp","none") ne "none");
-    $list .= "nextAlarmTime:time " if (AttrVal("$name","setAlarmTime","0") eq "1");
+    $list .= "nextAlarmTime:time ";
     $list .= "statusRequest:noArg ";
 
 
@@ -190,7 +190,7 @@ sub AMAD_Set($$@)
       || lc $cmd eq 'screenfullscreen'
       || lc $cmd eq 'screen'
       || lc $cmd eq 'openurl'
-      || lc $cmd eq 'openApp'
+      || lc $cmd eq 'openapp'
       || lc $cmd eq 'nextalarmtime'
       || lc $cmd eq 'statusrequest') {
 
@@ -213,12 +213,12 @@ sub AMAD_RetrieveAutomagicInfo($)
   
     HttpUtils_NonblockingGet(
 	{
-	    url        => $url,
-	    timeout    => 5,
-	    hash       => $hash,
-	    method     => "GET",
-	    doTrigger  => 1,
-	    callback   => \&AMAD_RetrieveAutomagicInfoFinished,
+	    url		=> $url,
+	    timeout	=> 5,
+	    hash	=> $hash,
+	    method	=> "GET",
+	    doTrigger	=> 1,
+	    callback	=> \&AMAD_RetrieveAutomagicInfoFinished,
 	}
     );
     Log3 $name, 4, "AMAD ($name) - NonblockingGet get URL";
@@ -289,12 +289,12 @@ sub AMAD_HTTP_POST($$)
     
     HttpUtils_NonblockingGet(
 	{
-	    url        => $url,
-	    timeout    => 5,
-	    hash       => $hash,
-	    method     => "POST",
-	    doTrigger  => 1,
-	    callback   => \&AMAD_HTTP_POSTerrorHandling,
+	    url		=> $url,
+	    timeout	=> 5,
+	    hash	=> $hash,
+	    method	=> "POST",
+	    doTrigger	=> 1,
+	    callback	=> \&AMAD_HTTP_POSTerrorHandling,
 	}
     );
     Log3 $name, 4, "AMAD ($name) - Send HTTP POST with URL $url";
@@ -437,6 +437,7 @@ sub AMAD_SelectSetCmd($$@)
     
 	return AMAD_HTTP_POST ($hash,$url);
     }
+    
     elsif (lc $cmd eq 'nextalarmtime') {
 	my $alarmTime = join(" ", @data);
 	my @alarm = split(":", $alarmTime);
@@ -447,9 +448,18 @@ sub AMAD_SelectSetCmd($$@)
 	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
 	return AMAD_HTTP_POST ($hash,$url);
     }
+    
     elsif (lc $cmd eq 'statusrequest') {
 	AMAD_GetUpdateLocal($hash);
 	return undef;
+    }
+    
+    elsif (lc $cmd eq 'openapp') {
+	my $app = join(" ", @data);
+
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/openApp?app=$app";
+    
+	return AMAD_HTTP_POST ($hash,$url);
     }
 
     return undef;
