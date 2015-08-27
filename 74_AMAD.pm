@@ -33,7 +33,7 @@ use Time::HiRes qw(gettimeofday);
 
 use HttpUtils;
 
-my $version = "0.5.1";
+my $version = "0.5.2";
 
 
 
@@ -50,7 +50,8 @@ sub AMAD_Initialize($) {
 			  "setFullscreen:0,1 ".
 			  "setScreenOrientation:0,1 ".
 			  "setScreenBrightness:0,1 ".
-			  "setMediaPlayer:0,1 ".
+			  "fhemServerIP ".
+			  "root:0,1 ".
 			  "interval ".
 			  "port ".
 			  "disable:1 ";
@@ -169,7 +170,7 @@ sub AMAD_Set($$@)
     $list .= "ttsMsg ";
     $list .= "volume:slider,0,1,15 ";
     $list .= "deviceState:online,offline ";
-    $list .= "mediaPlayer:play,stop,next,back " if (AttrVal("$name","setMediaPlayer","0") eq "1");
+    $list .= "mediaPlayer:play,stop,next,back " if (AttrVal("$name","fhemServerIP","none") ne "none");
     $list .= "screenBrightness:slider,0,1,255 " if (AttrVal("$name","setScreenBrightness","0") eq "1");
     $list .= "screen:on,off ";
     $list .= "screenOrientation:landscape,portrait,default " if (AttrVal("$name","setScreenOrientation","0") eq "1");
@@ -178,6 +179,7 @@ sub AMAD_Set($$@)
     $list .= "openApp:$apps " if (AttrVal("$name","setOpenApp","none") ne "none");
     $list .= "nextAlarmTime:time ";
     $list .= "statusRequest:noArg ";
+    $list .= "system:reboot " if (AttrVal("$name","root","none") ne "none");
 
 
   if (lc $cmd eq 'screenmsg'
@@ -192,6 +194,7 @@ sub AMAD_Set($$@)
       || lc $cmd eq 'openurl'
       || lc $cmd eq 'openapp'
       || lc $cmd eq 'nextalarmtime'
+      || lc $cmd eq 'system'
       || lc $cmd eq 'statusrequest') {
 
 	  Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
@@ -208,6 +211,7 @@ sub AMAD_RetrieveAutomagicInfo($)
     my $name = $hash->{NAME};
     my $host = $hash->{HOST};
     my $port = $hash->{PORT};
+    my $fhemip = AttrVal("$name","fhemServerIP","none");
 
     my $url = "http://" . $host . ":" . $port . "/fhem-amad/deviceInfo/";
   
@@ -217,6 +221,7 @@ sub AMAD_RetrieveAutomagicInfo($)
 	    timeout	=> 5,
 	    hash	=> $hash,
 	    method	=> "GET",
+	    header	=> "fhemIP: $fhemip\r\nfhemDevice: $name",
 	    doTrigger	=> 1,
 	    callback	=> \&AMAD_RetrieveAutomagicInfoFinished,
 	}
@@ -263,6 +268,7 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$)
     my $t;
     my $v;
     while (($t, $v) = each %buffer) {
+	$v =~ s/null//g;
 	readingsBulkUpdate($hash, $t, $v) if (defined($v));
     }
     readingsEndUpdate($hash, 1);
@@ -458,6 +464,14 @@ sub AMAD_SelectSetCmd($$@)
 	my $app = join(" ", @data);
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/openApp?app=$app";
+    
+	return AMAD_HTTP_POST ($hash,$url);
+    }
+    
+    elsif (lc $cmd eq 'system') {
+	my $systemcmd = join(" ", @data);
+
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/systemcommand?syscmd=$systemcmd";
     
 	return AMAD_HTTP_POST ($hash,$url);
     }
