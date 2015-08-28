@@ -33,7 +33,7 @@ use Time::HiRes qw(gettimeofday);
 
 use HttpUtils;
 
-my $version = "0.5.2";
+my $version = "0.5.3";
 
 
 
@@ -173,7 +173,7 @@ sub AMAD_Set($$@)
     $list .= "mediaPlayer:play,stop,next,back " if (AttrVal("$name","fhemServerIP","none") ne "none");
     $list .= "screenBrightness:slider,0,1,255 " if (AttrVal("$name","setScreenBrightness","0") eq "1");
     $list .= "screen:on,off ";
-    $list .= "screenOrientation:landscape,portrait,default " if (AttrVal("$name","setScreenOrientation","0") eq "1");
+    $list .= "screenOrientation:auto,landscape,portrait " if (AttrVal("$name","setScreenOrientation","0") eq "1");
     $list .= "screenFullscreen:on,off " if (AttrVal("$name","setFullscreen","0") eq "1");
     $list .= "openURL ";
     $list .= "openApp:$apps " if (AttrVal("$name","setOpenApp","none") ne "none");
@@ -431,8 +431,8 @@ sub AMAD_SelectSetCmd($$@)
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setScreenFullscreen?fullscreen=$mod";
 
-	AMAD_GetUpdateLocal($hash);
-	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
+	readingsSingleUpdate ($hash,$cmd,$mod,1);
+	
 	return AMAD_HTTP_POST ($hash,$url);
     }
     
@@ -504,37 +504,43 @@ sub AMAD_SelectSetCmd($$@)
   Die AndroidAPP Automagic (welche nicht von mir stammt und 2.90Euro kostet) funktioniert wie Tasker, ist aber bei weitem User freundlicher.
   Im Auslieferiungszustand werden folgende Zust&auml;nde dargestellt:
   <ul>
-  <br>
-    <li>Standardlautst&auml;rke</li>
+    <li>Zustand von Automagic auf dem Ger&auml;t</li>
+    <li>aktuell abgespieltes Musikalbum des verwendeten Mediaplayers</li>
+    <li>aktuell abgespielter Musikinterpret des verwendeten Mediaplayers</li>
+    <li>aktuell abgespielter Musiktitel des verwendeten Mediaplayers</li>
     <li>Status des Androidger&auml;tes - Online/Offline</li>
-    <li>n&auml;chste Alarmzeit</li>
     <li>n&auml;chster Alarmtag</li>
-    <li>Ladestatus - Netztei angeschlossen / nicht angeschlossen</li>
+    <li>n&auml;chste Alarmzeit</li>
     <li>Batteriestatus in %</li>
-    <li>Bildschirmhelligkeit</li>
+    <li>Ladestatus - Netztei angeschlossen / nicht angeschlossen</li>
     <li>Bildschirnstatus An/Aus</li>
+    <li>Bildschirmhelligkeit</li>
+    <li>Vollbildmodus An/Aus</li>
+    <li>Bildschirmausrichtung Auto/Landscape/Portrait</li>
+    <li>Standardlautst&auml;rke</li>
     <li>Media Lautst&auml;rke des Lautsprechers am Ger&auml;t</li>
     <li>Media Lautst&auml;rke des Bluetooth Lautsprechers</li>
-    <li>Zustand von Automagic auf dem Ger&auml;t</li>
   </ul>
-  <br><br>
-  Als Extra k&ouml;nnen noch aktueller Titel, Interpret und Album des verwendeten Mediaplayers angezeigt werden.
   <br>
   Mit etwas Einarbeitung k&ouml;nnen jegliche Informationen welche Automagic bereit stellt in FHEM angezeigt werden. Hierzu bedarf es lediglich
   einer kleinen Anpassung des "Information" Flows
-  <br>
-  <br>
+  <br><br>
   Das Modul gibt Dir auch die M&ouml;glichkeit Deine Androidger&auml;te zu steuern. So k&ouml;nnen folgende Aktionen durchgef&uuml;hrt werden.
   <ul>
-  <br>
-    <li>Medienlautst&auml;rke regeln</li>
-    <li>n&auml;chste Alarmzeit setzen</li>
-    <li>Bildschirmhelligkeit einstellen</li>
-    <li>Bildschirm An/Aus machen</li>
+    <li>Status des Ger&auml;tes (Online,Offline)</li>
     <li>Mediaplayer steuern (Play, Stop, n&auml;chster Titel, vorheriger Titel)</li>
+    <li>n&auml;chste Alarmzeit setzen</li>
+    <li>eine App auf dem Ger&auml;t &ouml;ffnen</li>
     <li>eine URL im Browser &ouml;ffnen</li>
+    <li>Bildschirm An/Aus machen</li>
+    <li>Bildschirmhelligkeit einstellen</li>
+    <li>Vollbildmodus einschalten</li>
     <li>eine Nachricht senden welche am Bildschirm angezeigt wird</li>
+    <li>Bildschirmausrichtung einstellen (Auto,Landscape,Portrait)</li>
+    <li>neuen Statusreport des Ger&auml;tes anfordern</li>
+    <li>Systembefehle setzen (Reboot)</li>
     <li>eine Nachricht senden welche <b>angesagt</b> wird (TTS)</li>
+    <li>Medienlautst&auml;rke regeln</li>  
   </ul>
   <br><br> 
   F&uuml;r all diese Aktionen und Informationen wird auf dem Androidger&auml;t Automagic und ein so genannter Flow ben&ouml;tigt. Die App m&uuml;&szlig;t
@@ -542,14 +548,13 @@ sub AMAD_SelectSetCmd($$@)
   <br><br>
   <b>Wie genau verwendet man nun AMAD?</b>
   <ul>
-  <br>
     <li>Installiert Euch die App "Automagic Premium" aus dem App Store oder die Testversion von <a href="https://automagic4android.com/de/testversion">hier</a></li>
     <li>ladet Euch das AMAD Modul und die Flowfiles von <a href="https://github.com/LeonGaultier/fhem-AMAD">GitHub</a> runter</li>
     <li>installiert die zwei Flows und aktiviert erstmal nur den "Information" Flow, eventuell bei den <a href="https://github.com/LeonGaultier/fhem-AMAD/tree/master/Flow_Updates">
     FlowUpdates</a> mal schauen ob es was neueres gibt und den entsprechenden Flow auf dem Ger&auml;t l&ouml;schen und den neuen Flow von GitHub installieren</li>
     <li>kopiert die Moduldatei 74_AMAD.pm nach $FHEMPATH/FHEM. Geht auf die FHEM Frontendseite und gebt dort in der Kommandozeile <i>reload 74_AMAD.pm</i> ein</li>
   </ul>
-  <br><br>
+  <br>
   Nun m&uuml;sst Ihr nur noch ein Device in FHEM anlegen.
   <br><br>
   <a name="AMADdefine"></a>
@@ -573,56 +578,64 @@ sub AMAD_SelectSetCmd($$@)
   <br><br>
   <a name="AMADreadings"></a>
   <b>Readings</b>
-  <ul><br>
-    <li>defaultVolume - Lautst&auml;rkewert welcher &uuml;ber "set defaultVolume" gesetzt wurde.</li>
+  <ul>
+    <li>automagicState - Statusmeldungen von der AutomagicApp</li>
+    <li>currentMusicAlbum - </li>
+    <li>currentMusicArtist - </li>
+    <li>currentMusicTrack - </li>
     <li>deviceState - Status des Androidger&auml;tes, muss selbst mit setreading gesetzt werden z.B. &uuml;ber die Anwesenheitskontrolle.<br>
     Ist Offline gesetzt, wird der Intervall zum Informationsabruf aus gesetzt.</li>
     <li>nextAlarmDay - aktiver Alarmtag</li>
     <li>nextAlarmTime - aktive Alarmzeit</li>
     <li>powerLevel - Status der Batterie in %</li>
     <li>powerPlugged - Netzteil angeschlossen? 0=NEIN, 2=JA</li>
+    <li>screen - Bildschirm An oderAus</li>
     <li>screenBrightness - Bildschirmhelligkeit von 0-255</li>
+    <li>screenFullscreen - Vollbildmodus (On,Off)</li>
+    <li>screenOrientation - Bildschirmausrichtung (Auto,Landscape,Portrait)</li>
+    <li>volume - Lautst&auml;rkewert welcher &uuml;ber "set volume" gesetzt wurde.</li>
     <li>volumeMusikBluetooth - Media Lautst&auml;rke von angeschlossenden Bluetooth Lautsprechern</li>
     <li>volumeMusikSpeaker - Media Lautst&auml;rke der internen Lautsprecher</li>
-    <li>screen - Bildschirm An oderAus</li>
-    <li>automagicState - Statusmeldungen von der AutomagicApp</li>
     <br>
     Die Readings volumeMusikBluetooth und volumeMusikSpeaker spiegeln die jeweilige Medialautst&auml;rke der angeschlossenden Bluetoothlautsprechern oder der internen Lautsprecher wieder.<br>
-    Sofern man die jeweiligen Lautst&auml;rken ausschlie&szlig;lich &uuml;ber den Set Befehl setzt, wird eine der beiden immer mit dem defaultVolume Reading &uuml;ber ein stimmen.<br><br>
-    Die Readings "currentMusicAlbum", "currentMusicArtist", "currentMusicTrack" werden nicht vom Modul AMAD gesteuert, sondern ausschlie&szlig;lich vom Automagic Flow. Hierf&uuml;r ist es notwendig
-    das der Flow entsprechend Deiner Netzwerkumgebung und Deines Androidger&auml;tes angepasst wird.<br>
-    &Ouml;ffne den Flow SetCommands und folge dem Strang welcher ganz ganz links aussen lang geht. Dieser trifft auf eine Raute. Die Raute symbolisiert eine Bedingung. Es wird gefragt,
-    ob ein bestimmtes WLan Netz vorhanden ist. Tragt bitte hier Euren Router oder Access Point ein. Als n&auml;chstes folgt Ihr dem Strang weiter und trifft auf 3 Rechtecke.<br>
-    In jedem der 3 Rechtecke ist ein Befehl zum setzen eines der drei Readings eingetragen. Ihr m&uuml;sst lediglich in allen drein die IP Eures FHEM Servers eintragen, sowie den korrekte
-    DeviceNamen welchen Ihr in FHEM f&uuml;r dieses Androidger&auml;t angegeben habt.<br><br>
-    Das Reading automagicState muss explizit aktiviert werden. Hierf&uuml;r geht Ihr in den Flow Information und dann ganz nach rechts. Dort steht eine einsame Raute (Bedingung) ohne Anbuindung
-    an das Rechteck mit der Pause. Dr&uuml;ckt auf das Rechteck mit der Pause und zieht das Plus bis runter auf die Raute. Nun habt Ihr eine Verbindung. Ab der Android 5.x Version setzt Ihr
-    unter Einstellungen:Ton&Benachrichtigungen:Benachrichtigungszugriff ein Haken bei Automagic. Leider kann ich nicht sagen wie es sich bei Versionen der 4.xer Reihe verh&auml;lt.    
+    Sofern man die jeweiligen Lautst&auml;rken ausschlie&szlig;lich &uuml;ber den Set Befehl setzt, wird eine der beiden immer mit dem "volume" Reading &uuml;ber ein stimmen.<br><br>
   </ul>
   <br><br>
   <a name="AMADset"></a>
   <b>Set</b>
-  <ul><br>
-    <li>defaultVolume - setzt die Medialautst&auml;rke. Entweder die internen Lautsprecher oder sofern angeschlossen die Bluetoothlautsprecher</li>
+  <ul>
     <li>deviceState - setzt den Device Status Online/Offline. Siehe Readings</li>
     <li>mediaPlayer - steuert den Standard Mediaplayer. play, stop, Titel z&uuml;r&uuml;ck, Titel vor.</li>
     <li>nextAlarmTime - setzt die Alarmzeit. Geht aber nur innerhalb der n&auml;chsten 24Std.</li>
     <li>openURL - &ouml;ffnet eine URL im Standardbrowser</li>
-    <li>screen - setzt den Bildschirm auf AN oder AUS mit Sperre</li>
-    <li>screenBrightness - setzt die Bildschirmhelligkeit, von 0-255</li>
+    <li>screen - setzt den Bildschirm on/off mit Sperre</li>
     <li>screenMsg - versendet eine Bildschirmnachricht</li>
+    <li>statusRequest - Fordert einen neuen Statusreport beim Device an</li>
     <li>ttsMsg - versendet eine Nachricht welche als Sprachnachricht ausgegeben wird</li>
-    <br>
+    <li>volume - setzt die Medialautst&auml;rke. Entweder die internen Lautsprecher oder sofern angeschlossen die Bluetoothlautsprecher</li>
+  </ul>
+  <br>
+  <b>Set abh&auml;ngig von gesetzten Attributen</b>
+  <ul>
+    <li>mediaPlayer - steuert den Standard Mediaplayer. play, stop, Titel z&uuml;r&uuml;ck, Titel vor. <b>Attribut fhemServerIP</b></li>
+    <li>openApp - &ouml;ffnet eine ausgew&auml;hlte App. <b>Attribut setOpenApp</b></li>
+    <li>screenBrightness - setzt die Bildschirmhelligkeit, von 0-255 <b>Attribut setScreenBrightness</b></li>
     Wenn Ihr das "set screenBrightness" verwenden wollt, muss eine kleine Anpassung im Flow SetCommand vorgenommen werden. &Ouml;ffnet die Aktion (eines der Vierecke ganz ganz unten)
     SetzeSystemeinstellung:System und macht einen Haken bei "Ich habe die Einstellungen &uuml;berpr&uuml;ft, ich weiss was ich tue".
+    <li>screenFullscreen - Schaltet den Vollbildmodus on/off. <b>Attribut setFullscreen</b></li>
+    <li>screenOrientation - Schaltet die Bildschirmausrichtung Auto/Landscape/Portait. <b>Attribut setScreenOrientation</b></li>
+    <li>system - setzt Systembefehle ab (nur bei gerootetet Ger&auml;en). Reboot <b>Attribut root</b></li>
+    Um openApp verwenden zu k&ouml;nnen, muss als Attribut ein, oder durch Komma getrennt, mehrere App Namen gesetzt werden. Der App Name ist frei w&auml;hlbar und nur zur Wiedererkennung notwendig.
+    Der selbe App Name mu&szlig; im Flow SetCommands auf der linken Seite unterhalb der Raute Expression:"openApp" in einen der 5 Str&auml;nge (eine App pro Strang) in beide Rauten eingetragen werden. Danach wird
+    in das
+    Viereck die App ausgew&auml;lt welche durch den Attribut App Namen gestartet werden soll.
   </ul>
   <br><br>
   <a name="AMADstate"></a>
   <b>STATE</b>
-  <ul><br>
-    Es gibt drei STATE Zust&auml;nde.
-    <li>initialized - Ist der Status kurz nach einem define, ein Set Befehl ist hier noch nicht m&ouml;glich.</li>
-    <li>activ - das Modul ist im aktiven Status und "Set Befehle" k&ouml;nnen gesetzt werden.</li>
+  <ul>
+    <li>initialized - Ist der Status kurz nach einem define..</li>
+    <li>activ - Das Modul ist im aktiven Status.</li>
   </ul>
   <br><br><br>
   <u><b>Anwendungsbeispiele:</b></u>
