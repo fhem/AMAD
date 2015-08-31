@@ -33,7 +33,7 @@ use Time::HiRes qw(gettimeofday);
 
 use HttpUtils;
 
-my $version = "0.5.5";
+my $version = "0.5.6";
 
 
 
@@ -604,9 +604,9 @@ sub AMAD_SelectSetCmd($$@)
   <b>Readings</b>
   <ul>
     <li>automagicState - Statusmeldungen von der AutomagicApp</li>
-    <li>currentMusicAlbum - </li>
-    <li>currentMusicArtist - </li>
-    <li>currentMusicTrack - </li>
+    <li>currentMusicAlbum - aktuell abgespieltes Musikalbum des verwendeten Mediaplayers</li>
+    <li>currentMusicArtist - aktuell abgespielter Musikinterpret des verwendeten Mediaplayers</li>
+    <li>currentMusicTrack - aktuell abgespielter Musiktitel des verwendeten Mediaplayers</li>
     <li>deviceState - Status des Androidger&auml;tes, muss selbst mit setreading gesetzt werden z.B. &uuml;ber die Anwesenheitskontrolle.<br>
     Ist Offline gesetzt, wird der Intervall zum Informationsabruf aus gesetzt.</li>
     <li>lastSetCommandError - letzte Fehlermeldung vom set Befehl</li>
