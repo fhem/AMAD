@@ -88,8 +88,8 @@
     Ist Offline gesetzt, wird der Intervall zum Informationsabruf aus gesetzt.</li>
     <li>lastSetCommandError - letzte Fehlermeldung vom set Befehl</li>
     <li>lastSetCommandState - letzter Status vom set Befehl, Befehl erfolgreich/nicht erfolgreich gesendet</li>
-    <li>lastStateRequestError - letzte Fehlermeldung vom stateRequest Befehl</li>
-    <li>lastStateRequestState - letzter Status vom stateRequest Befehl, Befehl erfolgreich/nicht erfolgreich gesendet</li>
+    <li>lastStatusRequestError - letzte Fehlermeldung vom statusRequest Befehl</li>
+    <li>lastStatusRequestState - letzter Status vom statusRequest Befehl, Befehl erfolgreich/nicht erfolgreich gesendet</li>
     <li>nextAlarmDay - aktiver Alarmtag</li>
     <li>nextAlarmTime - aktive Alarmzeit</li>
     <li>powerLevel - Status der Batterie in %</li>
