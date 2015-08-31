@@ -33,7 +33,7 @@ use Time::HiRes qw(gettimeofday);
 
 use HttpUtils;
 
-my $version = "0.5.3";
+my $version = "0.5.4";
 
 
 
@@ -151,7 +151,7 @@ sub AMAD_GetUpdateTimer($)
     my ($hash) = @_;
     my $name = $hash->{NAME};
  
-    AMAD_RetrieveAutomagicInfo($hash) if (ReadingsVal($name,"deviceState","online") eq "online" && $hash->{STATE} ne "disabled");
+    AMAD_RetrieveAutomagicInfo($hash) if (ReadingsVal($name,"deviceState","online") eq "online" && $hash->{STATE} ne "disabled"); # deviceState muß von Hand online/offline gesetzt werden z.B. über RESIDENZ Modul
   
     InternalTimer(gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 1);
     Log3 $name, 4, "AMAD ($name) - Call AMAD_GetUpdateTimer";
@@ -178,7 +178,7 @@ sub AMAD_Set($$@)
     $list .= "openURL ";
     $list .= "openApp:$apps " if (AttrVal("$name","setOpenApp","none") ne "none");
     $list .= "nextAlarmTime:time ";
-    $list .= "statusRequest:noArg ";
+    $list .= "stateRequest:noArg ";
     $list .= "system:reboot " if (AttrVal("$name","root","none") ne "none");
 
 
@@ -195,11 +195,11 @@ sub AMAD_Set($$@)
       || lc $cmd eq 'openapp'
       || lc $cmd eq 'nextalarmtime'
       || lc $cmd eq 'system'
-      || lc $cmd eq 'statusrequest') {
+      || lc $cmd eq 'staterequest') {
 
 	  Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
 	  return AMAD_SelectSetCmd ($hash, $cmd, @val) if (@val)
-							   || (lc $cmd eq 'statusrequest');
+							   || (lc $cmd eq 'staterequest');
   }
 
     return "Unknown argument $cmd, bearword as argument or wrong parameter(s), choose one of $list";
@@ -213,7 +213,7 @@ sub AMAD_RetrieveAutomagicInfo($)
     my $port = $hash->{PORT};
     my $fhemip = AttrVal("$name","fhemServerIP","none");
 
-    my $url = "http://" . $host . ":" . $port . "/fhem-amad/deviceInfo/";
+    my $url = "http://" . $host . ":" . $port . "/fhem-amad/deviceInfo/"; # Path muß so im Automagic als http request Trigger drin stehen
   
     HttpUtils_NonblockingGet(
 	{
@@ -243,6 +243,8 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$)
       if ($err ne "")
       {
 	  $hash->{STATE} = $err if ($hash->{STATE} ne "initialized");
+	  readingsSingleUpdate ($hash,"lastStateRequestError",$err,1);
+	  readingsSingleUpdate ($hash,"lastStateRequestState","stateRequest_error",1);
 	  Log3 $name, 5, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: error while requesting AutomagicInfo: $err";
 	  return;
       }
@@ -250,9 +252,22 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$)
 
     if($data eq "" and exists($param->{code}))
     {
-	$hash->{STATE} = $param if ($hash->{STATE} ne "initialized");
+	$hash->{STATE} = $param->{code} if ($hash->{STATE} ne "initialized");
+	
+	if ($param->{code} ne 200) {
+	    readingsSingleUpdate ($hash,"lastStateRequestError",$param->{code},1);
+	} else {
+	    readingsSingleUpdate ($hash,"lastStateRequestState","stateRequest_done",1);
+	}
+	
         Log3 $name, 5, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: received http code ".$param->{code}." without any data after requesting AMAD AutomagicInfo";
         return;
+    }
+    
+    if ($data eq "") {
+	readingsSingleUpdate ($hash,"lastStateRequestState","stateRequest_error",1);
+    } else {
+	readingsSingleUpdate ($hash,"lastStateRequestState","stateRequest_done",1);
     }
     
     $hash->{STATE} = "active" if ($hash->{STATE} eq "initialized" || $hash->{STATE} ne "active");
@@ -314,15 +329,15 @@ sub AMAD_HTTP_POSTerrorHandling($$$)
 {
     my ( $param, $err, $data ) = @_;
     my $hash = $param->{hash};
-    # my $doTrigger = $param->{doTrigger};
     my $name = $hash->{NAME};
-    # my $host = $hash->{HOST};
     
     
     if (defined($err)) {
       if ($err ne "")
       {
 	  $hash->{STATE} = $err if ($hash->{STATE} ne "initialized");
+	  readingsSingleUpdate ($hash,"lastSetCommandError",$err,1);
+	  readingsSingleUpdate ($hash,"lastSetCommandState","cmd_error",1);
 	  Log3 $name, 5, "AMAD ($name) - AMAD_HTTP_POST: error while send SetCommand: $err";
 	  return;
       }
@@ -330,10 +345,19 @@ sub AMAD_HTTP_POSTerrorHandling($$$)
 
     if($data eq "" and exists($param->{code}))
     {
-	$hash->{STATE} = $param if ($hash->{STATE} ne "initialized");
-        Log3 $name, 5, "AMAD ($name) - AMAD_HTTP_POST: received http code ".$param->{code}." without any data after send SetCommand";
-        return;
+	$hash->{STATE} = $param->{code} if ($hash->{STATE} ne "initialized");
+	
+	if ($param->{code} ne 200) {
+	    readingsSingleUpdate ($hash,"lastSetCommandError",$param->{code},1);
+	} else {
+	    readingsSingleUpdate ($hash,"lastSetCommandState","cmd_done",1);
+	}
+	
+	Log3 $name, 5, "AMAD ($name) - AMAD_HTTP_POST: received http code ".$param->{code}." without any data after send SetCommand";
+	return;
     }
+    
+    readingsSingleUpdate ($hash,"lastSetCommandState","cmd_done",1);
     
     return undef;
 }
@@ -455,7 +479,7 @@ sub AMAD_SelectSetCmd($$@)
 	return AMAD_HTTP_POST ($hash,$url);
     }
     
-    elsif (lc $cmd eq 'statusrequest') {
+    elsif (lc $cmd eq 'staterequest') {
 	AMAD_GetUpdateLocal($hash);
 	return undef;
     }
@@ -585,6 +609,10 @@ sub AMAD_SelectSetCmd($$@)
     <li>currentMusicTrack - </li>
     <li>deviceState - Status des Androidger&auml;tes, muss selbst mit setreading gesetzt werden z.B. &uuml;ber die Anwesenheitskontrolle.<br>
     Ist Offline gesetzt, wird der Intervall zum Informationsabruf aus gesetzt.</li>
+    <li>lastSetCommandError - letzte Fehlermeldung vom set Befehl</li>
+    <li>lastSetCommandState - letzter Status vom set Befehl, Befehl erfolgreich/nicht erfolgreich gesendet</li>
+    <li>lastStateRequestError - letzte Fehlermeldung vom stateRequest Befehl</li>
+    <li>lastStateRequestState - letzter Status vom stateRequest Befehl, Befehl erfolgreich/nicht erfolgreich gesendet</li>
     <li>nextAlarmDay - aktiver Alarmtag</li>
     <li>nextAlarmTime - aktive Alarmzeit</li>
     <li>powerLevel - Status der Batterie in %</li>
@@ -608,7 +636,7 @@ sub AMAD_SelectSetCmd($$@)
     <li>mediaPlayer - steuert den Standard Mediaplayer. play, stop, Titel z&uuml;r&uuml;ck, Titel vor.</li>
     <li>nextAlarmTime - setzt die Alarmzeit. Geht aber nur innerhalb der n&auml;chsten 24Std.</li>
     <li>openURL - &ouml;ffnet eine URL im Standardbrowser</li>
-    <li>screen - setzt den Bildschirm on/off mit Sperre</li>
+    <li>screen - setzt den Bildschirm on/off mit Sperre, in den Automagic Einstellungen muss "Admin Funktion" gesetzt werden sonst funktioniert "Screen off" nicht.</li>
     <li>screenMsg - versendet eine Bildschirmnachricht</li>
     <li>statusRequest - Fordert einen neuen Statusreport beim Device an</li>
     <li>ttsMsg - versendet eine Nachricht welche als Sprachnachricht ausgegeben wird</li>
@@ -624,7 +652,7 @@ sub AMAD_SelectSetCmd($$@)
     SetzeSystemeinstellung:System und macht einen Haken bei "Ich habe die Einstellungen &uuml;berpr&uuml;ft, ich weiss was ich tue".
     <li>screenFullscreen - Schaltet den Vollbildmodus on/off. <b>Attribut setFullscreen</b></li>
     <li>screenOrientation - Schaltet die Bildschirmausrichtung Auto/Landscape/Portait. <b>Attribut setScreenOrientation</b></li>
-    <li>system - setzt Systembefehle ab (nur bei gerootetet Ger&auml;en). Reboot <b>Attribut root</b></li>
+    <li>system - setzt Systembefehle ab (nur bei gerootetet Ger&auml;en). Reboot <b>Attribut root</b>, in den Automagic Einstellungen muss "Root Funktion" gesetzt werden</li>
     Um openApp verwenden zu k&ouml;nnen, muss als Attribut ein, oder durch Komma getrennt, mehrere App Namen gesetzt werden. Der App Name ist frei w&auml;hlbar und nur zur Wiedererkennung notwendig.
     Der selbe App Name mu&szlig; im Flow SetCommands auf der linken Seite unterhalb der Raute Expression:"openApp" in einen der 5 Str&auml;nge (eine App pro Strang) in beide Rauten eingetragen werden. Danach wird
     in das
