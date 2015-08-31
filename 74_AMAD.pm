@@ -33,7 +33,7 @@ use Time::HiRes qw(gettimeofday);
 
 use HttpUtils;
 
-my $version = "0.5.4";
+my $version = "0.5.5";
 
 
 
@@ -178,7 +178,7 @@ sub AMAD_Set($$@)
     $list .= "openURL ";
     $list .= "openApp:$apps " if (AttrVal("$name","setOpenApp","none") ne "none");
     $list .= "nextAlarmTime:time ";
-    $list .= "stateRequest:noArg ";
+    $list .= "statusRequest:noArg ";
     $list .= "system:reboot " if (AttrVal("$name","root","none") ne "none");
 
 
@@ -195,11 +195,11 @@ sub AMAD_Set($$@)
       || lc $cmd eq 'openapp'
       || lc $cmd eq 'nextalarmtime'
       || lc $cmd eq 'system'
-      || lc $cmd eq 'staterequest') {
+      || lc $cmd eq 'statusrequest') {
 
 	  Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
 	  return AMAD_SelectSetCmd ($hash, $cmd, @val) if (@val)
-							   || (lc $cmd eq 'staterequest');
+							   || (lc $cmd eq 'statusrequest');
   }
 
     return "Unknown argument $cmd, bearword as argument or wrong parameter(s), choose one of $list";
@@ -243,8 +243,8 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$)
       if ($err ne "")
       {
 	  $hash->{STATE} = $err if ($hash->{STATE} ne "initialized");
-	  readingsSingleUpdate ($hash,"lastStateRequestError",$err,1);
-	  readingsSingleUpdate ($hash,"lastStateRequestState","stateRequest_error",1);
+	  readingsSingleUpdate ($hash,"lastStatusRequestError",$err,1);
+	  readingsSingleUpdate ($hash,"lastStatusRequestState","statusRequest_error",1);
 	  Log3 $name, 5, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: error while requesting AutomagicInfo: $err";
 	  return;
       }
@@ -255,9 +255,9 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$)
 	$hash->{STATE} = $param->{code} if ($hash->{STATE} ne "initialized");
 	
 	if ($param->{code} ne 200) {
-	    readingsSingleUpdate ($hash,"lastStateRequestError",$param->{code},1);
+	    readingsSingleUpdate ($hash,"lastStatusRequestError",$param->{code},1);
 	} else {
-	    readingsSingleUpdate ($hash,"lastStateRequestState","stateRequest_done",1);
+	    readingsSingleUpdate ($hash,"lastStatusRequestState","statusRequest_done",1);
 	}
 	
         Log3 $name, 5, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: received http code ".$param->{code}." without any data after requesting AMAD AutomagicInfo";
@@ -265,9 +265,9 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$)
     }
     
     if ($data eq "") {
-	readingsSingleUpdate ($hash,"lastStateRequestState","stateRequest_error",1);
+	readingsSingleUpdate ($hash,"lastStatusRequestState","statusRequest_error",1);
     } else {
-	readingsSingleUpdate ($hash,"lastStateRequestState","stateRequest_done",1);
+	readingsSingleUpdate ($hash,"lastStatusRequestState","statusRequest_done",1);
     }
     
     $hash->{STATE} = "active" if ($hash->{STATE} eq "initialized" || $hash->{STATE} ne "active");
@@ -479,7 +479,7 @@ sub AMAD_SelectSetCmd($$@)
 	return AMAD_HTTP_POST ($hash,$url);
     }
     
-    elsif (lc $cmd eq 'staterequest') {
+    elsif (lc $cmd eq 'statusrequest') {
 	AMAD_GetUpdateLocal($hash);
 	return undef;
     }
@@ -611,8 +611,8 @@ sub AMAD_SelectSetCmd($$@)
     Ist Offline gesetzt, wird der Intervall zum Informationsabruf aus gesetzt.</li>
     <li>lastSetCommandError - letzte Fehlermeldung vom set Befehl</li>
     <li>lastSetCommandState - letzter Status vom set Befehl, Befehl erfolgreich/nicht erfolgreich gesendet</li>
-    <li>lastStateRequestError - letzte Fehlermeldung vom stateRequest Befehl</li>
-    <li>lastStateRequestState - letzter Status vom stateRequest Befehl, Befehl erfolgreich/nicht erfolgreich gesendet</li>
+    <li>lastStatusRequestError - letzte Fehlermeldung vom statusRequest Befehl</li>
+    <li>lastStatusRequestState - letzter Status vom statusRequest Befehl, Befehl erfolgreich/nicht erfolgreich gesendet</li>
     <li>nextAlarmDay - aktiver Alarmtag</li>
     <li>nextAlarmTime - aktive Alarmzeit</li>
     <li>powerLevel - Status der Batterie in %</li>
