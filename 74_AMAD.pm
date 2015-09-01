@@ -33,7 +33,7 @@ use Time::HiRes qw(gettimeofday);
 
 use HttpUtils;
 
-my $version = "0.5.7";
+my $version = "0.5.8";
 
 
 
@@ -63,26 +63,19 @@ sub AMAD_Define($$) {
     my ( $hash, $def ) = @_;
     my @a = split( "[ \t][ \t]*", $def );
 
-    return "too few parameters: define <name> AMAD <HOST> <PORT> <interval>" if ( @a != 5 );
+    return "too few parameters: define <name> AMAD <HOST>" if ( @a != 3 );
 
     my $name    	= $a[0];
     my $host    	= $a[2];
-    my $port		= $a[3];
-    my $interval  	= 120;
-
-    if(int(@a) == 5) {
-        $interval = int($a[4]);
-        if ($interval < 5 && $interval) {
-           return "interval too small, please use something > 5 (sec), default is 120 (sec)";
-        }
-    }
+    my $port		= 8090;
+    my $interval  	= 180;
 
     $hash->{HOST} 	= $host;
     $hash->{PORT} 	= $port;
     $hash->{INTERVAL} 	= $interval;
     $hash->{VERSION} 	= $version;
 
-    Log3 $name, 3, "AMAD ($name) - defined with host $hash->{HOST} and interval $hash->{INTERVAL} (sec)";
+    Log3 $name, 3, "AMAD ($name) - defined with host $hash->{HOST} on port $hash->{HOST} and interval $hash->{INTERVAL} (sec)";
 
     AMAD_GetUpdateLocal($hash);
 
@@ -125,6 +118,49 @@ sub AMAD_Attr(@) {
 	    $hash->{STATE}='active';
 	    Log3 $name, 3, "AMAD ($name) - enabled";
 
+	} else {
+	    if($cmd eq "set") {
+		$attr{$name}{$attrName} = $attrVal;
+		Log3 $name, 3, "AMAD ($name) - $attrName : $attrVal";
+	    }
+	    elsif ($cmd eq "del") {
+	    }
+	}
+    }
+    
+    if ($attrName eq "interval") {
+	if ($cmd eq "set") {
+	    if ($attrVal < 60) {
+		Log3 $name, 3, "AMAD ($name) - interval too small, please use something > 60 (sec), default is 180 (sec)";
+		return "interval too small, please use something > 60 (sec), default is 180 (sec)";
+	    } else {
+		$hash->{INTERVAL} = $attrVal;
+		Log3 $name, 3, "AMAD ($name) - set interval to $attrVal";
+	    }
+	}
+	elsif ($cmd eq "del") {
+	    $hash->{INTERVAL} = 180;
+	    Log3 $name, 3, "AMAD ($name) - set interval to default";
+	
+	} else {
+	    if($cmd eq "set") {
+		$attr{$name}{$attrName} = $attrVal;
+		Log3 $name, 3, "AMAD ($name) - $attrName : $attrVal";
+	    }
+	    elsif ($cmd eq "del") {
+	    }
+	}
+    }
+    
+    if ($attrName eq "port") {
+	if ($cmd eq "set") {
+	    $hash->{PORT} = $attrVal;
+	    Log3 $name, 3, "AMAD ($name) - set port to $attrVal";
+	}
+	elsif ($cmd eq "del") {
+	    $hash->{PORT} = 8090;
+	    Log3 $name, 3, "AMAD ($name) - set port to default";
+	
 	} else {
 	    if($cmd eq "set") {
 		$attr{$name}{$attrName} = $attrVal;
@@ -423,7 +459,7 @@ sub AMAD_HTTP_POSTerrorHandling($$$)
 	return;
     }
         
-    if($data =~ /\Error/i and exists($param->{code})) {    
+    if($data =~ /Error/i and exists($param->{code})) {    
 	$hash->{STATE} = $param->{code} if ($hash->{STATE} ne "initialized");
     
 	readingsBeginUpdate($hash);
