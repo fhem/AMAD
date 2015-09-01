@@ -2,7 +2,7 @@
 # 
 # Developed with Kate
 #
-#  (c) 2015 Copyright: Leon Gaultier (leongaultier at gmail dot com)
+#  (c) 2015 Copyright: Marko Oldenburg (leongaultier at gmail dot com)
 #  All rights reserved
 #
 #  This script is free software; you can redistribute it and/or modify
@@ -33,7 +33,7 @@ use Time::HiRes qw(gettimeofday);
 
 use HttpUtils;
 
-my $version = "0.5.6";
+my $version = "0.5.7";
 
 
 
@@ -107,29 +107,32 @@ sub AMAD_Attr(@) {
     my $hash = $defs{$name};
 
     if ($attrName eq "disable") {
-      if($cmd eq "set") {
-	if($attrVal eq "0") {
-	    RemoveInternalTimer($hash);
-            InternalTimer(gettimeofday()+2, "AMAD_GetUpdateTimer", $hash, 0) if ($hash->{STATE} eq "disabled");
-            $hash->{STATE}='active';
-            Log3 $name, 3, "AMAD ($name) - enabled";
-        } else {
-            $hash->{STATE} = 'disabled';
-            RemoveInternalTimer($hash);
-	    Log3 $name, 3, "AMAD ($name) - disabled";
-        }
-      } elsif ($cmd eq "del") {
-	  RemoveInternalTimer($hash);
-          InternalTimer(gettimeofday()+2, "AMAD_GetUpdateTimer", $hash, 0) if ($hash->{STATE} eq "disabled");
-          $hash->{STATE}='active';
-          Log3 $name, 3, "AMAD ($name) - enabled";
-	}
-      } else {
 	if($cmd eq "set") {
-	  $attr{$name}{$attrName} = $attrVal;
-          Log3 $name, 3, "AMAD ($name) - $attrName : $attrVal";
-        } elsif ($cmd eq "del") {
-      }
+	    if($attrVal eq "0") {
+		RemoveInternalTimer($hash);
+		InternalTimer(gettimeofday()+2, "AMAD_GetUpdateTimer", $hash, 0) if ($hash->{STATE} eq "disabled");
+		$hash->{STATE}='active';
+		Log3 $name, 3, "AMAD ($name) - enabled";
+	    } else {
+		$hash->{STATE} = 'disabled';
+		RemoveInternalTimer($hash);
+		Log3 $name, 3, "AMAD ($name) - disabled";
+	    }
+	}
+	elsif ($cmd eq "del") {
+	    RemoveInternalTimer($hash);
+	    InternalTimer(gettimeofday()+2, "AMAD_GetUpdateTimer", $hash, 0) if ($hash->{STATE} eq "disabled");
+	    $hash->{STATE}='active';
+	    Log3 $name, 3, "AMAD ($name) - enabled";
+
+	} else {
+	    if($cmd eq "set") {
+		$attr{$name}{$attrName} = $attrVal;
+		Log3 $name, 3, "AMAD ($name) - $attrName : $attrVal";
+	    }
+	    elsif ($cmd eq "del") {
+	    }
+	}
     }
 
     return undef;
@@ -227,6 +230,7 @@ sub AMAD_RetrieveAutomagicInfo($)
 	}
     );
     Log3 $name, 4, "AMAD ($name) - NonblockingGet get URL";
+    Log3 $name, 4, "AMAD ($name) - AMAD_RetrieveAutomagicInfo: calling Host: $host";
 }
 
 sub AMAD_RetrieveAutomagicInfoFinished($$$)
@@ -237,39 +241,76 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$)
     my $name = $hash->{NAME};
     my $host = $hash->{HOST};
 
-    Log3 $name, 4, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: calling Host: $host";
+    Log3 $name, 4, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: processed request data";
+    
 
+
+    ### Begin Error Handling
     if (defined($err)) {
-      if ($err ne "")
-      {
-	  $hash->{STATE} = $err if ($hash->{STATE} ne "initialized");
-	  readingsSingleUpdate ($hash,"lastStatusRequestError",$err,1);
-	  readingsSingleUpdate ($hash,"lastStatusRequestState","statusRequest_error",1);
-	  Log3 $name, 5, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: error while requesting AutomagicInfo: $err";
-	  return;
-      }
+	if ($err ne "") {
+	    $hash->{STATE} = $err if ($hash->{STATE} ne "initialized");
+
+	    readingsBeginUpdate ($hash);
+	    readingsBulkUpdate ($hash,"lastStatusRequestState","statusRequest_error");
+	  
+	    if ($err =~ /timed out/) {
+		readingsBulkUpdate ($hash,"lastStatusRequestError","connect to your device is timed out. check network");
+	    }
+	    elsif ($err =~ /Keine Route zum Zielrechner/) {
+		readingsBulkUpdate ($hash,"lastStatusRequestError","no route to target. bad network configuration or network is down");
+	    } else {
+		readingsBulkUpdate ($hash,"lastStatusRequestError","$err");
+	    }
+
+	readingsEndUpdate ($hash,1);
+	
+	Log3 $name, 5, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: error while requesting AutomagicInfo: $err";
+	return;
+	}
     }
 
-    if($data eq "" and exists($param->{code}))
-    {
+    if($data eq "" and exists($param->{code})) {
 	$hash->{STATE} = $param->{code} if ($hash->{STATE} ne "initialized");
-	
+    
+	readingsBeginUpdate ($hash);
+	readingsBulkUpdate ($hash,"lastStatusRequestState","statusRequest_error");
+    
 	if ($param->{code} ne 200) {
-	    readingsSingleUpdate ($hash,"lastStatusRequestError",$param->{code},1);
-	} else {
-	    readingsSingleUpdate ($hash,"lastStatusRequestState","statusRequest_done",1);
+	    readingsBulkUpdate ($hash,"lastStatusRequestError","http Error ".$param->{code});
 	}
 	
-        Log3 $name, 5, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: received http code ".$param->{code}." without any data after requesting AMAD AutomagicInfo";
-        return;
-    }
+	readingsBulkUpdate ($hash,"lastStatusRequestError","empty response, check automagic on your device");
+	readingsEndUpdate ($hash,1);
     
-    if ($data eq "") {
-	readingsSingleUpdate ($hash,"lastStatusRequestState","statusRequest_error",1);
-    } else {
-	readingsSingleUpdate ($hash,"lastStatusRequestState","statusRequest_done",1);
+	Log3 $name, 5, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: received http code ".$param->{code}." without any data after requesting AMAD AutomagicInfo";
+
+	return;
     }
+
+    if($data =~ /\Error/i and exists($param->{code})) {    
+	$hash->{STATE} = $param->{code} if ($hash->{STATE} ne "initialized");
+
+	readingsBeginUpdate($hash);
+	readingsBulkUpdate ($hash,"lastStatusRequestState","statusRequest_error");
     
+	    if ($param->{code} eq 404) {
+		readingsBulkUpdate ($hash,"lastStatusRequestError","automagic information flow is inactive on your device!");
+	    } else {
+		readingsBulkUpdate ($hash,"lastStatusRequestError","http error ".$param->{code});
+	    }
+	
+	readingsEndUpdate ($hash,1);
+    
+	Log3 $name, 5, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: received http code ".$param->{code}." receive Error after requesting AMAD AutomagicInfo";
+
+	return;
+    }
+
+    ### End Error Handling
+
+
+ 
+    ### Begin Response Processing
     $hash->{STATE} = "active" if ($hash->{STATE} eq "initialized" || $hash->{STATE} ne "active");
     
     my @valuestring = split('@@@@',  $data);
@@ -279,14 +320,20 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$)
 	$buffer{$values[0]} = $values[1];
     }
 
+
     readingsBeginUpdate($hash);
+    
     my $t;
     my $v;
     while (($t, $v) = each %buffer) {
 	$v =~ s/null//g;
 	readingsBulkUpdate($hash, $t, $v) if (defined($v));
     }
+    
+    readingsBulkUpdate ($hash,"lastStatusRequestState","statusRequest_done");
+    
     readingsEndUpdate($hash, 1);
+    ### End Response Processing
     
     $hash->{STATE} = "active" if ($hash->{STATE} eq "initialized");
     
@@ -331,33 +378,66 @@ sub AMAD_HTTP_POSTerrorHandling($$$)
     my $hash = $param->{hash};
     my $name = $hash->{NAME};
     
-    
-    if (defined($err)) {
-      if ($err ne "")
-      {
-	  $hash->{STATE} = $err if ($hash->{STATE} ne "initialized");
-	  readingsSingleUpdate ($hash,"lastSetCommandError",$err,1);
-	  readingsSingleUpdate ($hash,"lastSetCommandState","cmd_error",1);
-	  Log3 $name, 5, "AMAD ($name) - AMAD_HTTP_POST: error while send SetCommand: $err";
-	  return;
-      }
-    }
 
-    if($data eq "" and exists($param->{code}))
-    {
-	$hash->{STATE} = $param->{code} if ($hash->{STATE} ne "initialized");
-	
-	if ($param->{code} ne 200) {
-	    readingsSingleUpdate ($hash,"lastSetCommandError",$param->{code},1);
-	} else {
-	    readingsSingleUpdate ($hash,"lastSetCommandState","cmd_done",1);
+    ### Begin Error Handling
+    if (defined($err)) {
+	if ($err ne "") {
+	  $hash->{STATE} = $err if ($hash->{STATE} ne "initialized");
+	  
+	  readingsBeginUpdate ($hash);
+	  readingsBulkUpdate ($hash,"lastSetCommandState","cmd_error");
+	  
+	  if ($err =~ /timed out/) {
+	      readingsBulkUpdate ($hash,"lastSetCommandError","connect to your device is timed out. check network");
+	  }
+	  elsif ($err =~ /Keine Route zum Zielrechner/) {
+	      readingsBulkUpdate ($hash,"lastSetCommandError","no route to target. bad network configuration or network is down");
+	  } else {
+	      readingsBulkUpdate ($hash,"lastSetCommandError","$err");
+	  }
+	  readingsEndUpdate ($hash,1);
+	  
+	  Log3 $name, 5, "AMAD ($name) - AMAD_HTTP_POST: error while POST Command: $err";
+	  
+	  return;
 	}
+    }
+ 
+    if($data eq "" and exists($param->{code})) {
+	$hash->{STATE} = $param->{code} if ($hash->{STATE} ne "initialized");
+    
+	readingsBeginUpdate ($hash);
+    
+	    if ($param->{code} ne 200) {
+		readingsBulkUpdate ($hash,"lastSetCommandState","cmd_error");
+		readingsBulkUpdate ($hash,"lastSetCommandError","http Error ".$param->{code});
+	    }
+	readingsBulkUpdate ($hash,"lastSetCommandState","cmd_done");
+	readingsEndUpdate ($hash,1);
+    
+	Log3 $name, 5, "AMAD ($name) - AMAD_HTTP_POST: received http code ".$param->{code};
 	
-	Log3 $name, 5, "AMAD ($name) - AMAD_HTTP_POST: received http code ".$param->{code}." without any data after send SetCommand";
+	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
+	AMAD_GetUpdateLocal($hash);
+
 	return;
     }
+        
+    if($data =~ /\Error/i and exists($param->{code})) {    
+	$hash->{STATE} = $param->{code} if ($hash->{STATE} ne "initialized");
     
-    readingsSingleUpdate ($hash,"lastSetCommandState","cmd_done",1);
+	readingsBeginUpdate($hash);
+	readingsBulkUpdate ($hash,"lastSetCommandState","cmd_error");
+    
+	    if ($param->{code} eq 404) {
+		readingsBulkUpdate ($hash,"lastSetCommandError","automagic setcommand flow is inactive on your device!");
+	    } else {
+		readingsBulkUpdate ($hash,"lastSetCommandError","http error ".$param->{code});
+	    }
+    }
+
+    readingsEndUpdate ($hash,1);
+    ### End Error Handling
     
     return undef;
 }
@@ -399,8 +479,6 @@ sub AMAD_SelectSetCmd($$@)
 
 	readingsSingleUpdate ($hash,$cmd,$vol,1);
 	
-	AMAD_GetUpdateLocal($hash);
-	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
 	return AMAD_HTTP_POST ($hash,$url);
     }
     
@@ -425,8 +503,6 @@ sub AMAD_SelectSetCmd($$@)
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setBrightness?brightness=$bri";
     
-	AMAD_GetUpdateLocal($hash);
-	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
 	return AMAD_HTTP_POST ($hash,$url);
     }
     
@@ -435,8 +511,6 @@ sub AMAD_SelectSetCmd($$@)
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setScreenOnOff?screen=$mod";
 
-	AMAD_GetUpdateLocal($hash);
-	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
 	return AMAD_HTTP_POST ($hash,$url);
     }
     
@@ -445,8 +519,6 @@ sub AMAD_SelectSetCmd($$@)
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setScreenOrientation?orientation=$mod";
 
-	AMAD_GetUpdateLocal($hash);
-	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
 	return AMAD_HTTP_POST ($hash,$url);
     }
     
@@ -474,8 +546,6 @@ sub AMAD_SelectSetCmd($$@)
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setAlarm?hour=".$alarm[0]."&minute=".$alarm[1];
     
-	AMAD_GetUpdateLocal($hash);
-	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
 	return AMAD_HTTP_POST ($hash,$url);
     }
     
