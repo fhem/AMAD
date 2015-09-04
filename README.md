@@ -6,6 +6,8 @@
   Im Auslieferiungszustand werden folgende Zust&auml;nde dargestellt:
   <ul>
     <li>Zustand von Automagic auf dem Ger&auml;t</li>
+    <li>Bluetooth An/Aus</li>
+    <li>verbundene Bluetoothger&auml;te</li>
     <li>aktuell abgespieltes Musikalbum des verwendeten Mediaplayers</li>
     <li>aktuell abgespielter Musikinterpret des verwendeten Mediaplayers</li>
     <li>aktuell abgespielter Musiktitel des verwendeten Mediaplayers</li>
@@ -24,7 +26,7 @@
   </ul>
   <br>
   Mit etwas Einarbeitung k&ouml;nnen jegliche Informationen welche Automagic bereit stellt in FHEM angezeigt werden. Hierzu bedarf es lediglich
-  einer kleinen Anpassung des "Information" Flows
+  einer kleinen Anpassung des "Informations" Flows
   <br><br>
   Das Modul gibt Dir auch die M&ouml;glichkeit Deine Androidger&auml;te zu steuern. So k&ouml;nnen folgende Aktionen durchgef&uuml;hrt werden.
   <ul>
@@ -49,11 +51,8 @@
   <br><br>
   <b>Wie genau verwendet man nun AMAD?</b>
   <ul>
-    <li>Installiert Euch die App "Automagic Premium" aus dem App Store oder die Testversion von <a href="https://automagic4android.com/de/testversion">hier</a></li>
-    <li>ladet Euch das AMAD Modul und die Flowfiles von <a href="https://github.com/LeonGaultier/fhem-AMAD">GitHub</a> runter</li>
-    <li>installiert die zwei Flows und aktiviert erstmal nur den "Information" Flow, eventuell bei den <a href="https://github.com/LeonGaultier/fhem-AMAD/tree/master/Flow_Updates">
-    FlowUpdates</a> mal schauen ob es was neueres gibt und den entsprechenden Flow auf dem Ger&auml;t l&ouml;schen und den neuen Flow von GitHub installieren</li>
-    <li>kopiert die Moduldatei 74_AMAD.pm nach $FHEMPATH/FHEM. Geht auf die FHEM Frontendseite und gebt dort in der Kommandozeile <i>reload 74_AMAD.pm</i> ein</li>
+    <li>installiert Euch die App "Automagic Premium" aus dem App Store oder die Testversion von <a href="https://automagic4android.com/de/testversion">hier</a></li>
+    <li>installiert das Flowset 74_AMADautomagicFlows$VERSION.xml aus dem Ordner $INSTALLFHEM/lib/ auf Eurem Androidger&auml;t und aktiviert erstmal nur den "Informations" Flow.</li>
   </ul>
   <br>
   Nun m&uuml;sst Ihr nur noch ein Device in FHEM anlegen.
@@ -61,31 +60,34 @@
   <a name="AMADdefine"></a>
   <b>Define</b>
   <ul><br>
-    <code>define &lt;name&gt; AMAD &lt;IP-ADRESSE&gt; &lt;PORT&gt; &lt;INTERVAL&gt;</code>
+    <code>define &lt;name&gt; AMAD &lt;IP-ADRESSE&gt;</code>
     <br><br>
     Beispiel:
     <ul><br>
-      <code>define WandTabletWohnzimmer AMAD 192.168.0.23 8090 180</code><br>
+      <code>define WandTabletWohnzimmer AMAD 192.168.0.23</code><br>
     </ul>
     <br>
-    Diese Anweisung erstellt ein neues AMAD-Device. Die Parameter IP-ADRESSE und PORT legen die IP Adresse des Android Ger&auml;tes
-    sowie den, in den Flows des Trigger HTTP Request, angegebenen Port fest.<br>INTERVAL ist der Zeitabstand in dem ein erneuter Informationsabruf stattfinden soll. Alle x Sekunden.
-    Bei mir hat sich 180 gut bew&auml;hrt, also alle 3 Minuten<br>
-    <u><b>Bitte gebt f&uuml;r sofortige Erfolge als Port 8090 ein, das ist der Port der in den mitgelieferten Automagic Flows als Trigger Port eingetragen ist.<br>
-    Dieser kann sp&auml;ter mit Erfahrung auch ge&auml;ndert werden</b></u>
+    Diese Anweisung erstellt ein neues AMAD-Device. Der Parameter &lt;IP-ADRESSE&lt; legt die IP Adresse des Android Ger&auml;tes fest.<br>
+    Das Standard Abfrageinterval ist 180 Sekunden und kann &uuml;ber das Attribut intervall ge&auml;ndert werden. Wer den Port &auml;ndern m&ouml;chte, kann dies &uuml;ber
+    das Attribut port tun. <b>Ihr solltet aber wissen was Ihr tut, da dieser Port im HTTP Response Trigger der beiden Flows eingestellt ist. Demzufolge mu&szlig; dieser dort
+    auch ver&auml;dert werden.</b><br>
   </ul>
   <br><br> 
-  Fertig! Nach anlegen des Devices sollten bereits die ersten Readings reinkommen.
+  <b><u>Fertig! Nach anlegen der Ger&auml;teinstanz sollten nach sp&auml;testens 3 Minuten bereits die ersten Readings reinkommen.</u></b>
   <br><br>
   <a name="AMADreadings"></a>
   <b>Readings</b>
   <ul>
     <li>automagicState - Statusmeldungen von der AutomagicApp</li>
+    <li>bluetooth on/off - ist auf dem Ger&auml;t Bluetooth an oder aus</li>
+    <li>connectedBTdevices - eine Lieste der verbundenen Ger&auml;t</li>
     <li>currentMusicAlbum - aktuell abgespieltes Musikalbum des verwendeten Mediaplayers</li>
     <li>currentMusicArtist - aktuell abgespielter Musikinterpret des verwendeten Mediaplayers</li>
     <li>currentMusicTrack - aktuell abgespielter Musiktitel des verwendeten Mediaplayers</li>
     <li>deviceState - Status des Androidger&auml;tes, muss selbst mit setreading gesetzt werden z.B. &uuml;ber die Anwesenheitskontrolle.<br>
     Ist Offline gesetzt, wird der Intervall zum Informationsabruf aus gesetzt.</li>
+    <li>flow_SetCommands active/inactive - gibt den Status des SetCommands Flow wieder</li>
+    <li>flow_informations active/inactive - gibt den Status des Informations Flow wieder</li>
     <li>lastSetCommandError - letzte Fehlermeldung vom set Befehl</li>
     <li>lastSetCommandState - letzter Status vom set Befehl, Befehl erfolgreich/nicht erfolgreich gesendet</li>
     <li>lastStatusRequestError - letzte Fehlermeldung vom statusRequest Befehl</li>
@@ -125,7 +127,7 @@
     <li>mediaPlayer - steuert den Standard Mediaplayer. play, stop, Titel z&uuml;r&uuml;ck, Titel vor. <b>Attribut fhemServerIP</b></li>
     <li>openApp - &ouml;ffnet eine ausgew&auml;hlte App. <b>Attribut setOpenApp</b></li>
     <li>screenBrightness - setzt die Bildschirmhelligkeit, von 0-255 <b>Attribut setScreenBrightness</b></li>
-    Wenn Ihr das "set screenBrightness" verwenden wollt, muss eine kleine Anpassung im Flow SetCommand vorgenommen werden. &Ouml;ffnet die Aktion (eines der Vierecke ganz ganz unten)
+    Wenn Ihr das "set screenBrightness" verwenden wollt, muss eine kleine Anpassung im Flow SetCommands vorgenommen werden. &Ouml;ffnet die Aktion (eines der Vierecke ganz ganz unten)
     SetzeSystemeinstellung:System und macht einen Haken bei "Ich habe die Einstellungen &uuml;berpr&uuml;ft, ich weiss was ich tue".
     <li>screenFullscreen - Schaltet den Vollbildmodus on/off. <b>Attribut setFullscreen</b></li>
     <li>screenOrientation - Schaltet die Bildschirmausrichtung Auto/Landscape/Portait. <b>Attribut setScreenOrientation</b></li>
@@ -140,7 +142,8 @@
   <b>STATE</b>
   <ul>
     <li>initialized - Ist der Status kurz nach einem define..</li>
-    <li>activ - Das Modul ist im aktiven Status.</li>
+    <li>active - die Ger&auml;teinstanz ist im aktiven Status.</li>
+    <li>disabled - die Ger&auml;teinstanz wurde &uuml;ber das Attribut disable deaktiviert</li>
   </ul>
   <br><br><br>
   <u><b>Anwendungsbeispiele:</b></u>
