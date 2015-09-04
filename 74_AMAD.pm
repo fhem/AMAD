@@ -249,12 +249,13 @@ sub AMAD_Set($$@) {
 	    Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
 	  
 	    return "set command only works if STATE not equal initialized, please wait for next interval run" if( $hash->{STATE} eq "initialized");
-
 	    return "Cannot set command, FHEM Device is disabled" if( AttrVal( $name, "disable", "0" ) eq "1" );
+	    
+	    return AMAD_SelectSetCmd( $hash, $cmd, @val ) if( @val ) && ( ReadingsVal( $name, "deviceState", "online" ) eq "offline" ) && ( lc $cmd eq 'devicestate' );
+	    return "Cannot set command, FHEM Device is offline" if( ReadingsVal( $name, "deviceState", "online" ) eq "offline" );
 	  
-	    return AMAD_SelectSetCmd( $hash, $cmd, @val ) if( @val )
-							     || ( lc $cmd eq 'statusrequest' );
-  }
+	    return AMAD_SelectSetCmd( $hash, $cmd, @val ) if( @val ) || ( lc $cmd eq 'statusrequest' );
+    }
 
     return "Unknown argument $cmd, bearword as argument or wrong parameter(s), choose one of $list";
 }
@@ -406,11 +407,10 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
 
     ### End Error Handling
 
-
+    $hash->{helper}{infoErrorCounter} = 0;
  
     ### Begin Response Processing
     $hash->{STATE} = "active" if( $hash->{STATE} eq "initialized" || $hash->{STATE} ne "active" );
-    $hash->{helper}{infoErrorCounter} = 0;
     
     my @valuestring = split( '@@@@',  $data );
     my %buffer;
@@ -432,6 +432,8 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
     readingsBulkUpdate( $hash, "lastStatusRequestState", "statusRequest_done" );
     
     readingsEndUpdate( $hash, 1 );
+    
+    $hash->{helper}{infoErrorCounter} = 0;
     ### End Response Processing
     
     $hash->{STATE} = "active" if( $hash->{STATE} eq "initialized" );
@@ -473,7 +475,7 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
     
 
     ### Begin Error Handling
-    if($hash->{helper}{setCmdErrorCounter} > 2 ) {
+    if( $hash->{helper}{setCmdErrorCounter} > 2 ) {
 	readingsBeginUpdate( $hash );
 	readingsBulkUpdate( $hash, "lastSetCommandState", "statusRequest_error" );
 	
@@ -501,7 +503,8 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
 	    readingsBulkUpdate( $hash, "lastSetCommandError", "check automagicApp on your device" );
 	    
 	    Log3 $name, 4, "AMAD ($name) - Please check the AutomagicAPP on your Device";
-	} else {
+	} 
+	elsif( $hash->{helper}{setCmdErrorCounter} > 4 ) {
 	    readingsBulkUpdate( $hash, "lastSetCommandError", "unknown error, please contact the developer" );
 	    
 	    Log3 $name, 4, "AMAD ($name) - UNKNOWN ERROR, PLEASE CONTACT THE DEVELOPER, DEVICE DISABLED";
@@ -537,23 +540,16 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
 	}
     }
  
-    if( $data eq "" and exists( $param->{code} ) ) {
+    if( $data eq "" and exists( $param->{code} ) && $param->{code} ne 200 ) {
 	$hash->{STATE} = $param->{code} if( $hash->{STATE} ne "initialized" );
 	$hash->{helper}{setCmdErrorCounter} = ( $hash->{helper}{setCmdErrorCounter} + 1 );
     
 	readingsBeginUpdate( $hash );
-    
-	    if( $param->{code} ne 200 ) {
-		readingsBulkUpdate($hash, "lastSetCommandState", "cmd_error" );
-		readingsBulkUpdate($hash, "lastSetCommandError", "http Error ".$param->{code} );
-	    }
-	readingsBulkUpdate( $hash, "lastSetCommandState" ,"cmd_done" );
+	readingsBulkUpdate($hash, "lastSetCommandState", "cmd_error" );
+	readingsBulkUpdate($hash, "lastSetCommandError", "http Error ".$param->{code} );
 	readingsEndUpdate( $hash, 1 );
     
 	Log3 $name, 5, "AMAD ($name) - AMAD_HTTP_POST: received http code ".$param->{code};
-	
-	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
-	AMAD_GetUpdateLocal( $hash );
 
 	return;
     }
@@ -570,10 +566,18 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
 	    } else {
 		readingsBulkUpdate( $hash, "lastSetCommandError", "http error ".$param->{code} );
 	    }
+	readingsEndUpdate( $hash, 1 );
+	
+	return;
     }
-
-    readingsEndUpdate( $hash, 1 );
+    
     ### End Error Handling
+    
+    readingsSingleUpdate( $hash, "lastSetCommandState", "cmd_done", 1 );
+    $hash->{helper}{infoErrorCounter} = 0;
+    
+    Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
+    AMAD_GetUpdateLocal( $hash );
     
     return undef;
 }
