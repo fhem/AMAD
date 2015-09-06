@@ -33,7 +33,7 @@ use Time::HiRes qw(gettimeofday);
 
 use HttpUtils;
 
-my $version = "0.5.9";
+my $version = "0.5.10";
 
 
 
@@ -310,13 +310,17 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
 	    readingsBulkUpdate( $hash, "deviceState", "offline" );
 	    $hash->{STATE} = "AMAD Flows inactive, device set offline";
 	}
-	elsif( $hash->{helper}{infoErrorCounter} > 4 && $hash->{helper}{setCmdErrorCounter} > 2 ) {
-	    readingsBulkUpdate( $hash, "lastStatusRequestError", "to many errors, check your network or device configuration" );
+	elsif( $hash->{helper}{infoErrorCounter} > 9 && $hash->{helper}{setCmdErrorCounter} > 4 ) {
+	    readingsBulkUpdate( $hash, "lastStatusRequestError", "unknown error, please contact the developer" );
 	    
-	    Log3 $name, 4, "AMAD ($name) - To many Errors please check your Network or Device Configuration, DEVICE IS SET OFFLINE";
+	    Log3 $name, 4, "AMAD ($name) - UNKNOWN ERROR, PLEASE CONTACT THE DEVELOPER, DEVICE DISABLED";
 	    
-	    readingsBulkUpdate( $hash, "deviceState", "offline" );
-	    $hash->{STATE} = "To many Errors, device set offline";
+	    $attr{$name}{disable} = 1;
+	    $hash->{STATE} = "Unknown Error, device disabled";
+	    $hash->{helper}{infoErrorCounter} = 0;
+	    $hash->{helper}{setCmdErrorCounter} = 0;
+	    
+	    return;
 	}
 	elsif( ReadingsVal( $name, "flow_Informations", "active" ) eq "inactive" ) {
 	    readingsBulkUpdate( $hash, "lastStatusRequestError", "informations flow on your device is inactive, will try to reactivate" );
@@ -327,14 +331,15 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
 	    readingsBulkUpdate( $hash, "lastStatusRequestError", "check automagicApp on your device" );
 	    
 	    Log3 $name, 4, "AMAD ($name) - Please check the AutomagicAPP on your Device";
-	} else {
-	    readingsBulkUpdate( $hash, "lastStatusRequestError", "unknown error, please contact the developer" );
+	}
+	elsif( $hash->{helper}{infoErrorCounter} > 9 ) {
+	    readingsBulkUpdate( $hash, "lastStatusRequestError", "to many errors, check your network or device configuration" );
 	    
-	    Log3 $name, 4, "AMAD ($name) - UNKNOWN ERROR, PLEASE CONTACT THE DEVELOPER, DEVICE DISABLED";
+	    Log3 $name, 4, "AMAD ($name) - To many Errors please check your Network or Device Configuration, DEVICE IS SET OFFLINE";
 	    
-	    $hash->{STATE} = "Unknown Error, device disabled";
-	    
-	    $attr{$name}{disable} = 1;
+	    readingsBulkUpdate( $hash, "deviceState", "offline" );
+	    $hash->{STATE} = "To many Errors, device set offline";
+	    $hash->{helper}{infoErrorCounter} = 0;
 	}
 	readingsEndUpdate( $hash, 1 );
     }
@@ -486,13 +491,17 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
 	    readingsBulkUpdate( $hash, "deviceState", "offline" );
 	    $hash->{STATE} = "AMAD Flows inactive, device set offline";
 	}
-	elsif( $hash->{helper}{infoErrorCounter} > 4 && $hash->{helper}{setCmdErrorCounter} > 2 ) {
-	    readingsBulkUpdate($hash, "lastSetCommandError", "to many errors, check your network or device configuration" );
+	elsif( $hash->{helper}{infoErrorCounter} > 9 && $hash->{helper}{setCmdErrorCounter} > 4 ) {
+	    readingsBulkUpdate($hash, "lastSetCommandError", "unknown error, please contact the developer" );
 	    
-	    Log3 $name, 4, "AMAD ($name) - To many Errors please check your Network or Device Configuration, DEVICE IS SET OFFLINE";
+	    Log3 $name, 4, "AMAD ($name) - UNKNOWN ERROR, PLEASE CONTACT THE DEVELOPER, DEVICE DISABLED";
 	    
-	    readingsBulkUpdate( $hash, "deviceState", "offline" );
-	    $hash->{STATE} = "To many Errors, device set offline";
+	    $attr{$name}{disable} = 1;
+	    $hash->{STATE} = "Unknown Error, device disabled";
+	    $hash->{helper}{infoErrorCounter} = 0;
+	    $hash->{helper}{setCmdErrorCounter} = 0;
+	    
+	    return;
 	}
 	elsif( ReadingsVal( $name, "flow_SetCommands", "active" ) eq "inactive" ) {
 	    readingsBulkUpdate( $hash, "lastSetCommandError", "setCommands flow on your device is inactive, will try to reactivate" );
@@ -504,14 +513,14 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
 	    
 	    Log3 $name, 4, "AMAD ($name) - Please check the AutomagicAPP on your Device";
 	} 
-	elsif( $hash->{helper}{setCmdErrorCounter} > 4 ) {
-	    readingsBulkUpdate( $hash, "lastSetCommandError", "unknown error, please contact the developer" );
+	elsif( $hash->{helper}{setCmdErrorCounter} > 9 ) {
+	    readingsBulkUpdate( $hash, "lastSetCommandError", "to many errors, check your network or device configuration" );
 	    
-	    Log3 $name, 4, "AMAD ($name) - UNKNOWN ERROR, PLEASE CONTACT THE DEVELOPER, DEVICE DISABLED";
+	    Log3 $name, 4, "AMAD ($name) - To many Errors please check your Network or Device Configuration, DEVICE IS SET OFFLINE";
 	    
-	    $hash->{STATE} = "Unknown Error, device disabled";
-	    
-	    $attr{$name}{disable} = 1;
+	    readingsBulkUpdate( $hash, "deviceState", "offline" );
+	    $hash->{STATE} = "To many Errors, device set offline";
+	    $hash->{helper}{setCmdErrorCounter} = 0;
 	}
 	readingsEndUpdate( $hash, 1 );
     }
