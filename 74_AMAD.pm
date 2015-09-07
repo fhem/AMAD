@@ -33,7 +33,7 @@ use Time::HiRes qw(gettimeofday);
 
 use HttpUtils;
 
-my $version = "0.5.10";
+my $version = "0.5.11";
 
 
 
@@ -575,7 +575,6 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
 	    } else {
 		readingsBulkUpdate( $hash, "lastSetCommandError", "http error ".$param->{code} );
 	    }
-	readingsEndUpdate( $hash, 1 );
 	
 	return;
     }
@@ -583,7 +582,7 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
     ### End Error Handling
     
     readingsSingleUpdate( $hash, "lastSetCommandState", "cmd_done", 1 );
-    $hash->{helper}{infoErrorCounter} = 0;
+    $hash->{helper}{setCmdErrorCounter} = 0;
     
     Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
     AMAD_GetUpdateLocal( $hash );
