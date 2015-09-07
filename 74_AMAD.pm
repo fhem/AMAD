@@ -33,7 +33,7 @@ use Time::HiRes qw(gettimeofday);
 
 use HttpUtils;
 
-my $version = "0.5.11";
+my $version = "0.5.12";
 
 
 
@@ -584,9 +584,6 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
     readingsSingleUpdate( $hash, "lastSetCommandState", "cmd_done", 1 );
     $hash->{helper}{setCmdErrorCounter} = 0;
     
-    Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
-    AMAD_GetUpdateLocal( $hash );
-    
     return undef;
 }
 
@@ -605,7 +602,7 @@ sub AMAD_SelectSetCmd($$@) {
 	
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/screenMsg?message=$msg";
 	Log3 $name, 4, "AMAD ($name) - Sub AMAD_SetScreenMsg";
-
+	    
 	return AMAD_HTTP_POST( $hash,$url );
     }
     
@@ -626,6 +623,9 @@ sub AMAD_SelectSetCmd($$@) {
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setVolume?volume=$vol";
 
 	readingsSingleUpdate( $hash, $cmd, $vol, 1 );
+
+	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
+	AMAD_GetUpdateLocal( $hash );
 	
 	return AMAD_HTTP_POST( $hash, $url );
     }
@@ -651,6 +651,9 @@ sub AMAD_SelectSetCmd($$@) {
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setBrightness?brightness=$bri";
     
+	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
+	AMAD_GetUpdateLocal( $hash );
+	
 	return AMAD_HTTP_POST( $hash,$url );
     }
     
@@ -659,6 +662,9 @@ sub AMAD_SelectSetCmd($$@) {
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setScreenOnOff?screen=$mod";
 
+	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
+	AMAD_GetUpdateLocal( $hash );
+	
 	return AMAD_HTTP_POST( $hash,$url );
     }
     
@@ -667,6 +673,9 @@ sub AMAD_SelectSetCmd($$@) {
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setScreenOrientation?orientation=$mod";
 
+	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
+	AMAD_GetUpdateLocal( $hash );
+	
 	return AMAD_HTTP_POST( $hash,$url );
     }
     
@@ -694,6 +703,9 @@ sub AMAD_SelectSetCmd($$@) {
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setAlarm?hour=".$alarm[0]."&minute=".$alarm[1];
     
+	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
+	AMAD_GetUpdateLocal( $hash );
+	
 	return AMAD_HTTP_POST( $hash, $url );
     }
     
