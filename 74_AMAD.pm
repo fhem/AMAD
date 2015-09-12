@@ -1,4 +1,4 @@
-################################################################
+###############################################################################
 # 
 # Developed with Kate
 #
@@ -20,9 +20,10 @@
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
-################################################################
-
-
+#
+# $Id$
+#
+###############################################################################
 
 
 package main;
@@ -33,7 +34,7 @@ use Time::HiRes qw(gettimeofday);
 
 use HttpUtils;
 
-my $version = "0.6.0";
+my $version = "0.6.1";
 
 
 
@@ -90,8 +91,9 @@ my ( $hash, $def ) = @_;
 
     InternalTimer( gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 0 );
     
-    $hash->{STATE} = "initialized";
-    readingsSingleUpdate  ( $hash, "deviceState", "online", 0 );
+    # $hash->{STATE} = "initialized";    # direktes setzen von STATE ist absolete
+    readingsSingleUpdate ( $hash, "state", "initialized", 1 );
+    readingsSingleUpdate ( $hash, "deviceState", "online", 1 );
 
     return undef;
 }
@@ -114,19 +116,22 @@ my ( $cmd, $name, $attrName, $attrVal ) = @_;
 	if( $cmd eq "set" ) {
 	    if( $attrVal eq "0" ) {
 		RemoveInternalTimer( $hash );
-		InternalTimer( gettimeofday()+2, "AMAD_GetUpdateTimer", $hash, 0 ) if( $hash->{STATE} eq "disabled" );
-		$hash->{STATE}='active';
+		InternalTimer( gettimeofday()+2, "AMAD_GetUpdateTimer", $hash, 0 ) if( ReadingsVal( $hash->{NAME}, "state", 0 ) eq "disabled" );
+		# $hash->{STATE}='active';     # direktes STATE setzen ist absolete
+		readingsSingleUpdate ( $hash, "state", "active", 1 );
 		Log3 $name, 3, "AMAD ($name) - enabled";
 	    } else {
-		$hash->{STATE} = 'disabled';
+		# $hash->{STATE} = 'disabled';
+		readingsSingleUpdate ( $hash, "state", "disabled", 1 );
 		RemoveInternalTimer( $hash );
 		Log3 $name, 3, "AMAD ($name) - disabled";
 	    }
 	}
 	elsif( $cmd eq "del" ) {
 	    RemoveInternalTimer( $hash );
-	    InternalTimer( gettimeofday()+2, "AMAD_GetUpdateTimer", $hash, 0 ) if( $hash->{STATE} eq "disabled" );
-	    $hash->{STATE}='active';
+	    InternalTimer( gettimeofday()+2, "AMAD_GetUpdateTimer", $hash, 0 ) if( ReadingsVal( $hash->{NAME}, "state", 0 ) eq "disabled" );
+	    # $hash->{STATE}='active';
+	    readingsSingleUpdate ( $hash, "state", "active", 1 );
 	    Log3 $name, 3, "AMAD ($name) - enabled";
 
 	} else {
@@ -190,7 +195,7 @@ sub AMAD_GetUpdateLocal($) {
 my ( $hash ) = @_;
     my $name = $hash->{NAME};
 
-    AMAD_RetrieveAutomagicInfo( $hash ) if( ReadingsVal( $name, "deviceState", "online" ) eq "online" && $hash->{STATE} ne "initialized" && AttrVal( $name, "disable", 0 ) ne "1" );  ### deviceState muß von Hand online/offline gesetzt werden z.B. über RESIDENZ Modul
+    AMAD_RetrieveAutomagicInfo( $hash ) if( ReadingsVal( $name, "deviceState", "online" ) eq "online" && ReadingsVal( $hash->{NAME}, "state", 0 ) ne "initialized" && AttrVal( $name, "disable", 0 ) ne "1" );  ### deviceState muß von Hand online/offline gesetzt werden z.B. ueber RESIDENZ Modul
     
     return 1;
 }
@@ -200,7 +205,7 @@ sub AMAD_GetUpdateTimer($) {
     my ( $hash ) = @_;
     my $name = $hash->{NAME};
  
-    AMAD_RetrieveAutomagicInfo( $hash ) if( ReadingsVal( $name, "deviceState", "online" ) eq "online" && AttrVal( $name, "disable", 0 ) ne "1" );  ### deviceState muß von Hand online/offline gesetzt werden z.B. über RESIDENZ Modul
+    AMAD_RetrieveAutomagicInfo( $hash ) if( ReadingsVal( $name, "deviceState", "online" ) eq "online" && AttrVal( $name, "disable", 0 ) ne "1" );  ### deviceState muß von Hand online/offline gesetzt werden z.B. ueber RESIDENZ Modul
   
     InternalTimer( gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 1 );
     Log3 $name, 4, "AMAD ($name) - Call AMAD_GetUpdateTimer";
@@ -248,7 +253,7 @@ sub AMAD_Set($$@) {
 
 	    Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
 	  
-	    return "set command only works if STATE not equal initialized, please wait for next interval run" if( $hash->{STATE} eq "initialized");
+	    return "set command only works if state not equal initialized, please wait for next interval run" if( ReadingsVal( $hash->{NAME}, "state", 0 ) eq "initialized");
 	    return "Cannot set command, FHEM Device is disabled" if( AttrVal( $name, "disable", "0" ) eq "1" );
 	    
 	    return AMAD_SelectSetCmd( $hash, $cmd, @val ) if( @val ) && ( ReadingsVal( $name, "deviceState", "online" ) eq "offline" ) && ( lc $cmd eq 'devicestate' );
@@ -308,7 +313,8 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
 	    Log3 $name, 5, "AMAD ($name) - CHECK THE LAST ERROR READINGS FOR MORE INFO, DEVICE IS SET OFFLINE";
 	     
 	    readingsBulkUpdate( $hash, "deviceState", "offline" );
-	    $hash->{STATE} = "AMAD Flows inactive, device set offline";
+	    # $hash->{STATE} = "AMAD Flows inactive, device set offline";   # STATE direkt setzen ist absolete
+	    readingsBulkUpdate ( $hash, "state", "AMAD Flows inactive, device set offline");
 	}
 	elsif( $hash->{helper}{infoErrorCounter} > 9 && $hash->{helper}{setCmdErrorCounter} > 4 ) {
 	    readingsBulkUpdate( $hash, "lastStatusRequestError", "unknown error, please contact the developer" );
@@ -316,7 +322,9 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
 	    Log3 $name, 4, "AMAD ($name) - UNKNOWN ERROR, PLEASE CONTACT THE DEVELOPER, DEVICE DISABLED";
 	    
 	    $attr{$name}{disable} = 1;
-	    $hash->{STATE} = "Unknown Error, device disabled";
+	    # $hash->{STATE} = "Unknown Error, device disabled";
+	    readingsBulkUpdate ( $hash, "state", "Unknown Error, device disabled");
+	    
 	    $hash->{helper}{infoErrorCounter} = 0;
 	    $hash->{helper}{setCmdErrorCounter} = 0;
 	    
@@ -338,7 +346,8 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
 	    Log3 $name, 4, "AMAD ($name) - To many Errors please check your Network or Device Configuration, DEVICE IS SET OFFLINE";
 	    
 	    readingsBulkUpdate( $hash, "deviceState", "offline" );
-	    $hash->{STATE} = "To many Errors, device set offline";
+	    # $hash->{STATE} = "To many Errors, device set offline";      # STATE direkt setzen ist absolete
+	    readingsBulkUpdate ( $hash, "state", "To many Errors, device set offline");
 	    $hash->{helper}{infoErrorCounter} = 0;
 	}
 	readingsEndUpdate( $hash, 1 );
@@ -346,10 +355,11 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
     
     if( defined( $err ) ) {
 	if( $err ne "" ) {
-	    $hash->{STATE} = $err if( $hash->{STATE} ne "initialized" );
+	    readingsBeginUpdate( $hash );
+	    # $hash->{STATE} = $err if( $hash->{STATE} ne "initialized" );
+	    readingsBulkUpdate ( $hash, "state", "$err") if( ReadingsVal( $name, "state", 1 ) ne "initialized" );
 	    $hash->{helper}{infoErrorCounter} = ( $hash->{helper}{infoErrorCounter} + 1 );
 
-	    readingsBeginUpdate( $hash );
 	    readingsBulkUpdate( $hash, "lastStatusRequestState", "statusRequest_error" );
 	  
 	    if( $err =~ /timed out/ ) {
@@ -358,7 +368,7 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
 	    elsif( ( $err =~ /Keine Route zum Zielrechner/ ) && $hash->{helper}{infoErrorCounter} > 1 ) {
 		readingsBulkUpdate( $hash,"lastStatusRequestError", "no route to target. bad network configuration or network is down ");
 	    } else {
-		readingsBulkUpdate($hash, "lastStatusRequestError", "$err" );
+		readingsBulkUpdate($hash, "lastStatusRequestError", $err );
 	    }
 
 	readingsEndUpdate( $hash, 1 );
@@ -369,10 +379,11 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
     }
 
     if( $data eq "" and exists( $param->{code} ) ) {
-	$hash->{STATE} = $param->{code} if( $hash->{STATE} ne "initialized" );
+	readingsBeginUpdate( $hash );
+	# $hash->{STATE} = $param->{code} if( $hash->{STATE} ne "initialized" );     # direktes setzen von STATE ist absolete
+	readingsBulkUpdate ( $hash, "state", $param->{code} ) if( ReadingsVal( $name, "state", 1 ) ne "initialized" );
 	$hash->{helper}{infoErrorCounter} = ( $hash->{helper}{infoErrorCounter} + 1 );
     
-	readingsBeginUpdate( $hash );
 	readingsBulkUpdate( $hash, "lastStatusRequestState", "statusRequest_error" );
     
 	if( $param->{code} ne 200 ) {
@@ -388,10 +399,11 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
     }
 
     if( ( $data =~ /Error/i ) and exists( $param->{code} ) ) {    
-	$hash->{STATE} = $param->{code} if( $hash->{STATE} ne "initialized" );
+	#$hash->{STATE} = $param->{code} if( $hash->{STATE} ne "initialized" );    ## STATE direkt ist absolete
+	readingsBeginUpdate( $hash );
+	readingsBulkUpdate( $hash, "state", $param->{code} ) if( ReadingsVal( $name, "state" ,0) ne "initialized" );
 	$hash->{helper}{infoErrorCounter} = ( $hash->{helper}{infoErrorCounter} + 1 );
 
-	readingsBeginUpdate( $hash );
 	readingsBulkUpdate( $hash, "lastStatusRequestState", "statusRequest_error" );
     
 	    if( $param->{code} eq 404 && ReadingsVal( $name, "flow_Informations", "inactive" ) eq "inactive" ) {
@@ -415,7 +427,8 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
     $hash->{helper}{infoErrorCounter} = 0;
  
     ### Begin Response Processing
-    $hash->{STATE} = "active" if( $hash->{STATE} eq "initialized" || $hash->{STATE} ne "active" );
+    # $hash->{STATE} = "active" if( $hash->{STATE} eq "initialized" || $hash->{STATE} ne "active" );  ## STATE direkt setzen ist absolete
+    readingsSingleUpdate( $hash, "state", "active", 1) if( ReadingsVal( $name, "state", 0 ) ne "initialized" or ReadingsVal( $name, "state", 0 ) ne "active" );
     
     my @valuestring = split( '@@@@',  $data );
     my %buffer;
@@ -436,12 +449,14 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
     
     readingsBulkUpdate( $hash, "lastStatusRequestState", "statusRequest_done" );
     
-    readingsEndUpdate( $hash, 1 );
+    
     
     $hash->{helper}{infoErrorCounter} = 0;
     ### End Response Processing
     
-    $hash->{STATE} = "active" if( $hash->{STATE} eq "initialized" );
+    #$hash->{STATE} = "active" if( $hash->{STATE} eq "initialized" );   ## STATE direkt setzen ist absolete
+    readingsBulkUpdate( $hash, "state", "active" ) if( ReadingsVal( $name, "state", 0 ) eq "initialized" );
+    readingsEndUpdate( $hash, 1 );
     
     return undef;
 }
@@ -451,9 +466,11 @@ sub AMAD_HTTP_POST($$) {
     my ( $hash, $url ) = @_;
     my $name = $hash->{NAME};
     
-    my $state = $hash->{STATE};
+    #my $state = $hash->{STATE};
+    my $state = ReadingsVal( $name, "state", 0 );
     
-    $hash->{STATE} = "Send HTTP POST";
+    #$hash->{STATE} = "Send HTTP POST";
+    readingsSingleUpdate( $hash, "state", "Send HTTP POST", 1 );
     
     HttpUtils_NonblockingGet(
 	{
@@ -467,7 +484,8 @@ sub AMAD_HTTP_POST($$) {
     );
     Log3 $name, 4, "AMAD ($name) - Send HTTP POST with URL $url";
 
-    $hash->{STATE} = $state;
+    #$hash->{STATE} = $state;
+    readingsSingleUpdate( $hash, "state", $state, 1 );
 
     return undef;
 }
@@ -489,7 +507,8 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
 	    Log3 $name, 5, "AMAD ($name) - CHECK THE LAST ERROR READINGS FOR MORE INFO, DEVICE IS SET OFFLINE";
 	     
 	    readingsBulkUpdate( $hash, "deviceState", "offline" );
-	    $hash->{STATE} = "AMAD Flows inactive, device set offline";
+	    #$hash->{STATE} = "AMAD Flows inactive, device set offline";    # STATE direkt setzen ist absolete
+	    readingsBulkUpdate( $hash, "state", "AMAD Flows inactive, device set offline" );
 	}
 	elsif( $hash->{helper}{infoErrorCounter} > 9 && $hash->{helper}{setCmdErrorCounter} > 4 ) {
 	    readingsBulkUpdate($hash, "lastSetCommandError", "unknown error, please contact the developer" );
@@ -497,7 +516,8 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
 	    Log3 $name, 4, "AMAD ($name) - UNKNOWN ERROR, PLEASE CONTACT THE DEVELOPER, DEVICE DISABLED";
 	    
 	    $attr{$name}{disable} = 1;
-	    $hash->{STATE} = "Unknown Error, device disabled";
+	    #$hash->{STATE} = "Unknown Error, device disabled";
+	    readingsBulkUpdate( $hash, "state", "Unknown Error, device disabled" );
 	    $hash->{helper}{infoErrorCounter} = 0;
 	    $hash->{helper}{setCmdErrorCounter} = 0;
 	    
@@ -519,7 +539,8 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
 	    Log3 $name, 4, "AMAD ($name) - To many Errors please check your Network or Device Configuration, DEVICE IS SET OFFLINE";
 	    
 	    readingsBulkUpdate( $hash, "deviceState", "offline" );
-	    $hash->{STATE} = "To many Errors, device set offline";
+	    #$hash->{STATE} = "To many Errors, device set offline";   ## STATE direkt setzen ist absolete
+	    readingsBulkUpdate( $hash, "state", "To many Errors, device set offline" );
 	    $hash->{helper}{setCmdErrorCounter} = 0;
 	}
 	readingsEndUpdate( $hash, 1 );
@@ -527,10 +548,11 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
     
     if( defined( $err ) ) {
 	if( $err ne "" ) {
-	  $hash->{STATE} = $err if( $hash->{STATE} ne "initialized" );
+	  readingsBeginUpdate( $hash );
+	  #$hash->{STATE} = $err if( $hash->{STATE} ne "initialized" );  ## STATE direkt setzen ist absolete
+	  readingsBulkUpdate( $hash, "state", $err ) if( ReadingsVal( $name, "state", 0 ) ne "initialized" );
 	  $hash->{helper}{setCmdErrorCounter} = ($hash->{helper}{setCmdErrorCounter} + 1);
 	  
-	  readingsBeginUpdate( $hash );
 	  readingsBulkUpdate( $hash, "lastSetCommandState", "cmd_error" );
 	  
 	  if( $err =~ /timed out/ ) {
@@ -550,10 +572,12 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
     }
  
     if( $data eq "" and exists( $param->{code} ) && $param->{code} ne 200 ) {
-	$hash->{STATE} = $param->{code} if( $hash->{STATE} ne "initialized" );
-	$hash->{helper}{setCmdErrorCounter} = ( $hash->{helper}{setCmdErrorCounter} + 1 );
-    
 	readingsBeginUpdate( $hash );
+	#$hash->{STATE} = $param->{code} if( $hash->{STATE} ne "initialized" );  ## STATE direkt setzen ist absolete
+	readingsBulkUpdate( $hash, "state", $param->{code} ) if( ReadingsVal( $hash, "state", 0 ) ne "initialized" );
+	
+	$hash->{helper}{setCmdErrorCounter} = ( $hash->{helper}{setCmdErrorCounter} + 1 );
+
 	readingsBulkUpdate($hash, "lastSetCommandState", "cmd_error" );
 	readingsBulkUpdate($hash, "lastSetCommandError", "http Error ".$param->{code} );
 	readingsEndUpdate( $hash, 1 );
@@ -563,11 +587,13 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
 	return;
     }
         
-    if( ( $data =~ /Error/i ) and exists( $param->{code} ) ) {    
-	$hash->{STATE} = $param->{code} if( $hash->{STATE} ne "initialized" );
-	$hash->{helper}{setCmdErrorCounter} = ( $hash->{helper}{setCmdErrorCounter} + 1 );
-    
+    if( ( $data =~ /Error/i ) and exists( $param->{code} ) ) {
 	readingsBeginUpdate( $hash );
+	#$hash->{STATE} = $param->{code} if( $hash->{STATE} ne "initialized" );  ## STATE direkt setzen ist absolete
+	readingsBulkUpdate( $hash, "state", $param->{code} ) if( ReadingsVal( $name, "state", 0 ) ne "initialized" );
+	
+	$hash->{helper}{setCmdErrorCounter} = ( $hash->{helper}{setCmdErrorCounter} + 1 );
+
 	readingsBulkUpdate( $hash, "lastSetCommandState", "cmd_error" );
     
 	    if( $param->{code} eq 404 ) {
@@ -892,7 +918,7 @@ sub AMAD_SelectSetCmd($$@) {
   </ul>
   <br><br>
   <a name="AMADstate"></a>
-  <b>STATE</b>
+  <b>state</b>
   <ul>
     <li>initialized - Ist der Status kurz nach einem define..</li>
     <li>active - die Ger&auml;teinstanz ist im aktiven Status.</li>
