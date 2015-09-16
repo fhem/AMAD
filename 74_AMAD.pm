@@ -35,7 +35,7 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-my $version = "0.7.0";
+my $version = "0.7.1";
 
 
 
@@ -79,9 +79,6 @@ my ( $hash, $def ) = @_;
     my $port		= 8090;
     my $interval  	= 180;
     
-    # Interner Server fuer bidirektionale Kommunikation
-    my $sport		= 8090;
-    
 
     $hash->{HOST} 	= $host;
     $hash->{PORT} 	= $port;
@@ -93,11 +90,14 @@ my ( $hash, $def ) = @_;
     Log3 $name, 3, "AMAD ($name) - defined with host $hash->{HOST} on port $hash->{HOST} and interval $hash->{INTERVAL} (sec)";
     
     # Oeffnen des TCP Servers
-    my $ret = TcpServer_Open($hash, $sport, $global);
+    my $ret = TcpServer_Open( $hash, "8090", "global" );
+    
     if($ret && !$init_done) {
 	Log3 $name, 1, "$ret. Exiting.";
 	exit(1);
     }
+    Log3 $name, 1, "$ret. Wird geöffnet.";
+    return $ret;
     
 
     AMAD_GetUpdateLocal( $hash );
@@ -468,11 +468,14 @@ sub AMAD_Read($) {
     
     if($hash->{SERVERSOCKET}) {   # Accept and create a child
 	my $chash = TcpServer_Accept($hash, "http");
-	return if(!$chash);
+	$chash->{CD}->blocking(0);
+	return;
     }
     
-
+    my $buf;
+    my $ret = sysread($hash->{CD}, $buf, 256);
     
+    Log3 $name, 3, "AMAD ($name) - Recieve String $buf";
 
 }
 
