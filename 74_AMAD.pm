@@ -69,7 +69,8 @@ sub AMAD_Initialize($) {
 sub AMAD_Define($$) {
 
     my ( $hash, $def ) = @_;
-
+    
+    
     #if( !$defs{AMADCommBridge} ) {	# Anlegen einer Masterinstanz für die bidirektionale Kommunikation
     
 	#my $bridgeDevice = "AMADCommBridge";
@@ -81,6 +82,70 @@ sub AMAD_Define($$) {
 
 	#Log3 $hash->{NAME}, 3, "AMAD ( $hash->{NAME} ) - AMADCommBridge fertig angelegt";
     #}
+    
+    
+    my @a = split( "[ \t][ \t]*", $def );
+
+    return "too few parameters: define <name> AMAD <HOST>" if ( @a != 3 );
+
+
+    my $name    	= $a[0];
+    my $host    	= $a[2];
+    my $port		= 8090;
+    my $interval  	= 180;
+
+    $hash->{HOST} 	= $host;
+    $hash->{PORT} 	= $port;
+    $hash->{INTERVAL} 	= $interval;
+    $hash->{VERSION} 	= $version;
+    $hash->{helper}{infoErrorCounter} = 0;
+    $hash->{helper}{setCmdErrorCounter} = 0;
+
+    Log3 $name, 3, "AMAD ($name) - defined with host $hash->{HOST} on port $hash->{PORT} and interval $hash->{INTERVAL} (sec)";
+
+    AMAD_GetUpdateLocal( $hash );
+
+    InternalTimer( gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 0 );
+    #AMAD_CommBridge_Open( $hash ) if( $hash eq "AMADCommBridge" );
+    readingsSingleUpdate ( $hash, "state", "initialized", 1 );
+    readingsSingleUpdate ( $hash, "deviceState", "online", 1 );
+
+    return undef;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+my ( $hash, $def ) = @_;
+
+    
 
 
     my @a = split( "[ \t][ \t]*", $def );
@@ -107,7 +172,7 @@ sub AMAD_Define($$) {
     
     AMAD_GetUpdateLocal( $hash ); #if( $name ne "AMADCommBridge" );
     InternalTimer( gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 0 ); #if( $name ne "AMADCommBridge" );
-    #AMAD_CommBridge_Open( $hash ) if( $hash eq "AMADCommBridge" );
+    
     
     readingsSingleUpdate ( $hash, "state", "initialized", 1 ); #if( $name ne "AMADCommBridge" );
     readingsSingleUpdate ( $hash, "deviceState", "online", 1 ); #if( $name ne "AMADCommBridge" );
