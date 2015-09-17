@@ -35,7 +35,7 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-my $version = "0.7.1";
+my $version = "0.7.0";
 
 
 
@@ -47,7 +47,7 @@ sub AMAD_Initialize($) {
     $hash->{DefFn}	= "AMAD_Define";
     $hash->{UndefFn}	= "AMAD_Undef";
     $hash->{AttrFn}	= "AMAD_Attr";
-    $hash->{ReadFn}	= "AMAD_Read";
+    $hash->{ReadFn}	= "AMAD_CommBridge_Read";
     $hash->{AttrList} 	= "setOpenApp ".
 			  "setFullscreen:0,1 ".
 			  "setScreenOrientation:0,1 ".
@@ -68,7 +68,21 @@ sub AMAD_Initialize($) {
 
 sub AMAD_Define($$) {
 
-my ( $hash, $def ) = @_;
+    my ( $hash, $def ) = @_;
+
+    #if( !$defs{AMADCommBridge} ) {	# Anlegen einer Masterinstanz für die bidirektionale Kommunikation
+    
+	#my $bridgeDevice = "AMADCommBridge";
+	#CommandDefine( undef, "$bridgeDevice AMAD 127.0.0.1" );
+	#$defs{AMADCommBridge}{FAKEDEVICE} = 1;
+	#$defs{AMADCommBridge}{TEMPORARY} = 1;
+	#$defs{AMADCommBridge}{alias} = "AMAD Communication Bridge";
+	#$defs{AMADCommBridge}{room} = 'hidden';
+
+	#Log3 $hash->{NAME}, 3, "AMAD ( $hash->{NAME} ) - AMADCommBridge fertig angelegt";
+    #}
+
+
     my @a = split( "[ \t][ \t]*", $def );
 
     return "too few parameters: define <name> AMAD <HOST>" if ( @a != 3 );
@@ -88,33 +102,25 @@ my ( $hash, $def ) = @_;
     $hash->{helper}{setCmdErrorCounter} = 0;
 
     Log3 $name, 3, "AMAD ($name) - defined with host $hash->{HOST} on port $hash->{HOST} and interval $hash->{INTERVAL} (sec)";
-    
-    # Oeffnen des TCP Servers
-    my $ret = TcpServer_Open( $hash, "8090", "global" );
-    
-    if($ret && !$init_done) {
-	Log3 $name, 1, "$ret. Exiting.";
-	exit(1);
-    }
-    Log3 $name, 1, "$ret. Wird geöffnet.";
-    return $ret;
-    
 
-    AMAD_GetUpdateLocal( $hash );
-
-    InternalTimer( gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 0 );
     
-    readingsSingleUpdate ( $hash, "state", "initialized", 1 );
-    readingsSingleUpdate ( $hash, "deviceState", "online", 1 );
-
-    return undef;
+    
+    AMAD_GetUpdateLocal( $hash ); #if( $name ne "AMADCommBridge" );
+    InternalTimer( gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 0 ); #if( $name ne "AMADCommBridge" );
+    #AMAD_CommBridge_Open( $hash ) if( $hash eq "AMADCommBridge" );
+    
+    readingsSingleUpdate ( $hash, "state", "initialized", 1 ); #if( $name ne "AMADCommBridge" );
+    readingsSingleUpdate ( $hash, "deviceState", "online", 1 ); #if( $name ne "AMADCommBridge" );
 }
 
 sub AMAD_Undef($$) {
 
     my ( $hash, $arg ) = @_;
+    
     RemoveInternalTimer( $hash );
-    return TcpServer_Close($hash);
+
+    my $ret = TcpServer_Close( $hash ) if( $hash eq "AMADCommBridge" );
+    return $ret if( $hash eq "AMADCommBridge" );
 }
 
 sub AMAD_Attr(@) {
@@ -202,7 +208,7 @@ sub AMAD_GetUpdateLocal($) {
 my ( $hash ) = @_;
     my $name = $hash->{NAME};
 
-    AMAD_RetrieveAutomagicInfo( $hash ) if( ReadingsVal( $name, "deviceState", "online" ) eq "online" && ReadingsVal( $hash->{NAME}, "state", 0 ) ne "initialized" && AttrVal( $name, "disable", 0 ) ne "1" );  ### deviceState muß von Hand online/offline gesetzt werden z.B. ueber RESIDENZ Modul
+    AMAD_RetrieveAutomagicInfo( $hash ) if( $name ne "AMADCommBridge" && ReadingsVal( $name, "deviceState", "online" ) eq "online" && ReadingsVal( $hash->{NAME}, "state", 0 ) ne "initialized" && AttrVal( $name, "disable", 0 ) ne "1" );  ### deviceState muß von Hand online/offline gesetzt werden z.B. ueber RESIDENZ Modul
     
     return 1;
 }
@@ -212,12 +218,28 @@ sub AMAD_GetUpdateTimer($) {
     my ( $hash ) = @_;
     my $name = $hash->{NAME};
  
-    AMAD_RetrieveAutomagicInfo( $hash ) if( ReadingsVal( $name, "deviceState", "online" ) eq "online" && AttrVal( $name, "disable", 0 ) ne "1" );  ### deviceState muß von Hand online/offline gesetzt werden z.B. ueber RESIDENZ Modul
+    AMAD_RetrieveAutomagicInfo( $hash ) if( $name ne "AMADCommBridge" && ReadingsVal( $name, "deviceState", "online" ) eq "online" && AttrVal( $name, "disable", 0 ) ne "1" );  ### deviceState muss von Hand online/offline gesetzt werden z.B. ueber RESIDENZ Modul
   
     InternalTimer( gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 1 );
     Log3 $name, 4, "AMAD ($name) - Call AMAD_GetUpdateTimer";
 
     return 1;
+}
+
+sub AMAD_CommBridge_Open($) {
+
+    my ( $hash ) = @_;
+    my $name = $hash->{NAME};
+
+    # Oeffnen des TCP Servers
+    my $ret = TcpServer_Open( $hash, "8090", "global" );
+    
+    if( $ret && !$init_done ) {
+	Log3 $name, 1, "$ret. Exiting.";
+	exit(1);
+    }
+    Log3 $name, 1, "$ret. Wird geöffnet.";
+    return $ret;
 }
 
 sub AMAD_Set($$@) {
@@ -460,22 +482,26 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
     return undef;
 }
 
-sub AMAD_Read($) {
+sub AMAD_CommBridge_Read($$) {
 
-    my ($hash) = @_;
-    
+    my ( $hash, $reread ) = @_;
     my $name = $hash->{NAME};
     
     if($hash->{SERVERSOCKET}) {   # Accept and create a child
-	my $chash = TcpServer_Accept($hash, "http");
-	$chash->{CD}->blocking(0);
+	my $nhash = TcpServer_Accept( $hash, "AMAD" );
+	return if( !$nhash );
+	$nhash->{CD}->blocking(0);
 	return;
     }
     
-    my $buf;
-    my $ret = sysread($hash->{CD}, $buf, 256);
+    my $c = $hash->{CD};
     
-    Log3 $name, 3, "AMAD ($name) - Recieve String $buf";
+    if( !$reread ) {
+	my $buf;
+	my $ret = sysread( $c, $buf, 1024);
+    
+	Log3 $name, 3, "AMAD ($name) - Recieve String $buf";
+    }
 
 }
 
