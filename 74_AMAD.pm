@@ -48,6 +48,7 @@ sub AMAD_Initialize($) {
     $hash->{UndefFn}	= "AMAD_Undef";
     $hash->{AttrFn}	= "AMAD_Attr";
     $hash->{ReadFn}	= "AMAD_CommBridge_Read";
+    
     $hash->{AttrList} 	= "setOpenApp ".
 			  "setFullscreen:0,1 ".
 			  "setScreenOrientation:0,1 ".
@@ -59,7 +60,6 @@ sub AMAD_Initialize($) {
 			  "disable:1 ";
     $hash->{AttrList}	.= $readingFnAttributes;
     
-    
     foreach my $d(sort keys %defs) {
 	next if($defs{$d}{TYPE} ne "AMAD");
 	$defs{$d}->{VERSION} 	= $version;
@@ -69,21 +69,6 @@ sub AMAD_Initialize($) {
 sub AMAD_Define($$) {
 
     my ( $hash, $def ) = @_;
-    
-    
-    #if( !$defs{AMADCommBridge} ) {	# Anlegen einer Masterinstanz für die bidirektionale Kommunikation
-    
-	#my $bridgeDevice = "AMADCommBridge";
-	#CommandDefine( undef, "$bridgeDevice AMAD 127.0.0.1" );
-	#$defs{AMADCommBridge}{FAKEDEVICE} = 1;
-	#$defs{AMADCommBridge}{TEMPORARY} = 1;
-	#$defs{AMADCommBridge}{alias} = "AMAD Communication Bridge";
-	#$defs{AMADCommBridge}{room} = 'hidden';
-
-	#Log3 $hash->{NAME}, 3, "AMAD ( $hash->{NAME} ) - AMADCommBridge fertig angelegt";
-    #}
-    
-    
     my @a = split( "[ \t][ \t]*", $def );
 
     return "too few parameters: define <name> AMAD <HOST>" if ( @a != 3 );
@@ -96,86 +81,32 @@ sub AMAD_Define($$) {
 
     $hash->{HOST} 	= $host;
     $hash->{PORT} 	= $port;
-    $hash->{INTERVAL} 	= $interval;
+    $hash->{INTERVAL} 	= $interval if( $name ne "AMADCommBridge" );
     $hash->{VERSION} 	= $version;
-    $hash->{helper}{infoErrorCounter} = 0;
-    $hash->{helper}{setCmdErrorCounter} = 0;
+    $hash->{helper}{infoErrorCounter} = 0 if( $name ne "AMADCommBridge" );
+    $hash->{helper}{setCmdErrorCounter} = 0 if( $name ne "AMADCommBridge" );
 
-    Log3 $name, 3, "AMAD ($name) - defined with host $hash->{HOST} on port $hash->{PORT} and interval $hash->{INTERVAL} (sec)";
+    Log3 $name, 3, "AMAD ($name) - defined with host $hash->{HOST} on port $hash->{PORT} and interval $hash->{INTERVAL} (sec)" if( $name ne "AMADCommBridge" );
 
-    AMAD_GetUpdateLocal( $hash );
-
-    InternalTimer( gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 0 );
-    #AMAD_CommBridge_Open( $hash ) if( $hash eq "AMADCommBridge" );
+    AMAD_GetUpdateLocal( $hash ) if( $name ne "AMADCommBridge" );
+    InternalTimer( gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 0 ) if( $name ne "AMADCommBridge" );
+    
     readingsSingleUpdate ( $hash, "state", "initialized", 1 );
     readingsSingleUpdate ( $hash, "deviceState", "online", 1 );
+    
+    
+    if( !$defs{AMADCommBridge} ) {	# Anlegen einer Masterinstanz für die bidirektionale Kommunikation
+    
+	my $bridgeDevice = "AMADCommBridge";
+	CommandDefine( undef, "$bridgeDevice AMAD 127.0.0.1" );
+	$defs{AMADCommBridge}{TEMPORARY} = 1;
+	CommandAttr(undef,"$bridgeDevice room hidden");
+	
+	AMAD_CommBridge_Open( $hash );
+    }
+    
 
     return undef;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-my ( $hash, $def ) = @_;
-
-    
-
-
-    my @a = split( "[ \t][ \t]*", $def );
-
-    return "too few parameters: define <name> AMAD <HOST>" if ( @a != 3 );
-
-
-    my $name    	= $a[0];
-    my $host    	= $a[2];
-    my $port		= 8090;
-    my $interval  	= 180;
-    
-
-    $hash->{HOST} 	= $host;
-    $hash->{PORT} 	= $port;
-    $hash->{INTERVAL} 	= $interval;
-    $hash->{VERSION} 	= $version;
-    $hash->{helper}{infoErrorCounter} = 0;
-    $hash->{helper}{setCmdErrorCounter} = 0;
-
-    Log3 $name, 3, "AMAD ($name) - defined with host $hash->{HOST} on port $hash->{HOST} and interval $hash->{INTERVAL} (sec)";
-
-    
-    
-    AMAD_GetUpdateLocal( $hash ); #if( $name ne "AMADCommBridge" );
-    InternalTimer( gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 0 ); #if( $name ne "AMADCommBridge" );
-    
-    
-    readingsSingleUpdate ( $hash, "state", "initialized", 1 ); #if( $name ne "AMADCommBridge" );
-    readingsSingleUpdate ( $hash, "deviceState", "online", 1 ); #if( $name ne "AMADCommBridge" );
 }
 
 sub AMAD_Undef($$) {
@@ -273,7 +204,7 @@ sub AMAD_GetUpdateLocal($) {
 my ( $hash ) = @_;
     my $name = $hash->{NAME};
 
-    AMAD_RetrieveAutomagicInfo( $hash ) if( $name ne "AMADCommBridge" && ReadingsVal( $name, "deviceState", "online" ) eq "online" && ReadingsVal( $hash->{NAME}, "state", 0 ) ne "initialized" && AttrVal( $name, "disable", 0 ) ne "1" );  ### deviceState muß von Hand online/offline gesetzt werden z.B. ueber RESIDENZ Modul
+    AMAD_RetrieveAutomagicInfo( $hash ) if( ReadingsVal( $name, "deviceState", "online" ) eq "online" && ReadingsVal( $hash->{NAME}, "state", 0 ) ne "initialized" && AttrVal( $name, "disable", 0 ) ne "1" );  ### deviceState muß von Hand online/offline gesetzt werden z.B. ueber RESIDENZ Modul
     
     return 1;
 }
@@ -283,7 +214,7 @@ sub AMAD_GetUpdateTimer($) {
     my ( $hash ) = @_;
     my $name = $hash->{NAME};
  
-    AMAD_RetrieveAutomagicInfo( $hash ) if( $name ne "AMADCommBridge" && ReadingsVal( $name, "deviceState", "online" ) eq "online" && AttrVal( $name, "disable", 0 ) ne "1" );  ### deviceState muss von Hand online/offline gesetzt werden z.B. ueber RESIDENZ Modul
+    AMAD_RetrieveAutomagicInfo( $hash ) if( ReadingsVal( $name, "deviceState", "online" ) eq "online" && AttrVal( $name, "disable", 0 ) ne "1" );  ### deviceState muss von Hand online/offline gesetzt werden z.B. ueber RESIDENZ Modul
   
     InternalTimer( gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 1 );
     Log3 $name, 4, "AMAD ($name) - Call AMAD_GetUpdateTimer";
@@ -310,40 +241,42 @@ sub AMAD_CommBridge_Open($) {
 sub AMAD_Set($$@) {
     
     my ( $hash, $name, $cmd, @val ) = @_;
-    my $apps = AttrVal( $name, "setOpenApp", "none" );
-  
-    my $list = "";
     
-    $list .= "screenMsg ";
-    $list .= "ttsMsg ";
-    $list .= "volume:slider,0,1,15 ";
-    $list .= "deviceState:online,offline ";
-    $list .= "mediaPlayer:play,stop,next,back " if( AttrVal( $name, "fhemServerIP", "none" ) ne "none" );
-    $list .= "screenBrightness:slider,0,1,255 " if( AttrVal( $name, "setScreenBrightness", "1" ) eq "1" );
-    $list .= "screen:on,off ";
-    $list .= "screenOrientation:auto,landscape,portrait " if( AttrVal( $name, "setScreenOrientation", "1" ) eq "1" );
-    $list .= "screenFullscreen:on,off " if( AttrVal( $name, "setFullscreen", "1" ) eq "1" );
-    $list .= "openURL ";
-    $list .= "openApp:$apps " if( AttrVal( $name, "setOpenApp", "none" ) ne "none" );
-    $list .= "nextAlarmTime:time ";
-    $list .= "statusRequest:noArg ";
-    $list .= "system:reboot " if( AttrVal( $name, "root", "1" ) eq "1" );
+    if( $name ne "AMADCommBridge" ) {
+	my $apps = AttrVal( $name, "setOpenApp", "none" );
+  
+	my $list = "";
+    
+	$list .= "screenMsg ";
+	$list .= "ttsMsg ";
+	$list .= "volume:slider,0,1,15 ";
+	$list .= "deviceState:online,offline ";
+	$list .= "mediaPlayer:play,stop,next,back " if( AttrVal( $name, "fhemServerIP", "none" ) ne "none" );
+	$list .= "screenBrightness:slider,0,1,255 " if( AttrVal( $name, "setScreenBrightness", "1" ) eq "1" );
+	$list .= "screen:on,off ";
+	$list .= "screenOrientation:auto,landscape,portrait " if( AttrVal( $name, "setScreenOrientation", "1" ) eq "1" );
+	$list .= "screenFullscreen:on,off " if( AttrVal( $name, "setFullscreen", "1" ) eq "1" );
+	$list .= "openURL ";
+	$list .= "openApp:$apps " if( AttrVal( $name, "setOpenApp", "none" ) ne "none" );
+	$list .= "nextAlarmTime:time ";
+	$list .= "statusRequest:noArg ";
+	$list .= "system:reboot " if( AttrVal( $name, "root", "1" ) eq "1" );
 
 
-    if (lc $cmd eq 'screenmsg'
-	|| lc $cmd eq 'ttsmsg'
-	|| lc $cmd eq 'volume'
-	|| lc $cmd eq 'mediaplayer'
-	|| lc $cmd eq 'devicestate'
-	|| lc $cmd eq 'screenbrightness'
-	|| lc $cmd eq 'screenorientation'
-	|| lc $cmd eq 'screenfullscreen'
-	|| lc $cmd eq 'screen'
-	|| lc $cmd eq 'openurl'
-	|| lc $cmd eq 'openapp'
-	|| lc $cmd eq 'nextalarmtime'
-	|| lc $cmd eq 'system'
-	|| lc $cmd eq 'statusrequest') {
+	if (lc $cmd eq 'screenmsg'
+	    || lc $cmd eq 'ttsmsg'
+	    || lc $cmd eq 'volume'
+	    || lc $cmd eq 'mediaplayer'
+	    || lc $cmd eq 'devicestate'
+	    || lc $cmd eq 'screenbrightness'
+	    || lc $cmd eq 'screenorientation'
+	    || lc $cmd eq 'screenfullscreen'
+	    || lc $cmd eq 'screen'
+	    || lc $cmd eq 'openurl'
+	    || lc $cmd eq 'openapp'
+	    || lc $cmd eq 'nextalarmtime'
+	    || lc $cmd eq 'system'
+	    || lc $cmd eq 'statusrequest') {
 
 	    Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
 	  
@@ -354,9 +287,10 @@ sub AMAD_Set($$@) {
 	    return "Cannot set command, FHEM Device is offline" if( ReadingsVal( $name, "deviceState", "online" ) eq "offline" );
 	  
 	    return AMAD_SelectSetCmd( $hash, $cmd, @val ) if( @val ) || ( lc $cmd eq 'statusrequest' );
-    }
+	}
 
-    return "Unknown argument $cmd, bearword as argument or wrong parameter(s), choose one of $list";
+	return "Unknown argument $cmd, bearword as argument or wrong parameter(s), choose one of $list";
+    }
 }
 
 sub AMAD_RetrieveAutomagicInfo($) {
