@@ -35,7 +35,7 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-my $version = "0.7.1";
+my $version = "0.7.2";
 
 
 
@@ -513,9 +513,6 @@ sub AMAD_SelectSetCmd($$@) {
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setVolume?volume=$vol";
 
 	readingsSingleUpdate( $hash, $cmd, $vol, 1 );
-
-	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
-	AMAD_GetUpdateLocal( $hash );
 	
 	return AMAD_HTTP_POST( $hash, $url );
     }
@@ -540,9 +537,6 @@ sub AMAD_SelectSetCmd($$@) {
 	my $bri = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setBrightness?brightness=$bri";
-    
-	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
-	AMAD_GetUpdateLocal( $hash );
 	
 	return AMAD_HTTP_POST( $hash,$url );
     }
@@ -552,9 +546,6 @@ sub AMAD_SelectSetCmd($$@) {
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setScreenOnOff?screen=$mod";
 
-	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
-	AMAD_GetUpdateLocal( $hash );
-	
 	return AMAD_HTTP_POST( $hash,$url );
     }
     
@@ -562,9 +553,6 @@ sub AMAD_SelectSetCmd($$@) {
 	my $mod = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setScreenOrientation?orientation=$mod";
-
-	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
-	AMAD_GetUpdateLocal( $hash );
 	
 	return AMAD_HTTP_POST( $hash,$url );
     }
@@ -592,9 +580,6 @@ sub AMAD_SelectSetCmd($$@) {
 	my @alarm = split( ":", $alarmTime );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setAlarm?hour=".$alarm[0]."&minute=".$alarm[1];
-    
-	Log3 $name, 4, "AMAD ($name) - Starte Update GetUpdateLocal";
-	AMAD_GetUpdateLocal( $hash );
 	
 	return AMAD_HTTP_POST( $hash, $url );
     }
@@ -789,13 +774,12 @@ sub AMAD_CommBridge_Read($) {
 
     my ( $hash ) = @_;
     my $name = $hash->{NAME};
-    #my $chash = $modules{AMAD}{defptr}{<ip>};
     my $brihash = $modules{AMAD}{defptr}{BRIDGE};
 
-    # Received chars stored in $c
+    
     if( $hash->{SERVERSOCKET} ) {   # Accept and create a child
         TcpServer_Accept( $hash, "AMAD" );
-        # my $chash = TcpServer_Accept( $hash, "AMAD" );   # Wird zum schließen der Verbindung benötigt, siehe unten
+        
         return;
     }
 
@@ -809,7 +793,7 @@ sub AMAD_CommBridge_Read($) {
         return;
     }
 
-    my $response = "header lines: \r\nAMADCommBridge recive  Data complete\r\nPlease see next\r\n\r\nrunnin\r\n";
+    my $response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM will process\r\n now\r\n";
 
     my $c = $hash->{CD};
     print $c "HTTP/1.1 200 OK\r\n",
@@ -822,30 +806,62 @@ sub AMAD_CommBridge_Read($) {
     ## close($hash->{CD})
 
 
-
-
+    
     ###
     ## Consume Content
     ###
 
     my @data = split( '\R\R',  $buf );
+    
     if ( $data[0] =~ /FHEMCMD: setreading\b/ ) {
+	my $tv = $data[1];
+	
+	@data = split( '\R',  $data[0] );
+                $data[2] =~ s/FHEMDEVICE: //;
+		my $chash = $defs{$data[2]};
+		### Begin Response Processing
+    
+		my @valuestring = split( '@@@@',  $tv );
+		my %buffer;
 
-        Log3 $name, 3, "setreading ist gleich $data[1]";
+		foreach( @valuestring ) {
+		    my @values = split( '@@' , $_ );
+		    $buffer{$values[0]} = $values[1];
+		}
+    
+		my $t;
+		my $v;
+		while( ( $t, $v ) = each %buffer ) {
+		    $v =~ s/null//g;
+		    
+		    readingsBeginUpdate( $chash );
+		    readingsBulkUpdate( $chash, $t, $v ) if( defined( $v ) );
+		}
+    
+		readingsBulkUpdate( $chash, "lastStatusRequestState", "statusRequest_done" );
+		readingsEndUpdate( $chash, 1 );
+		### End Response Processing
+
         return;
-        #return AMAD_RetrieveAutomagicInfoFinished( "test", "err", $data[1] );
     }
 
     elsif ( $data[0] =~ /FHEMCMD: set\b/ ) {
-        readingsBeginUpdate( $brihash );
-        readingsBulkUpdate ( $brihash, "lastCmd", $data[1] );
-
-        @data = split( '\n',  $data[0] );
-                $data[2] =~ s/FHEMDEVICE: //;
-
-                readingsBulkUpdate ( $brihash, "lastCmdDevice", $data[2] );
-                readingsEndUpdate( $brihash, 1 );
-    }   
+        my $fhemCmd = $data[1];
+        
+        fhem ("$fhemCmd") if( AttrVal( "AMADCommBridge", "Expert", "0" ) eq "1" );
+	readingsSingleUpdate( $brihash, "receiveFhemCommand", $fhemCmd, 1 );
+	
+	return;
+    }
+    
+    elsif ( $data[0] =~ /FHEMCMD: statusrequest\b/ ) {
+	
+	@data = split( '\R',  $data[0] );
+        $data[2] =~ s/FHEMDEVICE: //;
+	my $chash = $defs{$data[2]};
+        
+	return AMAD_GetUpdateLocal( $chash );
+    }
 }
 
 
