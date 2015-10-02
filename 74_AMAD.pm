@@ -35,7 +35,7 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-my $version = "0.7.2";
+my $version = "0.7.3";
 
 
 
@@ -53,7 +53,6 @@ sub AMAD_Initialize($) {
 			  "setFullscreen:0,1 ".
 			  "setScreenOrientation:0,1 ".
 			  "setScreenBrightness:0,1 ".
-			  "fhemServerIP ".
 			  "root:0,1 ".
 			  "interval ".
 			  "port ".
@@ -90,9 +89,9 @@ sub AMAD_Define($$) {
 	return "there is already a amad bridge" if( $modules{AMAD}{defptr}{BRIDGE} );
 
 	$hash->{BRIDGE} = 1;
-	$hash->{TEMPORARY} = 1;
+	#$hash->{TEMPORARY} = 1;
 	$modules{AMAD}{defptr}{BRIDGE} = $hash;
-	$attr{$name}{room} = "hidden";
+	$attr{$name}{room} = "AMAD";
 	Log3 $name, 3, "AMAD ($name) - defined Bridge with Socketport $hash->{PORT}";
 	AMAD_CommBridge_Open( $hash );
 
@@ -240,7 +239,7 @@ sub AMAD_RetrieveAutomagicInfo($) {
     my $name = $hash->{NAME};
     my $host = $hash->{HOST};
     my $port = $hash->{PORT};
-    my $fhemip = AttrVal( $name, "fhemServerIP", "none" );
+    my $fhemip = ReadingsVal( "AMADCommBridge", "fhemServerIP", "none" );
 
     my $url = "http://" . $host . ":" . $port . "/fhem-amad/deviceInfo/"; # Path muß so im Automagic als http request Trigger drin stehen
   
@@ -435,7 +434,7 @@ sub AMAD_Set($$@) {
 	$list .= "ttsMsg ";
 	$list .= "volume:slider,0,1,15 ";
 	$list .= "deviceState:online,offline ";
-	$list .= "mediaPlayer:play,stop,next,back " if( AttrVal( $name, "fhemServerIP", "none" ) ne "none" );
+	$list .= "mediaPlayer:play,stop,next,back " if( ReadingsVal( "AMADCommBridge", "fhemServerIP", "none" ) ne "none");
 	$list .= "screenBrightness:slider,0,1,255 " if( AttrVal( $name, "setScreenBrightness", "1" ) eq "1" );
 	$list .= "screen:on,off ";
 	$list .= "screenOrientation:auto,landscape,portrait " if( AttrVal( $name, "setScreenOrientation", "1" ) eq "1" );
@@ -446,8 +445,7 @@ sub AMAD_Set($$@) {
 	$list .= "statusRequest:noArg ";
 	$list .= "system:reboot " if( AttrVal( $name, "root", "1" ) eq "1" );
 
-
-	if (lc $cmd eq 'screenmsg'
+	if( lc $cmd eq 'screenmsg'
 	    || lc $cmd eq 'ttsmsg'
 	    || lc $cmd eq 'volume'
 	    || lc $cmd eq 'mediaplayer'
@@ -460,7 +458,7 @@ sub AMAD_Set($$@) {
 	    || lc $cmd eq 'openapp'
 	    || lc $cmd eq 'nextalarmtime'
 	    || lc $cmd eq 'system'
-	    || lc $cmd eq 'statusrequest') {
+	    || lc $cmd eq 'statusrequest' ) {
 
 	    Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
 	  
@@ -473,6 +471,25 @@ sub AMAD_Set($$@) {
 	    return AMAD_SelectSetCmd( $hash, $cmd, @val ) if( @val ) || ( lc $cmd eq 'statusrequest' );
 	}
 
+	return "Unknown argument $cmd, bearword as argument or wrong parameter(s), choose one of $list";
+    }
+    
+    elsif( $name eq "AMADCommBridge" ) {
+    
+	my $list = "";
+    
+	## set Befehle für die AMAD_CommBridge
+	$list .= "expertMode:0,1 " if( $modules{AMAD}{defptr}{BRIDGE} );
+	$list .= "fhemServerIP " if( $modules{AMAD}{defptr}{BRIDGE} );
+	
+	if( lc $cmd eq 'expertmode'
+	    || lc $cmd eq 'fhemserverip' ) {
+	    
+	    readingsSingleUpdate( $hash, $cmd, $val[0], 0 );
+	    
+	    return;
+	}
+	
 	return "Unknown argument $cmd, bearword as argument or wrong parameter(s), choose one of $list";
     }
 }
@@ -848,7 +865,7 @@ sub AMAD_CommBridge_Read($) {
     elsif ( $data[0] =~ /FHEMCMD: set\b/ ) {
         my $fhemCmd = $data[1];
         
-        fhem ("$fhemCmd") if( AttrVal( "AMADCommBridge", "Expert", "0" ) eq "1" );
+        fhem ("$fhemCmd") if( ReadingsVal( "AMADCommBridge", "expertMode", 0 ) ne "0" );
 	readingsSingleUpdate( $brihash, "receiveFhemCommand", $fhemCmd, 1 );
 	
 	return;
