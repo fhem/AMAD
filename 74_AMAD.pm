@@ -35,7 +35,7 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-my $version = "0.7.4";
+my $version = "0.7.5";
 
 
 
@@ -60,10 +60,12 @@ sub AMAD_Initialize($) {
 			  "disable:1 ";
     $hash->{AttrList}	.= $readingFnAttributes;
     
-    foreach my $d(sort keys %defs) {
-	next if($defs{$d}{TYPE} ne "AMAD");
-	$defs{$d}->{VERSION} 	= $version;
+    foreach my $d(sort keys %{$modules{AMAD}{defptr}}) {
+	my $hash = $modules{AMAD}{defptr}{$d};
+	$hash->{VERSION} 	= $version;
     }
+    
+    
 }
 
 sub AMAD_Define($$) {
@@ -107,8 +109,8 @@ sub AMAD_Define($$) {
 	readingsSingleUpdate ( $hash, "deviceState", "online", 1 ) if( $hash->{HOST} );
         
 	InternalTimer( gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 0 ) if( $hash->{HOST} );
-	
-	$modules{AMAD}{defptr}{$hash->{HOST}};
+
+	$modules{AMAD}{defptr}{$hash->{HOST}} = $hash;
 
 	return undef;
     }
