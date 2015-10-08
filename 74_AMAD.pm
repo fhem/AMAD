@@ -97,9 +97,7 @@ sub AMAD_Define($$) {
 
     } else {
 	if( ! $modules{AMAD}{defptr}{BRIDGE} ) {
-	    CommandDefine( undef, "AMADCommBridge AMAD" );
-	    Log3 $name, 3, "AMAD ($name) - there is already a AMAD Bridge";
-
+	    CommandDefine( undef, "AMADCommBridge AMAD" );    
 	}   
 
 	Log3 $name, 3, "AMAD ($name) - defined with host $hash->{HOST} on port $hash->{PORT} and interval $hash->{INTERVAL} (sec)";
