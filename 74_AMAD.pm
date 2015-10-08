@@ -79,14 +79,14 @@ sub AMAD_Define($$) {
     my $port		= 8090;
     my $interval  	= 180;
 
-    $hash->{HOST} 	= $host;
+    $hash->{HOST} 	= $host if( $host );
     $hash->{PORT} 	= $port;
     $hash->{INTERVAL} 	= $interval if( $hash->{HOST} );
     $hash->{VERSION} 	= $version;
     $hash->{helper}{infoErrorCounter} = 0 if( $hash->{HOST} );
     $hash->{helper}{setCmdErrorCounter} = 0 if( $hash->{HOST} );
     
-    if( !$hash->{HOST} ) {
+    if( ! $hash->{HOST} ) {
 	return "there is already a AMAD Bridge" if( $modules{AMAD}{defptr}{BRIDGE} );
 
 	$hash->{BRIDGE} = 1;
@@ -96,8 +96,10 @@ sub AMAD_Define($$) {
 	AMAD_CommBridge_Open( $hash );
 
     } else {
-	if( !$modules{AMAD}{defptr}{BRIDGE} ) {
+	if( ! $modules{AMAD}{defptr}{BRIDGE} ) {
 	    CommandDefine( undef, "AMADCommBridge AMAD" );
+	    Log3 $name, 3, "AMAD ($name) - there is already a AMAD Bridge";
+
 	}   
 
 	Log3 $name, 3, "AMAD ($name) - defined with host $hash->{HOST} on port $hash->{PORT} and interval $hash->{INTERVAL} (sec)";
@@ -108,7 +110,7 @@ sub AMAD_Define($$) {
         
 	InternalTimer( gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 0 ) if( $hash->{HOST} );
 	
-	#$modules{AMAD}{defptr}{$hash->$hash->{HOST}};
+	$modules{AMAD}{defptr}{$hash->{HOST}};
 
 	return undef;
     }
@@ -120,14 +122,15 @@ sub AMAD_Undef($$) {
     
     if( $hash->{BRIDGE} ) {
 	delete $modules{AMAD}{defptr}{BRIDGE};
+	
+	my $ret = TcpServer_Close( $hash );
+	return $ret;
 
     } else {
         delete $modules{AMAD}{defptr}{$hash->{HOST}};
 
 	RemoveInternalTimer( $hash );
 
-	my $ret = TcpServer_Close( $hash );
-	return $ret;
     }
 }
 
