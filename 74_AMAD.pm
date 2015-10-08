@@ -35,7 +35,7 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-my $version = "0.7.3";
+my $version = "0.7.4";
 
 
 
@@ -50,6 +50,7 @@ sub AMAD_Initialize($) {
     $hash->{ReadFn}	= "AMAD_CommBridge_Read";
     
     $hash->{AttrList} 	= "setOpenApp ".
+			  "getActiveTask ".
 			  "setFullscreen:0,1 ".
 			  "setScreenOrientation:0,1 ".
 			  "setScreenBrightness:0,1 ".
@@ -86,10 +87,9 @@ sub AMAD_Define($$) {
     $hash->{helper}{setCmdErrorCounter} = 0 if( $hash->{HOST} );
     
     if( !$hash->{HOST} ) {
-	return "there is already a amad bridge" if( $modules{AMAD}{defptr}{BRIDGE} );
+	return "there is already a AMAD Bridge" if( $modules{AMAD}{defptr}{BRIDGE} );
 
 	$hash->{BRIDGE} = 1;
-	#$hash->{TEMPORARY} = 1;
 	$modules{AMAD}{defptr}{BRIDGE} = $hash;
 	$attr{$name}{room} = "AMAD";
 	Log3 $name, 3, "AMAD ($name) - defined Bridge with Socketport $hash->{PORT}";
@@ -100,8 +100,9 @@ sub AMAD_Define($$) {
 	    CommandDefine( undef, "AMADCommBridge AMAD" );
 	}   
 
-	Log3 $name, 3, "AMAD ($name) - defined with host $hash->{HOST} on port $hash->{PORT} and interval $hash->{INTERVAL} (sec)";         
-    
+	Log3 $name, 3, "AMAD ($name) - defined with host $hash->{HOST} on port $hash->{PORT} and interval $hash->{INTERVAL} (sec)";
+	
+	$attr{$name}{room} = "AMAD";
 	readingsSingleUpdate ( $hash, "state", "initialized", 1 ) if( $hash->{HOST} );
 	readingsSingleUpdate ( $hash, "deviceState", "online", 1 ) if( $hash->{HOST} );
         
@@ -240,6 +241,8 @@ sub AMAD_RetrieveAutomagicInfo($) {
     my $host = $hash->{HOST};
     my $port = $hash->{PORT};
     my $fhemip = ReadingsVal( "AMADCommBridge", "fhemServerIP", "none" );
+    my $activetask = AttrVal( $name, "getActiveTask", "none" );
+    
 
     my $url = "http://" . $host . ":" . $port . "/fhem-amad/deviceInfo/"; # Path muß so im Automagic als http request Trigger drin stehen
   
@@ -249,7 +252,7 @@ sub AMAD_RetrieveAutomagicInfo($) {
 	    timeout	=> 10,
 	    hash	=> $hash,
 	    method	=> "GET",
-	    header	=> "fhemIP: $fhemip\r\nfhemDevice: $name",
+	    header	=> "fhemIP: $fhemip\r\nfhemDevice: $name\r\nactiveTask: $activetask",
 	    doTrigger	=> 1,
 	    callback	=> \&AMAD_RetrieveAutomagicInfoFinished,
 	}
@@ -427,9 +430,9 @@ sub AMAD_Set($$@) {
     
     if( $name ne "AMADCommBridge" ) {
 	my $apps = AttrVal( $name, "setOpenApp", "none" );
+	my $activetask = AttrVal( $name, "setActiveTask", "none" );
   
 	my $list = "";
-    
 	$list .= "screenMsg ";
 	$list .= "ttsMsg ";
 	$list .= "volume:slider,0,1,15 ";
@@ -444,6 +447,8 @@ sub AMAD_Set($$@) {
 	$list .= "nextAlarmTime:time ";
 	$list .= "statusRequest:noArg ";
 	$list .= "system:reboot " if( AttrVal( $name, "root", "1" ) eq "1" );
+	$list .= "bluetooth:on,off ";
+	$list .= "notifySndFile ";
 
 	if( lc $cmd eq 'screenmsg'
 	    || lc $cmd eq 'ttsmsg'
@@ -457,7 +462,9 @@ sub AMAD_Set($$@) {
 	    || lc $cmd eq 'openurl'
 	    || lc $cmd eq 'openapp'
 	    || lc $cmd eq 'nextalarmtime'
+	    || lc $cmd eq 'bluetooth'
 	    || lc $cmd eq 'system'
+	    || lc $cmd eq 'notifysndfile'
 	    || lc $cmd eq 'statusrequest' ) {
 
 	    Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
@@ -618,6 +625,22 @@ sub AMAD_SelectSetCmd($$@) {
 	my $systemcmd = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/systemcommand?syscmd=$systemcmd";
+    
+	return AMAD_HTTP_POST( $hash,$url );
+    }
+    
+    elsif( lc $cmd eq 'bluetooth' ) {
+	my $mod = join( " ", @data );
+
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setbluetooth?bluetooth=$mod";
+    
+	return AMAD_HTTP_POST( $hash,$url );
+    }
+    
+    elsif( lc $cmd eq 'notifysndfile' ) {
+	my $notify = join( " ", @data );
+
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/playnotifysnd?notifyfile=$notify";
     
 	return AMAD_HTTP_POST( $hash,$url );
     }
@@ -865,7 +888,7 @@ sub AMAD_CommBridge_Read($) {
     elsif ( $data[0] =~ /FHEMCMD: set\b/ ) {
         my $fhemCmd = $data[1];
         
-        fhem ("$fhemCmd") if( ReadingsVal( "AMADCommBridge", "expertMode", 0 ) ne "0" );
+        fhem ("$fhemCmd") if( ReadingsVal( "AMADCommBridge", "expertMode", 0 ) eq "1" );
 	readingsSingleUpdate( $brihash, "receiveFhemCommand", $fhemCmd, 1 );
 	
 	return;
