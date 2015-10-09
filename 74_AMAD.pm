@@ -35,7 +35,7 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-my $version = "0.7.5";
+my $version = "0.7.6";
 
 
 
@@ -98,7 +98,7 @@ sub AMAD_Define($$) {
 	AMAD_CommBridge_Open( $hash );
 
     } else {
-	if( ! $modules{AMAD}{defptr}{BRIDGE} ) {
+	if( ! $modules{AMAD}{defptr}{BRIDGE} && $init_done ) {
 	    CommandDefine( undef, "AMADCommBridge AMAD" );    
 	}   
 
@@ -122,15 +122,20 @@ sub AMAD_Undef($$) {
     
     if( $hash->{BRIDGE} ) {
 	delete $modules{AMAD}{defptr}{BRIDGE};
-	
 	my $ret = TcpServer_Close( $hash );
 	return $ret;
 
     } else {
         delete $modules{AMAD}{defptr}{$hash->{HOST}};
-
 	RemoveInternalTimer( $hash );
-
+    
+	foreach my $d(sort keys %{$modules{AMAD}{defptr}}) {
+	    my $hash = $modules{AMAD}{defptr}{$d};
+	    my $host = $hash->{HOST};
+	    
+	    return if( $host );
+	    CommandDelete( undef, "AMADCommBridge" );
+	}
     }
 }
 
