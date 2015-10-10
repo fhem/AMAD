@@ -35,7 +35,7 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-my $version = "0.7.6";
+my $version = "0.7.7";
 
 
 
@@ -50,10 +50,11 @@ sub AMAD_Initialize($) {
     $hash->{ReadFn}	= "AMAD_CommBridge_Read";
     
     $hash->{AttrList} 	= "setOpenApp ".
-			  "getActiveTask ".
+			  "checkActiveTask ".
 			  "setFullscreen:0,1 ".
 			  "setScreenOrientation:0,1 ".
 			  "setScreenBrightness:0,1 ".
+			  #"setBluetoothDevice ".
 			  "root:0,1 ".
 			  "interval ".
 			  "port ".
@@ -249,7 +250,7 @@ sub AMAD_RetrieveAutomagicInfo($) {
     my $host = $hash->{HOST};
     my $port = $hash->{PORT};
     my $fhemip = ReadingsVal( "AMADCommBridge", "fhemServerIP", "none" );
-    my $activetask = AttrVal( $name, "getActiveTask", "none" );
+    my $activetask = AttrVal( $name, "checkActiveTask", "none" );
     
 
     my $url = "http://" . $host . ":" . $port . "/fhem-amad/deviceInfo/"; # Path muß so im Automagic als http request Trigger drin stehen
@@ -438,6 +439,7 @@ sub AMAD_Set($$@) {
     
     if( $name ne "AMADCommBridge" ) {
 	my $apps = AttrVal( $name, "setOpenApp", "none" );
+	my $btdev = AttrVal( $name, "setBluetoothDevice", "none" );
 	my $activetask = AttrVal( $name, "setActiveTask", "none" );
   
 	my $list = "";
@@ -457,6 +459,7 @@ sub AMAD_Set($$@) {
 	$list .= "system:reboot " if( AttrVal( $name, "root", "1" ) eq "1" );
 	$list .= "bluetooth:on,off ";
 	$list .= "notifySndFile ";
+	#$list .= "changetoBTDevice:$btdev " if( AttrVal( $name, "setBluetoothDevice", "none" ) ne "none" );
 
 	if( lc $cmd eq 'screenmsg'
 	    || lc $cmd eq 'ttsmsg'
@@ -473,6 +476,7 @@ sub AMAD_Set($$@) {
 	    || lc $cmd eq 'bluetooth'
 	    || lc $cmd eq 'system'
 	    || lc $cmd eq 'notifysndfile'
+	    || lc $cmd eq 'changetobtdevice'
 	    || lc $cmd eq 'statusrequest' ) {
 
 	    Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
@@ -650,6 +654,15 @@ sub AMAD_SelectSetCmd($$@) {
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/playnotifysnd?notifyfile=$notify";
     
+	return AMAD_HTTP_POST( $hash,$url );
+    }
+    
+    elsif( lc $cmd eq 'changetobtdevice' ) {
+	my $btdevice = join( " ", @data );    
+	my @btmac = split( "|", $btdevice );
+	
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setbtdevice?btdevicemac=".$btmac[1];
+   
 	return AMAD_HTTP_POST( $hash,$url );
     }
 
@@ -1087,7 +1100,7 @@ sub AMAD_CommBridge_Read($) {
   <br>
   Dieses Modul liefert, <b><u>in Verbindung mit der Android APP Automagic</u></b>, diverse Informationen von Android Ger&auml;ten.
   Die AndroidAPP Automagic (welche nicht von mir stammt und 2.90Euro kostet) funktioniert wie Tasker, ist aber bei weitem User freundlicher.
-  Im Auslieferiungszustand werden folgende Zust&auml;nde dargestellt:
+  Im Auslieferungszustand werden folgende Zust&auml;nde dargestellt:
   <ul>
     <li>Zustand von Automagic auf dem Ger&auml;t</li>
     <li>Bluetooth An/Aus</li>
