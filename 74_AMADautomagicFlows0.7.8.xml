@@ -17,6 +17,24 @@ global_track = getString("track");
 global_album = getString("album");</extras>
     <receiveInitialStickyBroadcast>false</receiveInitialStickyBroadcast>
   </trigger>
+  <trigger type="display_state">
+    <useDefaultName>true</useDefaultName>
+    <name>Display Status: Aus</name>
+    <enabled>false</enabled>
+    <displayOn>false</displayOn>
+  </trigger>
+  <trigger type="display_state">
+    <useDefaultName>true</useDefaultName>
+    <name>Display Status: Ein</name>
+    <enabled>false</enabled>
+    <displayOn>true</displayOn>
+  </trigger>
+  <trigger type="global_variable">
+    <useDefaultName>true</useDefaultName>
+    <name>Globale Variable: global_touched</name>
+    <enabled>false</enabled>
+    <variable>global_touched</variable>
+  </trigger>
   <trigger type="http_request">
     <useDefaultName>false</useDefaultName>
     <name>HTTP Request: /fhem-amad/deviceInfo/</name>
@@ -32,6 +50,26 @@ global_album = getString("album");</extras>
     <path>/fhem-amad/setCommands/*</path>
     <port>8090</port>
     <acquireWifiLock>true</acquireWifiLock>
+  </trigger>
+  <trigger type="periodic_timer">
+    <useDefaultName>true</useDefaultName>
+    <name>Periodischer Timer: alle 4m</name>
+    <enabled>false</enabled>
+    <frequency>240000</frequency>
+    <wakeDevice>true</wakeDevice>
+    <fixedTimes>false</fixedTimes>
+    <limitTimeRange>false</limitTimeRange>
+    <weekday>Mon</weekday>
+    <weekday>Tue</weekday>
+    <weekday>Wed</weekday>
+    <weekday>Thu</weekday>
+    <weekday>Fri</weekday>
+    <weekday>Sat</weekday>
+    <weekday>Sun</weekday>
+    <hourFrom>8</hourFrom>
+    <minuteFrom>0</minuteFrom>
+    <hourTo>17</hourTo>
+    <minuteTo>0</minuteTo>
   </trigger>
   <condition type="battery_level">
     <useDefaultName>true</useDefaultName>
@@ -96,6 +134,20 @@ global_album = getString("album");</extras>
     <deviceAddress></deviceAddress>
     <deviceName></deviceName>
   </condition>
+  <condition type="bluetooth_device_connected">
+    <useDefaultName>true</useDefaultName>
+    <name>Bluetooth Gerät verbunden: {param_btdeviceone}</name>
+    <any>false</any>
+    <deviceAddress>{param_btdeviceone}</deviceAddress>
+    <deviceName></deviceName>
+  </condition>
+  <condition type="bluetooth_device_connected">
+    <useDefaultName>true</useDefaultName>
+    <name>Bluetooth Gerät verbunden: {param_btdevicetwo}</name>
+    <any>false</any>
+    <deviceAddress>{param_btdevicetwo}</deviceAddress>
+    <deviceName></deviceName>
+  </condition>
   <condition type="auto_rotate_screen_enabled">
     <useDefaultName>true</useDefaultName>
     <name>Display automatisch drehen eingeschaltet</name>
@@ -123,6 +175,16 @@ global_album = getString("album");</extras>
     <useDefaultName>false</useDefaultName>
     <name>Expression: App5</name>
     <expression>param_app == ""</expression>
+  </condition>
+  <condition type="expression">
+    <useDefaultName>true</useDefaultName>
+    <name>Expression: global_touched=="ja"</name>
+    <expression>global_touched=="ja"</expression>
+  </condition>
+  <condition type="expression">
+    <useDefaultName>true</useDefaultName>
+    <name>Expression: global_touched=="wait"</name>
+    <expression>global_touched=="wait"</expression>
   </condition>
   <condition type="expression">
     <useDefaultName>false</useDefaultName>
@@ -416,9 +478,25 @@ global_album = getString("album");</extras>
   </action>
   <action type="connect_disconnect_bluetooth_device">
     <useDefaultName>true</useDefaultName>
-    <name>Bluetooth Gerät verbinden/trennen: Verbinden Headset {param_btdevicemac}</name>
-    <bluetoothDeviceProfile>HEADSET</bluetoothDeviceProfile>
-    <deviceAddress>{param_btdevicemac}</deviceAddress>
+    <name>Bluetooth Gerät verbinden/trennen: Trennen Advanced Audio Distribution {param_btdeviceone}</name>
+    <bluetoothDeviceProfile>A2DP</bluetoothDeviceProfile>
+    <deviceAddress>{param_btdeviceone}</deviceAddress>
+    <deviceName></deviceName>
+    <connect>false</connect>
+  </action>
+  <action type="connect_disconnect_bluetooth_device">
+    <useDefaultName>true</useDefaultName>
+    <name>Bluetooth Gerät verbinden/trennen: Trennen Advanced Audio Distribution {param_btdevicetwo}</name>
+    <bluetoothDeviceProfile>A2DP</bluetoothDeviceProfile>
+    <deviceAddress>{param_btdevicetwo}</deviceAddress>
+    <deviceName></deviceName>
+    <connect>false</connect>
+  </action>
+  <action type="connect_disconnect_bluetooth_device">
+    <useDefaultName>true</useDefaultName>
+    <name>Bluetooth Gerät verbinden/trennen: Verbinden Advanced Audio Distribution {param_swtobtdevicemac}</name>
+    <bluetoothDeviceProfile>A2DP</bluetoothDeviceProfile>
+    <deviceAddress>{param_swtobtdevicemac}</deviceAddress>
     <deviceName></deviceName>
     <connect>true</connect>
   </action>
@@ -476,6 +554,16 @@ global_album = getString("album");</extras>
     <settingName>volume_music_speaker</settingName>
     <variable>volumeMusikSpeaker</variable>
   </action>
+  <action type="execute_root_command">
+    <useDefaultName>true</useDefaultName>
+    <name>Kommandozeilenbefehl als Root ausführen: getevent -c 1 in </name>
+    <command>getevent -c 1</command>
+    <seContext></seContext>
+    <workingDirectory></workingDirectory>
+    <variableStdout>stdout</variableStdout>
+    <variableStderr>stderr</variableStderr>
+    <variableExitCode>exit_code</variableExitCode>
+  </action>
   <action type="restore_audio_stream_volume">
     <useDefaultName>false</useDefaultName>
     <name>Lautstärken setzen</name>
@@ -522,6 +610,18 @@ FHEMCMD: setreading</customHTTPHeaders>
     <storeInVariable>true</storeInVariable>
     <variable>response</variable>
     <path>/storage/emulated/0/Download/file.bin</path>
+  </action>
+  <action type="sleep">
+    <useDefaultName>true</useDefaultName>
+    <name>Pause: 10s (Schlafmodus zulassen)</name>
+    <duration>10s</duration>
+    <keepDeviceAwake>false</keepDeviceAwake>
+  </action>
+  <action type="sleep">
+    <useDefaultName>true</useDefaultName>
+    <name>Pause: 15s (Gerät wach halten)</name>
+    <duration>15s</duration>
+    <keepDeviceAwake>true</keepDeviceAwake>
   </action>
   <action type="sleep">
     <useDefaultName>true</useDefaultName>
@@ -575,9 +675,39 @@ global_album = "no soundplayer activ";</script>
   </action>
   <action type="script">
     <useDefaultName>true</useDefaultName>
+    <name>Script: global_display="an";global_own_reading="{getDate()}_display"</name>
+    <script>global_display="an";global_own_reading="{getDate()}_display"</script>
+  </action>
+  <action type="script">
+    <useDefaultName>true</useDefaultName>
+    <name>Script: global_display="aus";global_own_reading="{getDate()}_display"</name>
+    <script>global_display="aus";global_own_reading="{getDate()}_display"</script>
+  </action>
+  <action type="script">
+    <useDefaultName>true</useDefaultName>
     <name>Script: global_fhemip = {header_fhemip} global_fhemdevice = {header_fhemdevice}</name>
     <script>global_fhemip = {header_fhemip}
 global_fhemdevice = {header_fhemdevice}</script>
+  </action>
+  <action type="script">
+    <useDefaultName>true</useDefaultName>
+    <name>Script: global_touch="ja";global_own_reading="{getDate()}_touch";global_touched="ja"</name>
+    <script>global_touch="ja";global_own_reading="{getDate()}_touch";global_touched="ja"</script>
+  </action>
+  <action type="script">
+    <useDefaultName>true</useDefaultName>
+    <name>Script: global_touch="nein";global_own_reading="{getDate()}_touch"</name>
+    <script>global_touch="nein";global_own_reading="{getDate()}_touch"</script>
+  </action>
+  <action type="script">
+    <useDefaultName>true</useDefaultName>
+    <name>Script: global_touched="ja"</name>
+    <script>global_touched="ja"</script>
+  </action>
+  <action type="script">
+    <useDefaultName>true</useDefaultName>
+    <name>Script: global_touched="wait"</name>
+    <script>global_touched="wait"</script>
   </action>
   <action type="script">
     <useDefaultName>true</useDefaultName>
@@ -767,7 +897,7 @@ FHEMCMD: statusrequest</customHTTPHeaders>
   </action>
   <flow type="flow">
     <name>Informations</name>
-    <group>FHEM Info / Steuerung über AMAD Modul v0.7.7</group>
+    <group>FHEM Info / Steuerung über AMAD Modul v0.7.8</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <emergencyStopCount>120</emergencyStopCount>
@@ -873,8 +1003,67 @@ FHEMCMD: statusrequest</customHTTPHeaders>
     <connection from="t37" to="t40" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
   </flow>
   <flow type="flow">
+    <name>Meldung Display An</name>
+    <group>AMAD FHEM / OwnReadings Examples</group>
+    <enabled>false</enabled>
+    <executionPolicy>PARALLEL</executionPolicy>
+    <triggercontainer id="t1" x="70.0" y="52.5">
+      <trigger>Display Status: Ein</trigger>
+    </triggercontainer>
+    <actioncontainer id="t2" x="70.0" y="262.5">Script: global_display="an";global_own_reading="{getDate()}_display"</actioncontainer>
+    <connection from="t1" to="t2" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+  </flow>
+  <flow type="flow">
+    <name>Meldung Display Aus</name>
+    <group>AMAD FHEM / OwnReadings Examples</group>
+    <enabled>false</enabled>
+    <executionPolicy>PARALLEL</executionPolicy>
+    <triggercontainer id="t1" x="70.0" y="52.5">
+      <trigger>Display Status: Aus</trigger>
+    </triggercontainer>
+    <actioncontainer id="t2" x="70.0" y="262.5">Script: global_display="aus";global_own_reading="{getDate()}_display"</actioncontainer>
+    <connection from="t1" to="t2" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+  </flow>
+  <flow type="flow">
+    <name>Meldung kein Touch</name>
+    <group>AMAD FHEM / OwnReadings Examples</group>
+    <enabled>false</enabled>
+    <executionPolicy>STOP</executionPolicy>
+    <triggercontainer id="t1" x="244.99997" y="52.499985">
+      <trigger>Globale Variable: global_touched</trigger>
+    </triggercontainer>
+    <actioncontainer id="t2" x="245.0" y="297.49997">Pause: 15s (Gerät wach halten)</actioncontainer>
+    <actioncontainer id="t3" x="525.0" y="682.5">Script: global_touched="wait"</actioncontainer>
+    <conditioncontainer id="t4" x="244.99994" y="472.5">Expression: global_touched=="ja"</conditioncontainer>
+    <conditioncontainer id="t5" x="-105.00006" y="682.49994">Expression: global_touched=="wait"</conditioncontainer>
+    <actioncontainer id="t6" x="-104.99988" y="927.5">Script: global_touch="nein";global_own_reading="{getDate()}_touch"</actioncontainer>
+    <connection from="t1" to="t2" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t2" to="t4" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t4" to="t3" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t4" to="t5" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t5" to="t6" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+  </flow>
+  <flow type="flow">
+    <name>Meldung Touch</name>
+    <group>AMAD FHEM / OwnReadings Examples</group>
+    <enabled>false</enabled>
+    <executionPolicy>STOP</executionPolicy>
+    <triggercontainer id="t1" x="244.99997" y="-87.500015">
+      <trigger>Periodischer Timer: alle 4m</trigger>
+    </triggercontainer>
+    <actioncontainer id="t2" x="245.0" y="122.50003">Kommandozeilenbefehl als Root ausführen: getevent -c 1 in </actioncontainer>
+    <actioncontainer id="t3" x="244.99997" y="297.50006">Script: global_touched="ja"</actioncontainer>
+    <actioncontainer id="t4" x="245.00009" y="472.5">Script: global_touch="ja";global_own_reading="{getDate()}_touch";global_touched="ja"</actioncontainer>
+    <actioncontainer id="t5" x="244.99988" y="647.5">Pause: 10s (Schlafmodus zulassen)</actioncontainer>
+    <connection from="t1" to="t2" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t2" to="t3" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t3" to="t4" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t4" to="t5" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t5" to="t2" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+  </flow>
+  <flow type="flow">
     <name>SetCommands</name>
-    <group>FHEM Info / Steuerung über AMAD Modul v0.7.7</group>
+    <group>FHEM Info / Steuerung über AMAD Modul v0.7.8</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <emergencyStopCount>120</emergencyStopCount>
@@ -943,22 +1132,26 @@ FHEMCMD: statusrequest</customHTTPHeaders>
     <conditioncontainer id="t60" x="875.0" y="577.5">Expression: param_fullscreen == "off"</conditioncontainer>
     <conditioncontainer id="t61" x="665.0" y="577.5">Expression: param_fullscreen == "on"</conditioncontainer>
     <conditioncontainer id="t62" x="1820.0" y="-122.5">Expression: setBluetooth"</conditioncontainer>
-    <conditioncontainer id="t63" x="1715.0" y="577.5">Expression: param_bluetooth == "on"</conditioncontainer>
-    <conditioncontainer id="t64" x="1925.0" y="577.5">Expression: param_bluetooth == "off"</conditioncontainer>
-    <actioncontainer id="t65" x="1715.0" y="892.5">Bluetooth ein-/ausschalten: Ein</actioncontainer>
-    <actioncontainer id="t66" x="1925.0" y="892.5">Bluetooth ein-/ausschalten: Aus</actioncontainer>
-    <conditioncontainer id="t67" x="-385.0" y="-122.5">Expression: openURL"</conditioncontainer>
-    <conditioncontainer id="t68" x="-3115.0" y="367.5">Expression: Reboot</conditioncontainer>
-    <conditioncontainer id="t69" x="-1855.0" y="-122.5">Expression: setVolume"</conditioncontainer>
-    <actioncontainer id="t70" x="-1225.0" y="892.5">Sprachausgabe: {param_message}</actioncontainer>
-    <actioncontainer id="t71" x="-3325.0" y="892.5">Sound: /storage/emulated/0/Notifications/{param_notifyfile} als Benachrichtigung</actioncontainer>
-    <actioncontainer id="t72" x="-805.0" y="1662.5">StatusRequest</actioncontainer>
-    <conditioncontainer id="t73" x="-3325.0" y="-122.5">Expression: notifysnd"</conditioncontainer>
-    <actioncontainer id="t74" x="-3535.0" y="892.5">Bluetooth Gerät verbinden/trennen: Verbinden Headset {param_btdevicemac}</actioncontainer>
-    <conditioncontainer id="t75" x="-3535.0" y="-122.5">Expression: setBTDevice"</conditioncontainer>
-    <conditioncontainer id="t76" x="-805.0" y="-2012.5">Expression: trigger == "HTTP Request: /fhem-amad/setCommands/*"</conditioncontainer>
-    <conditioncontainer id="t77" x="-3535.0" y="87.5">Bluetooth Gerät verbunden: Beliebiges Geräte</conditioncontainer>
-    <connection from="t1" to="t76" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <conditioncontainer id="t63" x="-385.0" y="-122.5">Expression: openURL"</conditioncontainer>
+    <conditioncontainer id="t64" x="-3115.0" y="367.5">Expression: Reboot</conditioncontainer>
+    <conditioncontainer id="t65" x="-1855.0" y="-122.5">Expression: setVolume"</conditioncontainer>
+    <actioncontainer id="t66" x="-1225.0" y="892.5">Sprachausgabe: {param_message}</actioncontainer>
+    <actioncontainer id="t67" x="-3325.0" y="892.5">Sound: /storage/emulated/0/Notifications/{param_notifyfile} als Benachrichtigung</actioncontainer>
+    <actioncontainer id="t68" x="-805.0" y="1662.5">StatusRequest</actioncontainer>
+    <conditioncontainer id="t69" x="-3325.0" y="-122.5">Expression: notifysnd"</conditioncontainer>
+    <conditioncontainer id="t70" x="-805.0" y="-2012.5">Expression: trigger == "HTTP Request: /fhem-amad/setCommands/*"</conditioncontainer>
+    <conditioncontainer id="t71" x="1715.0" y="577.5">Expression: param_bluetooth == "off"</conditioncontainer>
+    <actioncontainer id="t72" x="1715.0" y="892.5">Bluetooth ein-/ausschalten: Aus</actioncontainer>
+    <conditioncontainer id="t73" x="1925.0" y="577.5">Expression: param_bluetooth == "on"</conditioncontainer>
+    <actioncontainer id="t74" x="1925.0" y="892.5">Bluetooth ein-/ausschalten: Ein</actioncontainer>
+    <conditioncontainer id="t75" x="2135.0002" y="-157.49994">Expression: setBTDevice"</conditioncontainer>
+    <conditioncontainer id="t76" x="2135.0002" y="52.499996">Bluetooth eingeschaltet</conditioncontainer>
+    <conditioncontainer id="t77" x="2135.0002" y="577.50006">Bluetooth Gerät verbunden: {param_btdeviceone}</conditioncontainer>
+    <actioncontainer id="t78" x="2310.0" y="717.5001">Bluetooth Gerät verbinden/trennen: Trennen Advanced Audio Distribution {param_btdeviceone}</actioncontainer>
+    <actioncontainer id="t79" x="2134.9998" y="1172.5">Bluetooth Gerät verbinden/trennen: Verbinden Advanced Audio Distribution {param_swtobtdevicemac}</actioncontainer>
+    <actioncontainer id="t80" x="2310.0" y="1032.5002">Bluetooth Gerät verbinden/trennen: Trennen Advanced Audio Distribution {param_btdevicetwo}</actioncontainer>
+    <conditioncontainer id="t81" x="2135.0002" y="892.50024">Bluetooth Gerät verbunden: {param_btdevicetwo}</conditioncontainer>
+    <connection from="t1" to="t70" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t2" to="t53" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t3" to="t52" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t4" to="t56" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -997,52 +1190,60 @@ FHEMCMD: statusrequest</customHTTPHeaders>
     <connection from="t43" to="t36" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t43" to="t30" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t43" to="t29" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t44" to="t68" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t44" to="t64" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t47" to="t46" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t47" to="t57" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t48" to="t57" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t49" to="t47" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t49" to="t48" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t50" to="t70" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t51" to="t72" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t52" to="t72" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t53" to="t72" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t54" to="t72" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t55" to="t72" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t56" to="t72" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t58" to="t72" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t50" to="t66" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t51" to="t68" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t52" to="t68" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t53" to="t68" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t54" to="t68" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t55" to="t68" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t56" to="t68" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t58" to="t68" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t59" to="t13" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t59" to="t12" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t59" to="t9" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t60" to="t15" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t61" to="t14" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t62" to="t63" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t62" to="t64" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t63" to="t65" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t64" to="t66" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t65" to="t72" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t66" to="t72" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t67" to="t6" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t68" to="t45" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t69" to="t51" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t73" to="t71" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t75" to="t77" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t76" to="t44" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t76" to="t43" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t76" to="t69" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t76" to="t27" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t76" to="t50" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t76" to="t3" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t76" to="t4" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t76" to="t5" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t76" to="t67" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t76" to="t22" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t76" to="t8" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t76" to="t59" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t76" to="t49" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t76" to="t62" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t76" to="t73" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t76" to="t75" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t77" to="t74" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t62" to="t73" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t62" to="t71" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t63" to="t6" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t64" to="t45" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t65" to="t51" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t69" to="t67" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t70" to="t44" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t70" to="t43" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t70" to="t65" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t70" to="t27" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t70" to="t50" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t70" to="t3" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t70" to="t4" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t70" to="t5" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t70" to="t63" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t70" to="t22" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t70" to="t8" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t70" to="t59" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t70" to="t49" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t70" to="t62" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t70" to="t69" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t70" to="t75" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t71" to="t72" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t72" to="t68" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t73" to="t74" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t74" to="t68" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t75" to="t76" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t76" to="t77" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t76" to="t74" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t77" to="t81" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t77" to="t78" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t78" to="t81" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t79" to="t68" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t80" to="t79" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t81" to="t79" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t81" to="t80" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
   </flow>
 </data>

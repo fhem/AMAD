@@ -35,7 +35,7 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-my $version = "0.7.7";
+my $version = "0.7.8";
 
 
 
@@ -54,7 +54,7 @@ sub AMAD_Initialize($) {
 			  "setFullscreen:0,1 ".
 			  "setScreenOrientation:0,1 ".
 			  "setScreenBrightness:0,1 ".
-			  #"setBluetoothDevice ".
+			  "setBluetoothDevice ".
 			  "root:0,1 ".
 			  "interval ".
 			  "port ".
@@ -459,7 +459,7 @@ sub AMAD_Set($$@) {
 	$list .= "system:reboot " if( AttrVal( $name, "root", "1" ) eq "1" );
 	$list .= "bluetooth:on,off ";
 	$list .= "notifySndFile ";
-	#$list .= "changetoBTDevice:$btdev " if( AttrVal( $name, "setBluetoothDevice", "none" ) ne "none" );
+	$list .= "changetoBTDevice:$btdev " if( AttrVal( $name, "setBluetoothDevice", "none" ) ne "none" );
 
 	if( lc $cmd eq 'screenmsg'
 	    || lc $cmd eq 'ttsmsg'
@@ -658,11 +658,15 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif( lc $cmd eq 'changetobtdevice' ) {
-	my $btdevice = join( " ", @data );    
-	my @btmac = split( "|", $btdevice );
+	my $swToBtDevice = join( " ", @data );    
+	my @swToBtMac = split( /\|/, $swToBtDevice );
+	my $btDevices = AttrVal( $name, "setBluetoothDevice", "none" ) if( AttrVal( $name, "setBluetoothDevice", "none" ) ne "none" );
+	my @btDevice = split( ',', $btDevices );
+	my @btDeviceOne = split( /\|/, $btDevice[0] );
+	my @btDeviceTwo = split( /\|/, $btDevice[1] );
 	
-	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setbtdevice?btdevicemac=".$btmac[1];
-   
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setbtdevice?swToBtDeviceMac=".$swToBtMac[1]."&btDeviceOne=".$btDeviceOne[1]."&btDeviceTwo=".$btDeviceTwo[1];
+	
 	return AMAD_HTTP_POST( $hash,$url );
     }
 
