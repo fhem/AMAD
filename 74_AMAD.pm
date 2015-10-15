@@ -35,7 +35,7 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-my $version = "0.7.8";
+my $version = "0.7.9";
 
 
 
@@ -459,6 +459,7 @@ sub AMAD_Set($$@) {
 	$list .= "system:reboot " if( AttrVal( $name, "root", "1" ) eq "1" );
 	$list .= "bluetooth:on,off ";
 	$list .= "notifySndFile ";
+	$list .= "clearNotificationBar:All,Automagic ";
 	$list .= "changetoBTDevice:$btdev " if( AttrVal( $name, "setBluetoothDevice", "none" ) ne "none" );
 
 	if( lc $cmd eq 'screenmsg'
@@ -477,6 +478,7 @@ sub AMAD_Set($$@) {
 	    || lc $cmd eq 'system'
 	    || lc $cmd eq 'notifysndfile'
 	    || lc $cmd eq 'changetobtdevice'
+	    || lc $cmd eq 'clearnotificationbar'
 	    || lc $cmd eq 'statusrequest' ) {
 
 	    Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
@@ -667,6 +669,14 @@ sub AMAD_SelectSetCmd($$@) {
 	
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setbtdevice?swToBtDeviceMac=".$swToBtMac[1]."&btDeviceOne=".$btDeviceOne[1]."&btDeviceTwo=".$btDeviceTwo[1];
 	
+	return AMAD_HTTP_POST( $hash,$url );
+    }
+    
+    elsif( lc $cmd eq 'clearnotificationbar' ) {
+	my $appname = join( " ", @data );
+
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/clearnotificationbar?app=$appname";
+    
 	return AMAD_HTTP_POST( $hash,$url );
     }
 
@@ -1108,7 +1118,8 @@ sub AMAD_CommBridge_Read($) {
   <ul>
     <li>Zustand von Automagic auf dem Ger&auml;t</li>
     <li>Bluetooth An/Aus</li>
-    <li>verbundene Bluetoothger&auml;te</li>
+    <li>Zustand einer definierten App (l&auml;uft aktiv im Vordergrund oder nicht?)</li>
+    <li>verbundene Bluetoothger&auml;te, inklusive deren MAC Adresse</li>
     <li>aktuell abgespieltes Musikalbum des verwendeten Mediaplayers</li>
     <li>aktuell abgespielter Musikinterpret des verwendeten Mediaplayers</li>
     <li>aktuell abgespielter Musiktitel des verwendeten Mediaplayers</li>
@@ -1131,9 +1142,12 @@ sub AMAD_CommBridge_Read($) {
   <br><br>
   Das Modul gibt Dir auch die M&ouml;glichkeit Deine Androidger&auml;te zu steuern. So k&ouml;nnen folgende Aktionen durchgef&uuml;hrt werden.
   <ul>
+    <li>Bluetooth Ein/Aus schalten</li>
+    <li>zu einem bestimmten Bluetoothger&auml;t wechseln/verbinden</li>
     <li>Status des Ger&auml;tes (Online,Offline)</li>
     <li>Mediaplayer steuern (Play, Stop, n&auml;chster Titel, vorheriger Titel)</li>
     <li>n&auml;chste Alarmzeit setzen</li>
+    <li>ein Benachrichtigungston abspielen (Notificationsound)</li>
     <li>eine App auf dem Ger&auml;t &ouml;ffnen</li>
     <li>eine URL im Browser &ouml;ffnen</li>
     <li>Bildschirm An/Aus machen</li>
@@ -1168,20 +1182,34 @@ sub AMAD_CommBridge_Read($) {
       <code>define WandTabletWohnzimmer AMAD 192.168.0.23</code><br>
     </ul>
     <br>
-    Diese Anweisung erstellt ein neues AMAD-Device. Der Parameter &lt;IP-ADRESSE&lt; legt die IP Adresse des Android Ger&auml;tes fest.<br>
+    Diese Anweisung erstellt ein neues AMAD-Device im Raum AMAD.Der Parameter &lt;IP-ADRESSE&lt; legt die IP Adresse des Android Ger&auml;tes fest.<br>
     Das Standard Abfrageinterval ist 180 Sekunden und kann &uuml;ber das Attribut intervall ge&auml;ndert werden. Wer den Port &auml;ndern m&ouml;chte, kann dies &uuml;ber
     das Attribut port tun. <b>Ihr solltet aber wissen was Ihr tut, da dieser Port im HTTP Response Trigger der beiden Flows eingestellt ist. Demzufolge mu&szlig; dieser dort
     auch ver&auml;dert werden.</b><br>
   </ul>
   <br><br> 
   <b><u>Fertig! Nach anlegen der Ger&auml;teinstanz sollten nach sp&auml;testens 3 Minuten bereits die ersten Readings reinkommen.</u></b>
+  <br><br><br>
+  <a name="AMADCommBridge"></a>
+  <b>AMAD Communication Bridge</b>
+  <ul>
+    Beim ersten anlegen einer AMAD Deviceinstanz wird automatisch ein Ger&auml;t Namens AMADCommBridge im Raum AMAD angelegt. <b>BITTE NIEMALS DEN NAMEN DER BRIDGE &Auml;NDERN!!!</b> 
+    Alle anderen Eigenschaften k&ouml;nnen ge&auml;ndert werden. Dieses Ger&auml;t diehnt zur Kommunikation
+    vom Androidger&auml;t zu FHEM ohne das zuvor eine Anfrage von FHEM aus ging. <b>Damit das Androidger&auml;t die IP von FHEM kennt, muss diese sofort nach dem anlegen der Bridge
+    &uuml;ber den set Befehl in ein entsprechendes Reading in die Bridge  geschrieben werden. DAS IST SUPER WICHTIG UND F&Uuml;R DIE FUNKTION DER BRIDGE NOTWENDIG.</b><br>
+    Bitte f&uuml;hrt hierzu folgenden Befehl aus. <i>set AMADCommBridge fhemServerIP &lt;FHEM-IP&gt;.</i><br>
+    Als zweites Reading k&ouml;nnt Ihr <i>expertMode</i>setzen. Mit diesem Reading wird eine unmittelbare Komminikation mit FHEM erreicht ohne die Einschr&auml;nkung &uuml;ber ein
+    Notify gehen zu m&uuml;ssen und nur reine set Befehle ausf&uuml;hren zu k&ouml;nnen.
+  </ul>
   <br><br>
   <a name="AMADreadings"></a>
   <b>Readings</b>
   <ul>
     <li>automagicState - Statusmeldungen von der AutomagicApp</li>
     <li>bluetooth on/off - ist auf dem Ger&auml;t Bluetooth an oder aus</li>
-    <li>connectedBTdevices - eine Lieste der verbundenen Ger&auml;t</li>
+    <li>checkActiveTask - Zustand einer zuvor definierten APP. 0=nicht aktiv oder nicht aktiv im Vordergrund, 1=aktiv im Vordergrund, <b>siehe Hinweis unten</b></li>
+    <li>connectedBTdevices - eine Liste der verbundenen Ger&auml;t</li>
+    <li>connectedBTdevicesMAC - eine Liste der MAC Adressen aller verbundender BT Ger&auml;te</li>
     <li>currentMusicAlbum - aktuell abgespieltes Musikalbum des verwendeten Mediaplayers</li>
     <li>currentMusicArtist - aktuell abgespielter Musikinterpret des verwendeten Mediaplayers</li>
     <li>currentMusicTrack - aktuell abgespielter Musiktitel des verwendeten Mediaplayers</li>
@@ -1204,17 +1232,22 @@ sub AMAD_CommBridge_Read($) {
     <li>volume - Lautst&auml;rkewert welcher &uuml;ber "set volume" gesetzt wurde.</li>
     <li>volumeMusikBluetooth - Media Lautst&auml;rke von angeschlossenden Bluetooth Lautsprechern</li>
     <li>volumeMusikSpeaker - Media Lautst&auml;rke der internen Lautsprecher</li>
-    <br>
-    Die Readings volumeMusikBluetooth und volumeMusikSpeaker spiegeln die jeweilige Medialautst&auml;rke der angeschlossenden Bluetoothlautsprechern oder der internen Lautsprecher wieder.<br>
+    <br><br>
+    Die Readings volumeMusikBluetooth und volumeMusikSpeaker spiegeln die jeweilige Medialautst&auml;rke der angeschlossenden Bluetoothlautsprecher oder der internen Lautsprecher wieder.
     Sofern man die jeweiligen Lautst&auml;rken ausschlie&szlig;lich &uuml;ber den Set Befehl setzt, wird eine der beiden immer mit dem "volume" Reading &uuml;ber ein stimmen.<br><br>
+    Beim Reading checkActivTask mu&szlig; zuvor der Packagename der zu pr&uuml;fenden App als Attribut <i>checkActiveTask</i> angegeben werden. Beispiel: <i>attr Nexus10Wohnzimmer
+    checkActiveTask com.android.chrome</i> f&uuml;r den Chrome Browser.
+    <br><br>
   </ul>
   <br><br>
   <a name="AMADset"></a>
   <b>Set</b>
   <ul>
+    <li>bluetooth - Schaltet Bluetooth on/off</li>
     <li>deviceState - setzt den Device Status Online/Offline. Siehe Readings</li>
     <li>mediaPlayer - steuert den Standard Mediaplayer. play, stop, Titel z&uuml;r&uuml;ck, Titel vor.</li>
     <li>nextAlarmTime - setzt die Alarmzeit. Geht aber nur innerhalb der n&auml;chsten 24Std.</li>
+    <li>notifySndFile - spielt die angegebende Mediadatei auf dem Androidger&auml;t ab. <b>Die aufzurufende Mediadatei mu&szlig; sich im Ordner /storage/emulated/0/Notifications/ befinden.</b></li>
     <li>openURL - &ouml;ffnet eine URL im Standardbrowser</li>
     <li>screen - setzt den Bildschirm on/off mit Sperre, in den Automagic Einstellungen muss "Admin Funktion" gesetzt werden sonst funktioniert "Screen off" nicht.</li>
     <li>screenMsg - versendet eine Bildschirmnachricht</li>
@@ -1225,6 +1258,8 @@ sub AMAD_CommBridge_Read($) {
   <br>
   <b>Set abh&auml;ngig von gesetzten Attributen</b>
   <ul>
+    <li></li>
+    <li>changetoBtDevice - wechselt zu einem anderen Bluetooth Ger&auml;t. <b>Attribut setBluetoothDevice mu&szlig; gesetzt sein. Siehe Hinweis unten!</b></li>
     <li>mediaPlayer - steuert den Standard Mediaplayer. play, stop, Titel z&uuml;r&uuml;ck, Titel vor. <b>Attribut fhemServerIP</b></li>
     <li>openApp - &ouml;ffnet eine ausgew&auml;hlte App. <b>Attribut setOpenApp</b></li>
     <li>screenBrightness - setzt die Bildschirmhelligkeit, von 0-255 <b>Attribut setScreenBrightness</b></li>
@@ -1233,10 +1268,14 @@ sub AMAD_CommBridge_Read($) {
     <li>screenFullscreen - Schaltet den Vollbildmodus on/off. <b>Attribut setFullscreen</b></li>
     <li>screenOrientation - Schaltet die Bildschirmausrichtung Auto/Landscape/Portait. <b>Attribut setScreenOrientation</b></li>
     <li>system - setzt Systembefehle ab (nur bei gerootetet Ger&auml;en). Reboot <b>Attribut root</b>, in den Automagic Einstellungen muss "Root Funktion" gesetzt werden</li>
+    <br>
     Um openApp verwenden zu k&ouml;nnen, muss als Attribut ein, oder durch Komma getrennt, mehrere App Namen gesetzt werden. Der App Name ist frei w&auml;hlbar und nur zur Wiedererkennung notwendig.
     Der selbe App Name mu&szlig; im Flow SetCommands auf der linken Seite unterhalb der Raute Expression:"openApp" in einen der 5 Str&auml;nge (eine App pro Strang) in beide Rauten eingetragen werden. Danach wird
-    in das
-    Viereck die App ausgew&auml;lt welche durch den Attribut App Namen gestartet werden soll.
+    in das Viereck die App ausgew&auml;lt welche durch den Attribut App Namen gestartet werden soll.<br><br>
+    Um zwischen Bluetoothger&auml;ten wechseln zu k&ouml;nnen, mu&szlig; das Attribut setBluetoothDevice mit folgender Syntax gesetzt werden. <b>attr &lt;DEVICE&gt; BTdeviceName1|MAC,BTDeviceName2|MAC</b> Es muss
+    zwingend darauf geachtet werden das beim BTdeviceName kein Leerzeichen vorhanden ist. Am besten zusammen oder mit Unterstrich. Achtet bei der MAC darauf das Ihr wirklich nach jeder zweiten Zahl auch
+    einen : drin habt<br>
+    Beispiel: <i>attr Nexus10Wohnzimmer setBluetoothDevice Logitech_BT_Adapter|AB:12:CD:34:EF:32,Anker_A3565|GH:56:IJ:78:KL:76</i> 
   </ul>
   <br><br>
   <a name="AMADstate"></a>
