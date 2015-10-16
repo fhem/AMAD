@@ -31,6 +31,12 @@ global_album = getString("album");</extras>
   </trigger>
   <trigger type="global_variable">
     <useDefaultName>true</useDefaultName>
+    <name>Globale Variable: global_own_reading</name>
+    <enabled>true</enabled>
+    <variable>global_own_reading</variable>
+  </trigger>
+  <trigger type="global_variable">
+    <useDefaultName>true</useDefaultName>
     <name>Globale Variable: global_touched</name>
     <enabled>false</enabled>
     <variable>global_touched</variable>
@@ -992,106 +998,107 @@ FHEMCMD: statusrequest</customHTTPHeaders>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <emergencyStopCount>120</emergencyStopCount>
-    <triggercontainer id="t1" x="1015.0" y="-1592.5">
+    <actioncontainer id="t1" x="1505.0" y="857.5">Script: notification_text = "no supported from your device"</actioncontainer>
+    <actioncontainer id="t2" x="1715.0" y="857.5">Script: screen_orientation = "auto"</actioncontainer>
+    <conditioncontainer id="t3" x="1715.0" y="612.5">Display automatisch drehen eingeschaltet</conditioncontainer>
+    <actioncontainer id="t4" x="1925.0" y="857.5">Script: screen_orientation = "portrait"</actioncontainer>
+    <conditioncontainer id="t5" x="2030.0" y="682.5">Display Orientierung: Portrait</conditioncontainer>
+    <actioncontainer id="t6" x="2135.0" y="857.5">Script: screen_orientation = "landscape"</actioncontainer>
+    <conditioncontainer id="t7" x="2450.0" y="612.5">Bluetooth eingeschaltet</conditioncontainer>
+    <actioncontainer id="t8" x="2625.0" y="857.5">Script: bluetooth_state = "off"</actioncontainer>
+    <actioncontainer id="t9" x="1295.0" y="857.5">Script: screen_state = "off"</actioncontainer>
+    <actioncontainer id="t10" x="1085.0" y="857.5">Script: screen_state = "on"</actioncontainer>
+    <conditioncontainer id="t11" x="1190.0" y="612.5">Display eingeschaltet</conditioncontainer>
+    <actioncontainer id="t12" x="665.0" y="857.5">Script: next_alarmtime = "{next_alarm,dateformat,HH:mm}"</actioncontainer>
+    <actioncontainer id="t13" x="770.0" y="612.5">Initialisiere Variable Nächster Alarm: next_alarm</actioncontainer>
+    <actioncontainer id="t14" x="875.0" y="857.5">Script: next_alarmday = "{next_alarm,dateformat,c}"</actioncontainer>
+    <actioncontainer id="t15" x="490.0" y="612.5">Initialisiere Variable Systemeinstellung: screenBrightness</actioncontainer>
+    <actioncontainer id="t16" x="280.0" y="612.5">Initialisiere Variable Systemeinstellung: volumeMusikSpeaker</actioncontainer>
+    <actioncontainer id="t17" x="70.0" y="612.5">Initialisiere Variable Systemeinstellung: volumeMusikBluetooth</actioncontainer>
+    <conditioncontainer id="t18" x="-455.0" y="612.5">Flow Aktiv: SetCommands</conditioncontainer>
+    <actioncontainer id="t19" x="-350.0" y="857.5">Script: setCommandFlow_state = "aktiv"</actioncontainer>
+    <actioncontainer id="t20" x="-665.0" y="1032.5">Setze Flow Status: Aktivieren SetCommands</actioncontainer>
+    <actioncontainer id="t21" x="-140.0" y="857.5">Script: global_artist = "no soundplayer activ"; global_track = "no soundplayer activ"; global_album = "no soundplayer activ";</actioncontainer>
+    <conditioncontainer id="t22" x="-140.0" y="612.5">Musik Aktiv</conditioncontainer>
+    <actioncontainer id="t23" x="1015.0" y="-332.5">Pause: 2s (Gerät wach halten)</actioncontainer>
+    <conditioncontainer id="t24" x="1015.0" y="-1277.5">Expression: trigger == "com.android.music.metachanged"</conditioncontainer>
+    <conditioncontainer id="t25" x="1015.0" y="-962.5">Expression: trigger == "Globale Variable: global_own_reading"</conditioncontainer>
+    <conditioncontainer id="t26" x="1330.0" y="-962.5">WLAN Verbunden: Alle SSIDs</conditioncontainer>
+    <conditioncontainer id="t27" x="665.0" y="-612.5">WLAN Verbunden: Alle SSIDs</conditioncontainer>
+    <actioncontainer id="t28" x="2345.0" y="857.5">Script: bluetooth_state = "on"</actioncontainer>
+    <conditioncontainer id="t29" x="2485.0" y="857.5">Bluetooth Gerät verbunden: Beliebiges Geräte</conditioncontainer>
+    <conditioncontainer id="t30" x="1015.0" y="-87.5">Akku Ladestand: grösser als 0%</conditioncontainer>
+    <actioncontainer id="t31" x="-560.0" y="857.5">Script: setCommandFlow_state = "inaktiv"</actioncontainer>
+    <actioncontainer id="t32" x="1015.0" y="-612.5">Script: global_fhemip = {header_fhemip} global_fhemdevice = {header_fhemdevice}</actioncontainer>
+    <conditioncontainer id="t33" x="-980.0" y="612.5">App Task läuft: {header_activetask} (neuster)</conditioncontainer>
+    <actioncontainer id="t34" x="-1085.0" y="857.5">Script: runTask = "0"</actioncontainer>
+    <actioncontainer id="t35" x="-875.0" y="857.5">Script: runTask = "1"</actioncontainer>
+    <actioncontainer id="t36" x="1330.0" y="-612.5">Reading Music Metachanged</actioncontainer>
+    <actioncontainer id="t37" x="665.0" y="-332.5">Own Reading</actioncontainer>
+    <actioncontainer id="t38" x="1015.0" y="1487.5">HTTP Response Information</actioncontainer>
+    <conditioncontainer id="t39" x="1435.0" y="612.5">Benachrichtigung in Statusbar angezeigt: Automagic</conditioncontainer>
+    <triggercontainer id="t40" x="1015.0" y="-1592.5">
       <trigger>HTTP Request: /fhem-amad/deviceInfo/</trigger>
       <trigger>com.android.music.metachanged</trigger>
+      <trigger>Globale Variable: global_own_reading</trigger>
     </triggercontainer>
-    <actioncontainer id="t2" x="1505.0" y="857.5">Script: notification_text = "no supported from your device"</actioncontainer>
-    <actioncontainer id="t3" x="1715.0" y="857.5">Script: screen_orientation = "auto"</actioncontainer>
-    <conditioncontainer id="t4" x="1715.0" y="612.5">Display automatisch drehen eingeschaltet</conditioncontainer>
-    <actioncontainer id="t5" x="1925.0" y="857.5">Script: screen_orientation = "portrait"</actioncontainer>
-    <conditioncontainer id="t6" x="2030.0" y="682.5">Display Orientierung: Portrait</conditioncontainer>
-    <actioncontainer id="t7" x="2135.0" y="857.5">Script: screen_orientation = "landscape"</actioncontainer>
-    <conditioncontainer id="t8" x="2450.0" y="612.5">Bluetooth eingeschaltet</conditioncontainer>
-    <actioncontainer id="t9" x="2625.0" y="857.5">Script: bluetooth_state = "off"</actioncontainer>
-    <actioncontainer id="t10" x="1295.0" y="857.5">Script: screen_state = "off"</actioncontainer>
-    <actioncontainer id="t11" x="1085.0" y="857.5">Script: screen_state = "on"</actioncontainer>
-    <conditioncontainer id="t12" x="1190.0" y="612.5">Display eingeschaltet</conditioncontainer>
-    <actioncontainer id="t13" x="665.0" y="857.5">Script: next_alarmtime = "{next_alarm,dateformat,HH:mm}"</actioncontainer>
-    <actioncontainer id="t14" x="770.0" y="612.5">Initialisiere Variable Nächster Alarm: next_alarm</actioncontainer>
-    <actioncontainer id="t15" x="875.0" y="857.5">Script: next_alarmday = "{next_alarm,dateformat,c}"</actioncontainer>
-    <actioncontainer id="t16" x="490.0" y="612.5">Initialisiere Variable Systemeinstellung: screenBrightness</actioncontainer>
-    <actioncontainer id="t17" x="280.0" y="612.5">Initialisiere Variable Systemeinstellung: volumeMusikSpeaker</actioncontainer>
-    <actioncontainer id="t18" x="70.0" y="612.5">Initialisiere Variable Systemeinstellung: volumeMusikBluetooth</actioncontainer>
-    <conditioncontainer id="t19" x="-455.0" y="612.5">Flow Aktiv: SetCommands</conditioncontainer>
-    <actioncontainer id="t20" x="-350.0" y="857.5">Script: setCommandFlow_state = "aktiv"</actioncontainer>
-    <actioncontainer id="t21" x="-665.0" y="1032.5">Setze Flow Status: Aktivieren SetCommands</actioncontainer>
-    <actioncontainer id="t22" x="-140.0" y="857.5">Script: global_artist = "no soundplayer activ"; global_track = "no soundplayer activ"; global_album = "no soundplayer activ";</actioncontainer>
-    <conditioncontainer id="t23" x="-140.0" y="612.5">Musik Aktiv</conditioncontainer>
-    <actioncontainer id="t24" x="1015.0" y="-332.5">Pause: 2s (Gerät wach halten)</actioncontainer>
-    <conditioncontainer id="t25" x="1015.0" y="-1277.5">Expression: trigger == "com.android.music.metachanged"</conditioncontainer>
-    <conditioncontainer id="t26" x="1015.0" y="-962.5">Expression: trigger == "Globale Variable: global_own_reading"</conditioncontainer>
-    <conditioncontainer id="t27" x="1330.0" y="-962.5">WLAN Verbunden: Alle SSIDs</conditioncontainer>
-    <conditioncontainer id="t28" x="665.0" y="-612.5">WLAN Verbunden: Alle SSIDs</conditioncontainer>
-    <actioncontainer id="t29" x="2345.0" y="857.5">Script: bluetooth_state = "on"</actioncontainer>
-    <conditioncontainer id="t30" x="2485.0" y="857.5">Bluetooth Gerät verbunden: Beliebiges Geräte</conditioncontainer>
-    <conditioncontainer id="t31" x="1015.0" y="-87.5">Akku Ladestand: grösser als 0%</conditioncontainer>
-    <actioncontainer id="t32" x="-560.0" y="857.5">Script: setCommandFlow_state = "inaktiv"</actioncontainer>
-    <actioncontainer id="t33" x="1015.0" y="-612.5">Script: global_fhemip = {header_fhemip} global_fhemdevice = {header_fhemdevice}</actioncontainer>
-    <conditioncontainer id="t34" x="-980.0" y="612.5">App Task läuft: {header_activetask} (neuster)</conditioncontainer>
-    <actioncontainer id="t35" x="-1085.0" y="857.5">Script: runTask = "0"</actioncontainer>
-    <actioncontainer id="t36" x="-875.0" y="857.5">Script: runTask = "1"</actioncontainer>
-    <actioncontainer id="t37" x="1330.0" y="-612.5">Reading Music Metachanged</actioncontainer>
-    <actioncontainer id="t38" x="665.0" y="-332.5">Own Reading</actioncontainer>
-    <actioncontainer id="t39" x="1015.0" y="1487.5">HTTP Response Information</actioncontainer>
-    <conditioncontainer id="t40" x="1435.0" y="612.5">Benachrichtigung in Statusbar angezeigt: Automagic</conditioncontainer>
-    <connection from="t1" to="t25" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t2" to="t39" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t3" to="t39" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t4" to="t6" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t4" to="t3" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t5" to="t39" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t6" to="t5" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t6" to="t7" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t7" to="t39" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t8" to="t29" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t8" to="t9" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t8" to="t30" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t9" to="t39" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t10" to="t39" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t11" to="t39" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t12" to="t11" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t12" to="t10" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t13" to="t39" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t14" to="t13" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t14" to="t15" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t15" to="t39" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t16" to="t39" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t17" to="t39" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t18" to="t39" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t19" to="t20" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t19" to="t32" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t20" to="t39" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t22" to="t39" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t23" to="t22" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t24" to="t31" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t1" to="t38" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t2" to="t38" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t3" to="t5" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t3" to="t2" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t4" to="t38" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t5" to="t4" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t5" to="t6" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t6" to="t38" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t7" to="t28" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t7" to="t8" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t7" to="t29" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t8" to="t38" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t9" to="t38" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t10" to="t38" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t11" to="t10" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t11" to="t9" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t12" to="t38" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t13" to="t12" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t13" to="t14" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t14" to="t38" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t15" to="t38" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t16" to="t38" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t17" to="t38" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t18" to="t19" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t18" to="t31" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t19" to="t38" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t21" to="t38" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t22" to="t21" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t23" to="t30" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t24" to="t26" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t24" to="t25" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t25" to="t32" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t25" to="t27" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t25" to="t26" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t26" to="t33" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t26" to="t28" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t26" to="t36" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t27" to="t37" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t28" to="t38" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t29" to="t38" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t30" to="t17" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t30" to="t16" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t30" to="t15" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t30" to="t13" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t30" to="t11" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t30" to="t39" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t31" to="t18" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t31" to="t17" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t31" to="t16" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t31" to="t14" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t31" to="t12" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t31" to="t40" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t31" to="t4" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t31" to="t23" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t31" to="t8" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t31" to="t19" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t31" to="t34" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t32" to="t39" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t32" to="t21" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t33" to="t24" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t34" to="t36" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t34" to="t35" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t35" to="t39" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t36" to="t39" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t40" to="t2" type="EXCEPTION" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t40" to="t39" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t30" to="t3" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t30" to="t22" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t30" to="t7" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t30" to="t18" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t30" to="t33" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t31" to="t38" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t31" to="t20" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t32" to="t23" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t33" to="t35" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t33" to="t34" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t34" to="t38" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t35" to="t38" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t39" to="t1" type="EXCEPTION" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t39" to="t38" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t40" to="t24" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
   </flow>
   <flow type="flow">
     <name>Meldung Display An</name>
