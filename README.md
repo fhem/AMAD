@@ -95,7 +95,7 @@
   <a name="AMADreadings"></a>
   <b>Readings</b>
   <ul>
-    <li>automagicState - Statusmeldungen von der AutomagicApp</li>
+    <li>automagicState - Statusmeldungen von der AutomagicApp <b>(Voraussetzung Android >4.3). Wer ein Android >4.3 hat und im Reading steht "wird nicht unterst&uuml;tzt", mu&szlig; in den Androideinstellungen unter Ton und Benachrichtigungen -> Benachrichtigungszugriff ein Haken setzen f&uuml;r Automagic</b></li>
     <li>bluetooth on/off - ist auf dem Ger&auml;t Bluetooth an oder aus</li>
     <li>checkActiveTask - Zustand einer zuvor definierten APP. 0=nicht aktiv oder nicht aktiv im Vordergrund, 1=aktiv im Vordergrund, <b>siehe Hinweis unten</b></li>
     <li>connectedBTdevices - eine Liste der verbundenen Ger&auml;t</li>
@@ -122,18 +122,51 @@
     <li>volume - Lautst&auml;rkewert welcher &uuml;ber "set volume" gesetzt wurde.</li>
     <li>volumeMusikBluetooth - Media Lautst&auml;rke von angeschlossenden Bluetooth Lautsprechern</li>
     <li>volumeMusikSpeaker - Media Lautst&auml;rke der internen Lautsprecher</li>
-    <br><br>
+    <br>
     Die Readings volumeMusikBluetooth und volumeMusikSpeaker spiegeln die jeweilige Medialautst&auml;rke der angeschlossenden Bluetoothlautsprecher oder der internen Lautsprecher wieder.
     Sofern man die jeweiligen Lautst&auml;rken ausschlie&szlig;lich &uuml;ber den Set Befehl setzt, wird eine der beiden immer mit dem "volume" Reading &uuml;ber ein stimmen.<br><br>
     Beim Reading checkActivTask mu&szlig; zuvor der Packagename der zu pr&uuml;fenden App als Attribut <i>checkActiveTask</i> angegeben werden. Beispiel: <i>attr Nexus10Wohnzimmer
     checkActiveTask com.android.chrome</i> f&uuml;r den Chrome Browser.
     <br><br>
   </ul>
+  <b>Eigene Readings im AMAD-Device erstellen</b>
+  <ul>
+    Es ist m&ouml;glich, aus beliebigen eigenen Automagic-Flows eigene Readings im AMAD-Device zu erstellen und zu f&uuml;llen. Die &Uuml;bertragung zum FHEM AMAD-Device erfolgt umgehend &uuml;ber die AMADCommBridge - daher sollte auf eine zu h&auml;ufige Aktualisierung verzichtet werden. Die Vorgehensweise in Automagic hierf&uuml;r ist folgende:
+    <ul>
+    <br>
+      <li>zun&auml;chst erstellt man sich, soweit nicht bereits geschehen, einen Automagic-Flow der die Information, die in ein Reading &uuml;bernommen werden soll zur Verf&uuml;gung stellt</li>
+      <li>diese Information speichert man nun mittels Automagic Action Script in eine globale Variable namens global_reading_<Readingname> (beim <Readingname> auf Gro&szlig;- und Kleinschreibung achten):</li>
+    <br>
+    <code>
+      Beispiel: Das Reading Touch soll den Wert "ja" erhalten
+      Action Script: global_reading_Touch="ja"
+    </code>
+    <br><br>
+      <li>abschlie&szlig;end muss noch die &Uuml;bertragung des Wertes initiiert werden. Dies erfolgt, indem der Wert der Variable global_own_reading auf den Wert <Zeitstempel>_<Readingname> gesetzt wird (auch hier auf Gro&szlig;- und Kleinschreibung achten):</li>
+    <br>
+      <code>
+	Beispiel: Das Reading Touch soll &uuml;bertragen werden<br>
+	Action Script: global_own_reading="{getDate()}_Touch"<br>
+	Hinweis: man kann auch beide Aktionen in ein Script packen:
+	<ul>
+	  global_reading_Touch="ja";global_own_reading="{getDate()}_Touch"
+	</ul>
+      </code>
+      <br>
+	<li>M&ouml;chte man nun als n&auml;chstes z.B. eine sofortige Benachrichtigung, wenn das Display des Tablets an- oder ausgeschaltet wird, k&ouml;nnte man sich Flows bauen, welche beim De-/Aktivieren des Display ausgef&uuml;hrt werden:</li>
+      <br>
+	<code>
+	  Action Script beim Aktivieren des Displays: global_reading_Display="an";global_own_reading="{getDate()}_Display"
+	  Action Script beim Deaktivieren des Displays: global_reading_Display="aus";global_own_reading="{getDate()}_Display"
+	</code>
+    </ul>
+  </ul>
   <br><br>
   <a name="AMADset"></a>
   <b>Set</b>
   <ul>
     <li>bluetooth - Schaltet Bluetooth on/off</li>
+    <li>clearNotificationBar - (All,Automagic) l&ouml;scht alle Meldungen oder nur die Automagic Meldungen in der Statusleiste</li>
     <li>deviceState - setzt den Device Status Online/Offline. Siehe Readings</li>
     <li>mediaPlayer - steuert den Standard Mediaplayer. play, stop, Titel z&uuml;r&uuml;ck, Titel vor.</li>
     <li>nextAlarmTime - setzt die Alarmzeit. Geht aber nur innerhalb der n&auml;chsten 24Std.</li>
@@ -148,7 +181,6 @@
   <br>
   <b>Set abh&auml;ngig von gesetzten Attributen</b>
   <ul>
-    <li></li>
     <li>changetoBtDevice - wechselt zu einem anderen Bluetooth Ger&auml;t. <b>Attribut setBluetoothDevice mu&szlig; gesetzt sein. Siehe Hinweis unten!</b></li>
     <li>mediaPlayer - steuert den Standard Mediaplayer. play, stop, Titel z&uuml;r&uuml;ck, Titel vor. <b>Attribut fhemServerIP</b></li>
     <li>openApp - &ouml;ffnet eine ausgew&auml;hlte App. <b>Attribut setOpenApp</b></li>
@@ -189,5 +221,7 @@
   Der gr&ouml;&szlig;te Dank geht an meinen Mentor Andre (justme1968), er hat mir mit hilfreichen Tips geholfen Perlcode zu verstehen und Spa&szlig; am programmieren zu haben.<br>
   Auch m&ouml;chte ich mich bei Jens bedanken (jensb) welcher mir ebenfalls mit hilfreichen Tips bei meinen aller ersten Gehversuchen beim Perlcode schreiben unterst&uuml;tzt hat.<br>
   So und nun noch ein besonderer Dank an pah (Prof. Dr. Peter Henning ), ohne seine Aussage "Keine Ahnung hatten wir alle mal, das ist keine Ausrede" h&auml;tte ich bestimmt nicht angefangen Interesse an
-  Modulentwicklung zu zeigen :-)</b>
+  Modulentwicklung zu zeigen :-)<br>
+  Danke an J&uuml;rgen(ujaudio) der sich um die &Uuml;bersetzung der Commandref ins Englische gek&uuml;mmert hat und hoffentlich weiter k&uuml;mmern wird :-)<br>
+  Danke auch an Ronny(RoBra81) f&uuml;r seine tollte Idee und Umsetzung von eigenen AMAD Readings aus externen Flows.</b>
 </ul>
