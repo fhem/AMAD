@@ -35,7 +35,7 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-my $version = "0.7.9";
+my $version = "0.7.10";
 
 
 
@@ -65,8 +65,6 @@ sub AMAD_Initialize($) {
 	my $hash = $modules{AMAD}{defptr}{$d};
 	$hash->{VERSION} 	= $version;
     }
-    
-    
 }
 
 sub AMAD_Define($$) {
@@ -979,9 +977,12 @@ sub AMAD_CommBridge_Read($) {
   <br><br>
   With this module it is also possible to control an Android device as follows.
   <ul>
-    <li>State of the device (nnline, offline)</li>
+    <li>Switch Bluetooth on/off</li>
+    <li>Set or change the connection to a specific Bluetooth device</li>
+    <li>State of the device (online, offline)</li>
     <li>Media Player control ( play / stop / next track / previous track)</li>
     <li>Set next alarm time</li>
+    <li>Play a notification sound</li>
     <li>Open an app on the device</li>
     <li>Open a URL in the browser on the device</li>
     <li>Set Screen on/off</li>
@@ -1024,14 +1025,25 @@ sub AMAD_CommBridge_Read($) {
   </ul>
   <br><br>
   <b><u>Done! After connecting the device instance should already come in the first Readings within 3 minutes.</u></b>
+  <br><br><br>
+  <a name="AMADCommBridge"></a>
+  <b>AMAD Communication Bridge</b>
+  <ul>
+    When you define the first AMAD device instance another device named AMADCommBridge will also be defined. Its room attribute is AMAD.YOU SHOULD NEVER CHANGE THIS NAME. Feel free to change all other properties. You need this device for the communication fom the Andoid unit to FHEM without having received any query from FHEM. The Android unit must know the IP address of FHEM, so you must enter the set command for the corresponding reading immediately after the definition of the bridge. This is extremly important to get the functionality working properly!
+    The command is
+    set AMADCommBridge fhemServerIP <FHEM-IP>.
+    There is another reading expertMode which allows a direct communication with FHEM without haviung to use a notify or being limited to set commands.
+  </ul>
   <br><br>
   <a name="AMADreadings"></a>
   <b>Readings</b>
   <ul>
     <li>automagic state - status messages from the AutomagicApp</li>
     <li>bluetooth on / off - is Bluetooth switched on or off on the device</li>
+    <li>checkActiveTask - state of an app being defined before, 1=activ in the foreground, see the hint further down</li>
     <li>connectedBTdevices - a list of the connected devices</li>
-    <li>current Music Album - currently abgespieltes Music Album of the media player used</li>
+    <li>connectedBTdevicesMAC – list f the MAC addresses of all connected BT devices</li>
+    <li>current Music Album - currently played music album of the media player used</li>
     <li>current music artist - currently played music artist of the media player used</li>
     <li>current Music Track - currently played music title of the media player used</li>
     <li>deviceState - State of the Android device, must itself be set with setreading e.g. about the attendance check. When offline is set, the interval is set off for information retrieval.</li>
@@ -1054,7 +1066,43 @@ sub AMAD_CommBridge_Read($) {
     <li>volume music speaker - Media volume of the internal speakers</li>
     <br>
     The Readings volume Music Bluetooth and music speaker volume reflect the respective media volume of the closed border is Bluetooth speakers or the internal speaker again.
-    Unless one the respective volumes relies exclusively on the Set command, one of the two will always agree with the "volume" Reading a.
+    Unless one the respective volumes relies exclusively on the Set command, one of the two will always agree with the "volume" Reading a.<br><br>
+    Before using the Reading checkActivTask you must set the nme of the package name of te app to be checked innthe attribute checkActiveTask. Eample:
+    attr Nexus10Wohnzimmer checkActiveTask com.android.chrome for the Chrome browser.
+  </ul><br><br>
+  <b>Define user specific Readings in the AMAD device</b>
+  <ul>
+    You can specify your own reaqdings in the AMAD device and use them in combination with your Automagic flow. The transmission takes place immediately by means of the AMADCommBridge - so you should not update it too often. This is how you can do it:
+    <ul>
+    <br>
+      <li>first you need to define an Automagic flow for the information for the reading</li>
+      <li>diese Information speichert man nun mittels Automagic Action Script in eine globale Variable namens global_reading_<Readingname> (beim <Readingname> auf Gro&szlig;- und Kleinschreibung achten):</li>
+    <br>
+    <code>
+      this information needs to be stored with the help of an Automagic action in a global variable (case sensitiv!). Example:
+      The Reading Touch should get the value "yes"
+      Action Script: global_reading_Touch="yes"
+    </code>
+    <br><br>
+      <li>abschlie&szlig;end muss noch die &Uuml;bertragung des Wertes initiiert werden. Dies erfolgt, indem der Wert der Variable global_own_reading auf den Wert <Zeitstempel>_<Readingname> gesetzt wird (auch hier auf Gro&szlig;- und Kleinschreibung achten):</li>
+    <br>
+      <code>
+	Finally you need to trigger the transmission of the value. This is dne by setting the the value of the variable global_own_reading to _ gesetzt wird (again: case sensitiv!):
+	Example: The Reading Touch should be transfered<br>
+	Action Script: global_own_reading="{getDate()}_Touch"<br>
+	Hint: you can put both actions in one script:
+	<ul>
+	  global_reading_Touch="ja";global_own_reading="{getDate()}_Touch"
+	</ul>
+      </code>
+      <br>
+	<li>Asume you want to get an immediate information when the display of your tablet has been switched on or off then you can define the following flows:
+      <br>
+	<code>
+	  Action Script when the display is activated: global_reading_Display="on";global_own_reading="{getDate()}_Display" 
+	  Action Script when the display is deactivated: global_reading_Display="off";global_own_reading="{getDate()}_Display"</li>
+	</code>
+    </ul>
   </ul>
   <br><br>
   <a name="AMADset"></a>
@@ -1063,6 +1111,7 @@ sub AMAD_CommBridge_Read($) {
     <li>Device State - sets the Device Status Online / Offline. See Readings</li>
     <li>Media Player - controls the default media player. Play, Stop, Back Route title, ahead of title.</li>
     <li>NextAlarm time - sets the alarm time. only within the next 24hrs.</li>
+    <li>notifySndFile - plays the specified media file on the Android device. The file to be played must be in the folder /storage/emulated/0/Notifications/.</li>
     <li>openURL - opens a URL in your default browser</li>
     <li>screen - are sets the screen on / off with barrier in the car Magic settings must "Admin Function" set will not work "Screen off".</li>
     <li>screenMsg - sends a message screen</li>
@@ -1073,6 +1122,7 @@ sub AMAD_CommBridge_Read($) {
   <br>
   <b>Set depending on set attributes</b>
   <ul>
+    <li>changetoBtDevice - changes to another Bluetooth device. The attribute setBluetoothDevice must be set. See hint below!</li>
     <li>mediaPlayer - controls the default media player. Play, Stop, Back Route title, ahead of title. <b>Attribute fhemServerIP</b></li>
     <li>openapp - opens a selected app. <b>Attribute setOpenApp</b></li>
     <li>screen Brightness - sets the screen brightness, 0-255 <b>Attribute setScreenBrightness</b></li>
@@ -1080,7 +1130,11 @@ sub AMAD_CommBridge_Read($) {
     <li>screen fullscreen - Switches to full screen mode on / off. <b>Attribute SetFullscreen </b></li>
     <li>screenOrientation - Switches the screen orientation Auto / Landscape / Portrait. <b>Attribute setScreenOrientation</b></li>
     <li>system - set system commands from (only rooted devices). Reboot <b>Attribut root</b>, in the Auto Magic Settings "root function" must be set</li>
-    In order to use openApp you need an attribute where separated by a comma, several app names are set in order to use openapp. The app name is arbitrary and only required for recognition. The same app name must be used in the flow in SetCommands on the left below the hash expression: "openapp" be in one of the 5 paths (one app per path) entered in both diamonds. Thereafter, in the quadrangle selected the app which app through the attribute names should be started.
+    In order to use openApp you need an attribute where separated by a comma, several app names are set in order to use openapp. The app name is arbitrary and only required for recognition. The same app name must be used in the flow in SetCommands on the left below the hash expression: "openapp" be in one of the 5 paths (one app per path) entered in both diamonds. Thereafter, in the quadrangle selected the app which app through the attribute names should be started.<br><br>
+    To switch between different Bluetooth devices, you need set the attribute setBluetoothDevice accordingly. 
+    attr <DEVICE> BTdeviceName1|MAC,BTDeviceName2|MAC 
+    There may never be a sapce in BTdeviceName. There must also be the colon(:) in the MAC address after every second sign!
+    Example: attr Nexus10Wohnzimmer setBluetoothDevice Logitech_BT_Adapter|AB:12:CD:34:EF:32,Anker_A3565|GH:56:IJ:78:KL:76
   </ul>
   <br><br>
   <a name="AMADstate"></a>
