@@ -35,7 +35,7 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-my $version = "0.7.10";
+my $version = "0.7.11";
 
 
 
@@ -256,7 +256,7 @@ sub AMAD_RetrieveAutomagicInfo($) {
     HttpUtils_NonblockingGet(
 	{
 	    url		=> $url,
-	    timeout	=> 10,
+	    timeout	=> 60,
 	    hash	=> $hash,
 	    method	=> "GET",
 	    header	=> "fhemIP: $fhemip\r\nfhemDevice: $name\r\nactiveTask: $activetask",
