@@ -1395,7 +1395,7 @@ sub AMAD_CommBridge_Read($) {
   So und nun noch ein besonderer Dank an pah (Prof. Dr. Peter Henning ), ohne seine Aussage "Keine Ahnung hatten wir alle mal, das ist keine Ausrede" h&auml;tte ich bestimmt nicht angefangen Interesse an
   Modulentwicklung zu zeigen :-)<br>
   Danke an J&uuml;rgen(ujaudio) der sich um die &Uuml;bersetzung der Commandref ins Englische gek&uuml;mmert hat und hoffentlich weiter k&uuml;mmern wird :-)<br>
-  Danke auch an Ronny(RoBra81) f&uuml;r seine tollte Idee und Umsetzung von eigenen AMAD Readings aus externen Flows.</b>
+  Danke auch an Ronny(RoBra81) f&uuml;r seine tolle Idee und Umsetzung von eigenen AMAD Readings aus externen Flows.</b>
 </ul>
 
 =end html_DE
