@@ -35,11 +35,7 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-<<<<<<< HEAD
-my $version = "0.6.3";
-=======
 my $version = "0.8.0";
->>>>>>> devel
 
 
 
@@ -94,15 +90,11 @@ sub AMAD_Define($$) {
     if( ! $hash->{HOST} ) {
 	return "there is already a AMAD Bridge" if( $modules{AMAD}{defptr}{BRIDGE} );
 
-<<<<<<< HEAD
-    Log3 $name, 3, "AMAD ($name) - defined with host $hash->{HOST} on port $hash->{PORT} and interval $hash->{INTERVAL} (sec)";
-=======
 	$hash->{BRIDGE} = 1;
 	$modules{AMAD}{defptr}{BRIDGE} = $hash;
 	$attr{$name}{room} = "AMAD";
 	Log3 $name, 3, "AMAD ($name) - defined Bridge with Socketport $hash->{PORT}";
 	AMAD_CommBridge_Open( $hash );
->>>>>>> devel
 
     } else {
 	if( ! $modules{AMAD}{defptr}{BRIDGE} && $init_done ) {
