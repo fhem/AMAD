@@ -894,15 +894,15 @@ sub AMAD_CommBridge_Read($) {
     ###
 
     my @data = split( '\R\R',  $buf );
+    my $chash = undef;
     
     if ( $data[0] =~ /FHEMCMD: setreading\b/ ) {
 	my $tv = $data[1];
 	
 	@data = split( '\R',  $data[0] );
-                $data[3] =~ s/FHEMDEVICE: //;
-		my $chash = $defs{$data[3]};
+
 		### Begin Response Processing
-		Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: processing receive reading values";
+		Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: processing receive reading values chash = $chash";
     
 		my @valuestring = split( '@@@@',  $tv );
 		my %buffer;
@@ -914,15 +914,36 @@ sub AMAD_CommBridge_Read($) {
     
 		my $t;
 		my $v;
-		while( ( $t, $v ) = each %buffer ) {
-		    $v =~ s/null//g;
+		
+		if( $data[2] =~ /FHEMDEVICE:/ ) {
+		
+                    $data[2] =~ s/FHEMDEVICE: //;
+                    
+                    while( ( $t, $v ) = each %buffer ) {
+                        $v =~ s/null//g;
 		    
-		    readingsBeginUpdate( $chash );
-		    readingsBulkUpdate( $chash, $t, $v ) if( defined( $v ) );
-		}
-    
-		readingsBulkUpdate( $chash, "lastStatusRequestState", "statusRequest_done" );
-		readingsEndUpdate( $chash, 1 );
+                        readingsBeginUpdate( $chash );
+                        readingsBulkUpdate( $chash, $t, $v ) if( defined( $v ) );
+                    }
+                    
+                    readingsBulkUpdate( $chash, "lastStatusRequestState", "statusRequest_done" );
+                    readingsEndUpdate( $chash, 1 );
+                    
+                } else {
+                    $data[3] =~ s/FHEMDEVICE: //;
+                    
+                    while( ( $t, $v ) = each %buffer ) {
+                        $v =~ s/null//g;
+		    
+                        readingsBeginUpdate( $chash );
+                        readingsBulkUpdate( $chash, $t, $v ) if( defined( $v ) );
+                    }
+                    
+                    readingsBulkUpdate( $chash, "lastStatusRequestState", "statusRequest_done" );
+                    readingsEndUpdate( $chash, 1 );
+                    
+                }
+                
 		### End Response Processing
 
         return;
@@ -949,11 +970,21 @@ sub AMAD_CommBridge_Read($) {
     elsif ( $data[0] =~ /FHEMCMD: statusrequest\b/ ) {
 
 	@data = split( '\R',  $data[0] );
-        $data[3] =~ s/FHEMDEVICE: //;
-	my $chash = $defs{$data[3]};
+
+        if( $data[2] =~ /FHEMDEVICE:/ ) {
+	
+            $data[2] =~ s/FHEMDEVICE: //;
+            my $chash = $defs{$data[2]};
+            Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: Call statusRequest";
+            return AMAD_GetUpdateLocal( $chash );
         
-        Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: Call statusRequest";
-	return AMAD_GetUpdateLocal( $chash );
+        } else {
+            $data[3] =~ s/FHEMDEVICE: //;
+            my $chash = $defs{$data[3]};
+            Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: Call statusRequest";
+            return AMAD_GetUpdateLocal( $chash );
+            
+        }
     }
 }
 
