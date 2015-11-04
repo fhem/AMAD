@@ -35,7 +35,7 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-my $version = "0.8.1";
+my $version = "0.9.0";
 
 
 
@@ -459,7 +459,7 @@ sub AMAD_Set($$@) {
 	$list .= "notifySndFile ";
 	$list .= "clearNotificationBar:All,Automagic ";
 	$list .= "changetoBTDevice:$btdev " if( AttrVal( $name, "setBluetoothDevice", "none" ) ne "none" );
-	#$list .= "activateVoiceInput:noArg ";    # erste Codeteile für Spracheingabe
+	$list .= "activateVoiceInput:noArg ";
 
 	if( lc $cmd eq 'screenmsg'
 	    || lc $cmd eq 'ttsmsg'
@@ -899,8 +899,8 @@ sub AMAD_CommBridge_Read($) {
 	my $tv = $data[1];
 	
 	@data = split( '\R',  $data[0] );
-                $data[2] =~ s/FHEMDEVICE: //;
-		my $chash = $defs{$data[2]};
+                $data[3] =~ s/FHEMDEVICE: //;
+		my $chash = $defs{$data[3]};
 		### Begin Response Processing
     
 		my @valuestring = split( '@@@@',  $tv );
@@ -936,7 +936,7 @@ sub AMAD_CommBridge_Read($) {
 	return;
     }
     
-    elsif ( $data[0] =~ /FHEMCMD: voicecmd\b/ ) {
+    elsif ( $data[0] =~ /FHEMCMD: voiceinputvalue\b/ ) {
         my $fhemCmd = $data[1];
         
 	readingsSingleUpdate( $brihash, "receiveVoiceCommand", $fhemCmd, 1 );
@@ -945,10 +945,10 @@ sub AMAD_CommBridge_Read($) {
     }
     
     elsif ( $data[0] =~ /FHEMCMD: statusrequest\b/ ) {
-	
+
 	@data = split( '\R',  $data[0] );
-        $data[2] =~ s/FHEMDEVICE: //;
-	my $chash = $defs{$data[2]};
+        $data[3] =~ s/FHEMDEVICE: //;
+	my $chash = $defs{$data[3]};
         
 	return AMAD_GetUpdateLocal( $chash );
     }
