@@ -900,16 +900,6 @@ sub AMAD_CommBridge_Read($) {
 	my $tv = $data[1];
 	
 	@data = split( '\R',  $data[0] );
-                if( $data[2] =~ /FHEMDEVICE:/ ) {
-                
-                    $data[2] =~ s/FHEMDEVICE: //;
-                    my $chash = $defs{$data[2]};
-                    
-                } else {
-                    $data[3] =~ s/FHEMDEVICE: //;
-                    my $chash = $defs{$data[3]};
-                    
-                }
                     
 		### Begin Response Processing
     
@@ -923,15 +913,38 @@ sub AMAD_CommBridge_Read($) {
     
 		my $t;
 		my $v;
-		while( ( $t, $v ) = each %buffer ) {
-		    $v =~ s/null//g;
+		
+		if( $data[2] =~ /FHEMDEVICE:/ ) {
+                
+                    $data[2] =~ s/FHEMDEVICE: //;
+                    my $chash = $defs{$data[2]};
+                    
+                    while( ( $t, $v ) = each %buffer ) {
+                        $v =~ s/null//g;
 		    
-		    readingsBeginUpdate( $chash );
-		    readingsBulkUpdate( $chash, $t, $v ) if( defined( $v ) );
-		}
+                        readingsBeginUpdate( $chash );
+                        readingsBulkUpdate( $chash, $t, $v ) if( defined( $v ) );
+                    }
     
-		readingsBulkUpdate( $chash, "lastStatusRequestState", "statusRequest_done" );
-		readingsEndUpdate( $chash, 1 );
+                    readingsBulkUpdate( $chash, "lastStatusRequestState", "statusRequest_done" );
+                    readingsEndUpdate( $chash, 1 );
+                    
+                } else {
+                    $data[3] =~ s/FHEMDEVICE: //;
+                    my $chash = $defs{$data[3]};
+                    
+                    while( ( $t, $v ) = each %buffer ) {
+                        $v =~ s/null//g;
+		    
+                        readingsBeginUpdate( $chash );
+                        readingsBulkUpdate( $chash, $t, $v ) if( defined( $v ) );
+                    }
+    
+                    readingsBulkUpdate( $chash, "lastStatusRequestState", "statusRequest_done" );
+                    readingsEndUpdate( $chash, 1 );
+                    
+                }
+                
 		### End Response Processing
 
         return;
@@ -961,14 +974,16 @@ sub AMAD_CommBridge_Read($) {
 	
             $data[2] =~ s/FHEMDEVICE: //;
             my $chash = $defs{$data[2]};
+            
+            return AMAD_GetUpdateLocal( $chash );
         
         } else {
             $data[3] =~ s/FHEMDEVICE: //;
             my $chash = $defs{$data[3]};
             
+            return AMAD_GetUpdateLocal( $chash );
+            
         }
-        
-	return AMAD_GetUpdateLocal( $chash );
     }
 }
 
