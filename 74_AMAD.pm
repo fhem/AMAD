@@ -35,7 +35,7 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-my $version = "0.9.0";
+my $version = "0.9.1";
 
 
 
@@ -902,6 +902,7 @@ sub AMAD_CommBridge_Read($) {
                 $data[3] =~ s/FHEMDEVICE: //;
 		my $chash = $defs{$data[3]};
 		### Begin Response Processing
+		Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: processing receive reading values";
     
 		my @valuestring = split( '@@@@',  $tv );
 		my %buffer;
@@ -932,6 +933,7 @@ sub AMAD_CommBridge_Read($) {
         
         fhem ("$fhemCmd") if( ReadingsVal( "AMADCommBridge", "expertMode", 0 ) eq "1" );
 	readingsSingleUpdate( $brihash, "receiveFhemCommand", $fhemCmd, 1 );
+	Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: set reading receive fhem command";
 	
 	return;
     }
@@ -940,7 +942,7 @@ sub AMAD_CommBridge_Read($) {
         my $fhemCmd = $data[1];
         
 	readingsSingleUpdate( $brihash, "receiveVoiceCommand", $fhemCmd, 1 );
-	
+	Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: set reading receive voice command";
 	return;
     }
     
@@ -950,6 +952,7 @@ sub AMAD_CommBridge_Read($) {
         $data[3] =~ s/FHEMDEVICE: //;
 	my $chash = $defs{$data[3]};
         
+        Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: Call statusRequest";
 	return AMAD_GetUpdateLocal( $chash );
     }
 }
