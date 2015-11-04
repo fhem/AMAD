@@ -35,7 +35,7 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-my $version = "0.8.1";
+my $version = "0.8.2";
 
 
 
@@ -894,13 +894,23 @@ sub AMAD_CommBridge_Read($) {
     ###
 
     my @data = split( '\R\R',  $buf );
+    my $chash = undef;
     
     if ( $data[0] =~ /FHEMCMD: setreading\b/ ) {
 	my $tv = $data[1];
 	
 	@data = split( '\R',  $data[0] );
-                $data[2] =~ s/FHEMDEVICE: //;
-		my $chash = $defs{$data[2]};
+                if( $data[2] =~ /FHEMDEVICE:/ ) {
+                
+                    $data[2] =~ s/FHEMDEVICE: //;
+                    my $chash = $defs{$data[2]};
+                    
+                } else {
+                    $data[3] =~ s/FHEMDEVICE: //;
+                    my $chash = $defs{$data[3]};
+                    
+                }
+                    
 		### Begin Response Processing
     
 		my @valuestring = split( '@@@@',  $tv );
@@ -947,8 +957,16 @@ sub AMAD_CommBridge_Read($) {
     elsif ( $data[0] =~ /FHEMCMD: statusrequest\b/ ) {
 	
 	@data = split( '\R',  $data[0] );
-        $data[2] =~ s/FHEMDEVICE: //;
-	my $chash = $defs{$data[2]};
+	if( $data[2] =~ /FHEMDEVICE:/ ) {
+	
+            $data[2] =~ s/FHEMDEVICE: //;
+            my $chash = $defs{$data[2]};
+        
+        } else {
+            $data[3] =~ s/FHEMDEVICE: //;
+            my $chash = $defs{$data[3]};
+            
+        }
         
 	return AMAD_GetUpdateLocal( $chash );
     }
