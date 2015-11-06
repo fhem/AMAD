@@ -35,7 +35,7 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-my $version = "0.9.2";
+my $version = "0.9.3";
 
 
 
@@ -894,21 +894,13 @@ sub AMAD_CommBridge_Read($) {
     ###
 
     my @data = split( '\R\R',  $buf );
-    my $chash;
-    my $fhemdev;
-
     
-    my @fhemdev = split( '\R',  $data[0] );
-        foreach my $ret( @fhemdev ) {
-            if( $ret =~ /FHEMDEVICE: (.*)/ ) {
-                $fhemdev = $1;
-            }
-        }
-        
-    $chash = $defs{$fhemdev};
+    my $header = AMAD_Header2Hash( $data[0] );
+    my $device = $header->{FHEMDEVICE};
+    my $chash = $defs{$device};
+    my $fhemcmd = $header->{FHEMCMD};
 
-
-    if ( $data[0] =~ /FHEMCMD: setreading\b/ ) {
+    if ( $fhemcmd =~ /setreading\b/ ) {
 	my $tv = $data[1];
 	
 	@data = split( '\R',  $data[0] );
@@ -942,7 +934,7 @@ sub AMAD_CommBridge_Read($) {
         return;
     }
 
-    elsif ( $data[0] =~ /FHEMCMD: set\b/ ) {
+    elsif ( $fhemcmd =~ /set\b/ ) {
         my $fhemCmd = $data[1];
         
         fhem ("$fhemCmd") if( ReadingsVal( "AMADCommBridge", "expertMode", 0 ) eq "1" );
@@ -952,7 +944,7 @@ sub AMAD_CommBridge_Read($) {
 	return;
     }
     
-    elsif ( $data[0] =~ /FHEMCMD: voiceinputvalue\b/ ) {
+    elsif ( $fhemcmd =~ /voiceinputvalue\b/ ) {
         my $fhemCmd = $data[1];
         
 	readingsSingleUpdate( $brihash, "receiveVoiceCommand", $fhemCmd, 1 );
@@ -960,16 +952,32 @@ sub AMAD_CommBridge_Read($) {
 	return;
     }
     
-    elsif ( $data[0] =~ /FHEMCMD: statusrequest\b/ ) {
+    elsif ( $fhemcmd eq "statusrequest" ) {
 
         Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: Call statusRequest";
         return AMAD_GetUpdateLocal( $chash );
     }
 }
 
+sub AMAD_Header2Hash($) {       
+    my ( $string ) = @_;
+    my %hash = ();
+
+    foreach my $line (split("\r\n", $string)) {
+        my ($key,$value) = split( ": ", $line );
+        next if( !$value );
+
+        $value =~ s/^ //;
+        $hash{$key} = $value;
+    }     
+        
+    return \%hash;
+}
+
+
+
 
 1;
-
 
 =pod
 =begin html
