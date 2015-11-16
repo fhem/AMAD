@@ -35,7 +35,7 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-my $version = "0.9.3";
+my $version = "0.9.4";
 
 
 
@@ -58,8 +58,8 @@ sub AMAD_Initialize($) {
 			  "root:0,1 ".
 			  "interval ".
 			  "port ".
-			  "disable:1 ";
-    $hash->{AttrList}	.= $readingFnAttributes;
+			  "disable:1 " if( $hash->{HOST} );
+    $hash->{AttrList}	.= $readingFnAttributes if( $hash->{HOST} );
     
     foreach my $d(sort keys %{$modules{AMAD}{defptr}}) {
 	my $hash = $modules{AMAD}{defptr}{$d};
@@ -73,7 +73,7 @@ sub AMAD_Define($$) {
     
     my @a = split( "[ \t][ \t]*", $def );
 
-    return "too few parameters: define <name> AMAD <HOST>" if( @a != 3 && $a[0] ne "AMADCommBridge" );
+    return "too few parameters: define <name> AMAD <HOST>" if( @a < 2 && @a > 3 );
 
     my $name    	= $a[0];
     my $host    	= $a[2];
@@ -88,7 +88,7 @@ sub AMAD_Define($$) {
     $hash->{helper}{setCmdErrorCounter} = 0 if( $hash->{HOST} );
     
     if( ! $hash->{HOST} ) {
-	return "there is already a AMAD Bridge" if( $modules{AMAD}{defptr}{BRIDGE} );
+	return "there is already a AMAD Bridge, did you want to define a AMAD host use: define <name> AMAD <HOST>" if( $modules{AMAD}{defptr}{BRIDGE} );
 
 	$hash->{BRIDGE} = 1;
 	$modules{AMAD}{defptr}{BRIDGE} = $hash;
@@ -122,8 +122,7 @@ sub AMAD_Undef($$) {
     if( $hash->{BRIDGE} ) {
 	delete $modules{AMAD}{defptr}{BRIDGE};
 	my $ret = TcpServer_Close( $hash );
-	return $ret;
-
+	
     } else {
         delete $modules{AMAD}{defptr}{$hash->{HOST}};
 	RemoveInternalTimer( $hash );
@@ -131,9 +130,11 @@ sub AMAD_Undef($$) {
 	foreach my $d(sort keys %{$modules{AMAD}{defptr}}) {
 	    my $hash = $modules{AMAD}{defptr}{$d};
 	    my $host = $hash->{HOST};
-	    
-	    return if( $host );
-	    CommandDelete( undef, "AMADCommBridge" );
+
+	    if( $host ) {
+                my $name = $hash->{NAME};
+                CommandDelete( undef, $name ) if( $hash->{BRIDGE} );
+            }
 	}
     }
 }
@@ -244,10 +245,12 @@ sub AMAD_GetUpdateTimer($) {
 sub AMAD_RetrieveAutomagicInfo($) {
 
     my ($hash) = @_;
+    my $bhash = $modules{AMAD}{defptr}{BRIDGE};
+    my $bname = $bhash->{NAME};
     my $name = $hash->{NAME};
     my $host = $hash->{HOST};
     my $port = $hash->{PORT};
-    my $fhemip = ReadingsVal( "AMADCommBridge", "fhemServerIP", "none" );
+    my $fhemip = ReadingsVal( $bhash, "fhemServerIP", "none" );
     my $activetask = AttrVal( $name, "checkActiveTask", "none" );
     
 
@@ -435,7 +438,10 @@ sub AMAD_Set($$@) {
     
     my ( $hash, $name, $cmd, @val ) = @_;
     
-    if( $name ne "AMADCommBridge" ) {
+    my $bhash = $modules{AMAD}{defptr}{BRIDGE};
+    my $bname = $bhash->{NAME};
+    
+    if( $name ne "$bname" ) {
 	my $apps = AttrVal( $name, "setOpenApp", "none" );
 	my $btdev = AttrVal( $name, "setBluetoothDevice", "none" );
 	my $activetask = AttrVal( $name, "setActiveTask", "none" );
@@ -445,7 +451,7 @@ sub AMAD_Set($$@) {
 	$list .= "ttsMsg ";
 	$list .= "volume:slider,0,1,15 ";
 	$list .= "deviceState:online,offline ";
-	$list .= "mediaPlayer:play,stop,next,back " if( ReadingsVal( "AMADCommBridge", "fhemServerIP", "none" ) ne "none");
+	$list .= "mediaPlayer:play,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
 	$list .= "screenBrightness:slider,0,1,255 " if( AttrVal( $name, "setScreenBrightness", "1" ) eq "1" );
 	$list .= "screen:on,off ";
 	$list .= "screenOrientation:auto,landscape,portrait " if( AttrVal( $name, "setScreenOrientation", "1" ) eq "1" );
@@ -495,7 +501,8 @@ sub AMAD_Set($$@) {
 	return "Unknown argument $cmd, bearword as argument or wrong parameter(s), choose one of $list";
     }
     
-    elsif( $name eq "AMADCommBridge" ) {
+    #elsif( $name eq "$bname" ) {
+    elsif( $modules{AMAD}{defptr}{BRIDGE} ) {
     
 	my $list = "";
     
@@ -836,29 +843,29 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
 
 sub AMAD_CommBridge_Open($) {
 
-    my ( $hash ) = @_;
-    my $name = $hash->{NAME};
+    my ( $bhash ) = @_;
+    my $bname = $bhash->{NAME};
 
     # Oeffnen des TCP Sockets
-    my $ret = TcpServer_Open( $hash, "8090", "global" );
+    my $bret = TcpServer_Open( $bhash, "8090", "global" );
     
-    if( $ret && !$init_done ) {
-	Log3 $name, 3, "$ret. Exiting.";
+    if( $bret && !$init_done ) {
+	Log3 $bname, 3, "$bret. Exiting.";
 	exit(1);
     }
     
-    readingsSingleUpdate ( $hash, "state", "opened", 1 );
-    Log3 $name, 5, "Socket wird geöffnet.";
+    readingsSingleUpdate ( $bhash, "state", "opened", 1 );
+    Log3 $bname, 5, "Socket wird geöffnet.";
     
-    return $ret;
+    return $bret;
 }
 
 sub AMAD_CommBridge_Read($) {
 
     my ( $hash ) = @_;
     my $name = $hash->{NAME};
-    my $brihash = $modules{AMAD}{defptr}{BRIDGE};
-
+    my $bhash = $modules{AMAD}{defptr}{BRIDGE};
+    my $bname = $bhash->{NAME};
     
     if( $hash->{SERVERSOCKET} ) {   # Accept and create a child
         TcpServer_Accept( $hash, "AMAD" );
@@ -897,7 +904,8 @@ sub AMAD_CommBridge_Read($) {
     
     my $header = AMAD_Header2Hash( $data[0] );
     my $device = $header->{FHEMDEVICE};
-    my $chash = $defs{$device};
+    my $dhash = $defs{$device};
+    
     my $fhemcmd = $header->{FHEMCMD};
 
     if ( $fhemcmd =~ /setreading\b/ ) {
@@ -906,7 +914,7 @@ sub AMAD_CommBridge_Read($) {
 	@data = split( '\R',  $data[0] );
 
 		### Begin Response Processing
-		Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: processing receive reading values chash = $chash";
+		Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: processing receive reading values";
     
 		my @valuestring = split( '@@@@',  $tv );
 		my %buffer;
@@ -922,12 +930,12 @@ sub AMAD_CommBridge_Read($) {
                 while( ( $t, $v ) = each %buffer ) {
                     $v =~ s/null//g;
 
-                    readingsBeginUpdate( $chash );
-                    readingsBulkUpdate( $chash, $t, $v ) if( defined( $v ) );
+                    readingsBeginUpdate( $dhash );
+                    readingsBulkUpdate( $dhash, $t, $v ) if( defined( $v ) );
                 }
                     
-                readingsBulkUpdate( $chash, "lastStatusRequestState", "statusRequest_done" );
-                readingsEndUpdate( $chash, 1 );
+                readingsBulkUpdate( $dhash, "lastStatusRequestState", "statusRequest_done" );
+                readingsEndUpdate( $dhash, 1 );
                 
 		### End Response Processing
 
@@ -937,8 +945,8 @@ sub AMAD_CommBridge_Read($) {
     elsif ( $fhemcmd =~ /set\b/ ) {
         my $fhemCmd = $data[1];
         
-        fhem ("$fhemCmd") if( ReadingsVal( "AMADCommBridge", "expertMode", 0 ) eq "1" );
-	readingsSingleUpdate( $brihash, "receiveFhemCommand", $fhemCmd, 1 );
+        fhem ("$fhemCmd") if( ReadingsVal( "$bname", "expertMode", 0 ) eq "1" );
+	readingsSingleUpdate( $bhash, "receiveFhemCommand", $fhemCmd, 1 );
 	Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: set reading receive fhem command";
 	
 	return;
@@ -947,7 +955,7 @@ sub AMAD_CommBridge_Read($) {
     elsif ( $fhemcmd =~ /voiceinputvalue\b/ ) {
         my $fhemCmd = $data[1];
         
-	readingsSingleUpdate( $brihash, "receiveVoiceCommand", $fhemCmd, 1 );
+	readingsSingleUpdate( $bhash, "receiveVoiceCommand", $fhemCmd, 1 );
 	Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: set reading receive voice command";
 	return;
     }
@@ -955,7 +963,7 @@ sub AMAD_CommBridge_Read($) {
     elsif ( $fhemcmd eq "statusrequest" ) {
 
         Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: Call statusRequest";
-        return AMAD_GetUpdateLocal( $chash );
+        return AMAD_GetUpdateLocal( $dhash );
     }
 }
 
