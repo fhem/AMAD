@@ -58,8 +58,8 @@ sub AMAD_Initialize($) {
 			  "root:0,1 ".
 			  "interval ".
 			  "port ".
-			  "disable:1 " if( $hash->{HOST} );
-    $hash->{AttrList}	.= $readingFnAttributes if( $hash->{HOST} );
+			  "disable:1 ".
+			  $readingFnAttributes;
     
     foreach my $d(sort keys %{$modules{AMAD}{defptr}}) {
 	my $hash = $modules{AMAD}{defptr}{$d};
@@ -250,7 +250,7 @@ sub AMAD_RetrieveAutomagicInfo($) {
     my $name = $hash->{NAME};
     my $host = $hash->{HOST};
     my $port = $hash->{PORT};
-    my $fhemip = ReadingsVal( $bhash, "fhemServerIP", "none" );
+    my $fhemip = ReadingsVal( $bname, "fhemServerIP", "none" );
     my $activetask = AttrVal( $name, "checkActiveTask", "none" );
     
 
@@ -882,16 +882,7 @@ sub AMAD_CommBridge_Read($) {
         CommandDelete( undef, $hash->{NAME} );
         return;
     }
-
-    my $response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM will process\r\n now\r\n";
-
-    my $c = $hash->{CD};
-    print $c "HTTP/1.1 200 OK\r\n",
-             "Content-Type: text/plain\r\n",
-             "Content-Length: ".length($response)."\r\n\r\n",
-             $response;
-
-
+    
     
     #### Verarbeitung der Daten welche über die AMADCommBridge kommen ####
 
@@ -905,6 +896,8 @@ sub AMAD_CommBridge_Read($) {
     my $header = AMAD_Header2Hash( $data[0] );
     my $device = $header->{FHEMDEVICE};
     my $dhash = $defs{$device};
+    my $response;
+    my $c;
     
     my $fhemcmd = $header->{FHEMCMD};
 
@@ -938,6 +931,13 @@ sub AMAD_CommBridge_Read($) {
                 readingsEndUpdate( $dhash, 1 );
                 
 		### End Response Processing
+		
+        $response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM was processes\r\n";
+        $c = $hash->{CD};
+        print $c "HTTP/1.1 200 OK\r\n",
+            "Content-Type: text/plain\r\n",
+            "Content-Length: ".length($response)."\r\n\r\n",
+            $response;
 
         return;
     }
@@ -945,9 +945,16 @@ sub AMAD_CommBridge_Read($) {
     elsif ( $fhemcmd =~ /set\b/ ) {
         my $fhemCmd = $data[1];
         
-        fhem ("$fhemCmd") if( ReadingsVal( "$bname", "expertMode", 0 ) eq "1" );
-	readingsSingleUpdate( $bhash, "receiveFhemCommand", $fhemCmd, 1 );
+        fhem ("set $fhemCmd") if( ReadingsVal( $bname, "expertMode", 0 ) eq "1" );
+	readingsSingleUpdate( $bhash, "receiveFhemCommand", "set ".$fhemCmd, 0 );
 	Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: set reading receive fhem command";
+	
+	$response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM execute set command now\r\n";
+        $c = $hash->{CD};
+        print $c "HTTP/1.1 200 OK\r\n",
+            "Content-Type: text/plain\r\n",
+            "Content-Length: ".length($response)."\r\n\r\n",
+            $response;
 	
 	return;
     }
@@ -957,14 +964,52 @@ sub AMAD_CommBridge_Read($) {
         
 	readingsSingleUpdate( $bhash, "receiveVoiceCommand", $fhemCmd, 1 );
 	Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: set reading receive voice command";
+	
+	$response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM was processes\r\n";
+        $c = $hash->{CD};
+        print $c "HTTP/1.1 200 OK\r\n",
+            "Content-Type: text/plain\r\n",
+            "Content-Length: ".length($response)."\r\n\r\n",
+            $response;
+            
 	return;
     }
     
     elsif ( $fhemcmd eq "statusrequest" ) {
+    
+        $response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM was processes\r\n";
+        $c = $hash->{CD};
+        print $c "HTTP/1.1 200 OK\r\n",
+            "Content-Type: text/plain\r\n",
+            "Content-Length: ".length($response)."\r\n\r\n",
+            $response;
 
         Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: Call statusRequest";
         return AMAD_GetUpdateLocal( $dhash );
     }
+    
+    elsif ( $fhemcmd =~ /readingsval\b/ ) {
+        my $fhemCmd = $data[1];
+        my @datavalue = split( ' ', $data[1] );
+
+        $response = ReadingsVal( $datavalue[0], $datavalue[1], $datavalue[2] );
+        $c = $hash->{CD};
+        print $c "HTTP/1.1 200 OK\r\n",
+            "Content-Type: text/plain\r\n",
+            "Content-Length: ".length($response)."\r\n\r\n",
+            $response;
+        
+	Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: response ReadingsVal Value to Automagic Device";
+	return;
+    }
+
+
+    $response = "header lines: \r\n AMADCommBridge receive incomplete or corrupt Data\r\n FHEM to do nothing\r\n";
+    $c = $hash->{CD};
+    print $c "HTTP/1.1 200 OK\r\n",
+        "Content-Type: text/plain\r\n",
+        "Content-Length: ".length($response)."\r\n\r\n",
+        $response;
 }
 
 sub AMAD_Header2Hash($) {       
