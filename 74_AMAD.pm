@@ -35,7 +35,7 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-my $version = "0.9.6";
+my $version = "0.9.7";
 
 
 
@@ -110,7 +110,7 @@ sub AMAD_Define($$) {
 	InternalTimer( gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 0 ) if( $hash->{HOST} );
 
 	$modules{AMAD}{defptr}{$hash->{HOST}} = $hash;
-
+	
 	return undef;
     }
 }
@@ -121,8 +121,8 @@ sub AMAD_Undef($$) {
     
     if( $hash->{BRIDGE} ) {
 	delete $modules{AMAD}{defptr}{BRIDGE};
-	my $ret = TcpServer_Close( $hash );
-	
+	TcpServer_Close( $hash );
+
     } else {
         delete $modules{AMAD}{defptr}{$hash->{HOST}};
 	RemoveInternalTimer( $hash );
@@ -130,11 +130,10 @@ sub AMAD_Undef($$) {
 	foreach my $d(sort keys %{$modules{AMAD}{defptr}}) {
 	    my $hash = $modules{AMAD}{defptr}{$d};
 	    my $host = $hash->{HOST};
-
-	    if( $host ) {
-                my $name = $hash->{NAME};
-                CommandDelete( undef, $name ) if( $hash->{BRIDGE} );
-            }
+	    
+	    return if( $host );
+              my $name = $hash->{NAME};
+              CommandDelete( undef, $name );
 	}
     }
 }
@@ -1013,11 +1012,11 @@ sub AMAD_CommBridge_Read($) {
 	
         if( $fhemcmd =~ /^{.*}$/ ) {
         
-            response = $fhemCmd if( ReadingsVal( $bname, "expertMode", 0 ) eq "1" );
+            $response = $fhemCmd if( ReadingsVal( $bname, "expertMode", 0 ) eq "1" );
             
 	} else {
 	
-            response = "header lines: \r\n AMADCommBridge receive no typical FHEM function\r\n FHEM to do nothing\r\n";
+            $response = "header lines: \r\n AMADCommBridge receive no typical FHEM function\r\n FHEM to do nothing\r\n";
 	}
 	
         $c = $hash->{CD};
