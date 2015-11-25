@@ -35,7 +35,7 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-my $version = "0.9.4";
+my $version = "0.9.6";
 
 
 
@@ -962,7 +962,10 @@ sub AMAD_CommBridge_Read($) {
     elsif ( $fhemcmd =~ /voiceinputvalue\b/ ) {
         my $fhemCmd = $data[1];
         
-	readingsSingleUpdate( $bhash, "receiveVoiceCommand", $fhemCmd, 1 );
+        readingsBeginUpdate( $bhash);
+	readingsBulkUpdate( $bhash, "receiveVoiceCommand", $fhemCmd );
+	readingsBulkUpdate( $bhash, "receiveVoiceDevice", $device );
+	readingsEndUpdate( $bhash, 1 );
 	Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: set reading receive voice command";
 	
 	$response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM was processes\r\n";
@@ -1000,6 +1003,29 @@ sub AMAD_CommBridge_Read($) {
             $response;
         
 	Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: response ReadingsVal Value to Automagic Device";
+	return;
+    }
+    
+    elsif ( $fhemcmd =~ /fhemfunc\b/ ) {
+        my $fhemCmd = $data[1];
+	
+	Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: receive fhem-function command";
+	
+        if( $fhemcmd =~ /^{.*}$/ ) {
+        
+            response = $fhemCmd if( ReadingsVal( $bname, "expertMode", 0 ) eq "1" );
+            
+	} else {
+	
+            response = "header lines: \r\n AMADCommBridge receive no typical FHEM function\r\n FHEM to do nothing\r\n";
+	}
+	
+        $c = $hash->{CD};
+        print $c "HTTP/1.1 200 OK\r\n",
+            "Content-Type: text/plain\r\n",
+            "Content-Length: ".length($response)."\r\n\r\n",
+            $response;
+	
 	return;
     }
 
