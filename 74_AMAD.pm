@@ -35,7 +35,7 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-my $version = "0.9.7";
+my $version = "0.9.9";
 
 
 
@@ -1069,6 +1069,7 @@ sub AMAD_Header2Hash($) {
   The AndroidAPP Auto Magic (this 3rd party app costs 2.90Euro) works better than Tasker and is more user-friendly.<br>
   The following information can be displayed:
   <ul>
+    <li>Android Version</li>
     <li>State of Automagic on the device</li>
     <li>Bluetooth on / off</li>
     <li>Connected Bluetooth devices </li>
@@ -1093,6 +1094,7 @@ sub AMAD_Header2Hash($) {
   <br><br>
   With this module it is also possible to control an Android device as follows.
   <ul>
+    <li>Activate Voice Input</li>
     <li>Switch Bluetooth on/off</li>
     <li>Set or change the connection to a specific Bluetooth device</li>
     <li>State of the device (online, offline)</li>
@@ -1154,6 +1156,7 @@ sub AMAD_Header2Hash($) {
   <a name="AMADreadings"></a>
   <b>Readings</b>
   <ul>
+    <li>androidVersion - installed Android Version</li>
     <li>automagic state - status messages from the AutomagicApp</li>
     <li>bluetooth on / off - is Bluetooth switched on or off on the device</li>
     <li>checkActiveTask - state of an app being defined before, 1=activ in the foreground, see the hint further down</li>
@@ -1224,6 +1227,7 @@ sub AMAD_Header2Hash($) {
   <a name="AMADset"></a>
   <b>Set</b>
   <ul>
+    <li>activateVoiceInput - activat Voice Input on Android Device</li>
     <li>Device State - sets the Device Status Online / Offline. See Readings</li>
     <li>Media Player - controls the default media player. Play, Stop, Back Route title, ahead of title.</li>
     <li>NextAlarm time - sets the alarm time. only within the next 24hrs.</li>
@@ -1286,6 +1290,7 @@ sub AMAD_Header2Hash($) {
   Die AndroidAPP Automagic (welche nicht von mir stammt und 2.90Euro kostet) funktioniert wie Tasker, ist aber bei weitem User freundlicher.
   Im Auslieferungszustand werden folgende Zust&auml;nde dargestellt:
   <ul>
+    <li>Android Version</li>
     <li>Zustand von Automagic auf dem Ger&auml;t</li>
     <li>Bluetooth An/Aus</li>
     <li>Zustand einer definierten App (l&auml;uft aktiv im Vordergrund oder nicht?)</li>
@@ -1312,6 +1317,7 @@ sub AMAD_Header2Hash($) {
   <br><br>
   Das Modul gibt Dir auch die M&ouml;glichkeit Deine Androidger&auml;te zu steuern. So k&ouml;nnen folgende Aktionen durchgef&uuml;hrt werden.
   <ul>
+    <li>aktiviert Spracheingabe</li>
     <li>Bluetooth Ein/Aus schalten</li>
     <li>zu einem bestimmten Bluetoothger&auml;t wechseln/verbinden</li>
     <li>Status des Ger&auml;tes (Online,Offline)</li>
@@ -1375,6 +1381,7 @@ sub AMAD_Header2Hash($) {
   <a name="AMADreadings"></a>
   <b>Readings</b>
   <ul>
+    <li>androidVersion - aktuell installierte Androidversion</li>
     <li>automagicState - Statusmeldungen von der AutomagicApp <b>(Voraussetzung Android >4.3). Wer ein Android >4.3 hat und im Reading steht "wird nicht unterst&uuml;tzt", mu&szlig; in den Androideinstellungen unter Ton und Benachrichtigungen -> Benachrichtigungszugriff ein Haken setzen f&uuml;r Automagic</b></li>
     <li>bluetooth on/off - ist auf dem Ger&auml;t Bluetooth an oder aus</li>
     <li>checkActiveTask - Zustand einer zuvor definierten APP. 0=nicht aktiv oder nicht aktiv im Vordergrund, 1=aktiv im Vordergrund, <b>siehe Hinweis unten</b></li>
@@ -1445,6 +1452,7 @@ sub AMAD_Header2Hash($) {
   <a name="AMADset"></a>
   <b>Set</b>
   <ul>
+    <li>activateVoiceInput - schaltet die Spracheingabe ein</li>
     <li>bluetooth - Schaltet Bluetooth on/off</li>
     <li>clearNotificationBar - (All,Automagic) l&ouml;scht alle Meldungen oder nur die Automagic Meldungen in der Statusleiste</li>
     <li>deviceState - setzt den Device Status Online/Offline. Siehe Readings</li>
