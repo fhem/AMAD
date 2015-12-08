@@ -1147,7 +1147,8 @@ sub AMAD_Header2Hash($) {
   <a name="AMADCommBridge"></a>
   <b>AMAD Communication Bridge</b>
   <ul>
-    When you define the first AMAD device instance another device named AMADCommBridge will also be defined. Its room attribute is AMAD.YOU SHOULD NEVER CHANGE THIS NAME. Feel free to change all other properties. You need this device for the communication fom the Andoid unit to FHEM without having received any query from FHEM. The Android unit must know the IP address of FHEM, so you must enter the set command for the corresponding reading immediately after the definition of the bridge. This is extremly important to get the functionality working properly!
+    When you define the first AMAD device instance another device named AMADCommBridge will also be defined. Its room attribute is AMAD.
+    You need this device for the communication fom the Andoid unit to FHEM without having received any query from FHEM. The Android unit must know the IP address of FHEM, so you must enter the set command for the corresponding reading immediately after the definition of the bridge. This is extremly important to get the functionality working properly!
     The command is
     set AMADCommBridge fhemServerIP <FHEM-IP>.
     There is another reading expertMode which allows a direct communication with FHEM without haviung to use a notify or being limited to set commands.
@@ -1364,7 +1365,7 @@ sub AMAD_Header2Hash($) {
   <a name="AMADCommBridge"></a>
   <b>AMAD Communication Bridge</b>
   <ul>
-    Beim ersten anlegen einer AMAD Deviceinstanz wird automatisch ein Ger&auml;t Namens AMADCommBridge im Raum AMAD angelegt. <b>BITTE NIEMALS DEN NAMEN DER BRIDGE &Auml;NDERN!!!</b> 
+    Beim ersten anlegen einer AMAD Deviceinstanz wird automatisch ein Ger&auml;t Namens AMADCommBridge im Raum AMAD angelegt.
     Alle anderen Eigenschaften k&ouml;nnen ge&auml;ndert werden. Dieses Ger&auml;t diehnt zur Kommunikation
     vom Androidger&auml;t zu FHEM ohne das zuvor eine Anfrage von FHEM aus ging. <b>Damit das Androidger&auml;t die IP von FHEM kennt, muss diese sofort nach dem anlegen der Bridge
     &uuml;ber den set Befehl in ein entsprechendes Reading in die Bridge  geschrieben werden. DAS IST SUPER WICHTIG UND F&Uuml;R DIE FUNKTION DER BRIDGE NOTWENDIG.</b><br>
