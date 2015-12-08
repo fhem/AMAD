@@ -6,6 +6,7 @@
   Die AndroidAPP Automagic (welche nicht von mir stammt und 2.90Euro kostet) funktioniert wie Tasker, ist aber bei weitem User freundlicher.
   Im Auslieferungszustand werden folgende Zust&auml;nde dargestellt:
   <ul>
+    <li>Android Version</li>
     <li>Zustand von Automagic auf dem Ger&auml;t</li>
     <li>Bluetooth An/Aus</li>
     <li>Zustand einer definierten App (l&auml;uft aktiv im Vordergrund oder nicht?)</li>
@@ -32,6 +33,7 @@
   <br><br>
   Das Modul gibt Dir auch die M&ouml;glichkeit Deine Androidger&auml;te zu steuern. So k&ouml;nnen folgende Aktionen durchgef&uuml;hrt werden.
   <ul>
+    <li>aktiviert Spracheingabe</li>
     <li>Bluetooth Ein/Aus schalten</li>
     <li>zu einem bestimmten Bluetoothger&auml;t wechseln/verbinden</li>
     <li>Status des Ger&auml;tes (Online,Offline)</li>
@@ -95,6 +97,7 @@
   <a name="AMADreadings"></a>
   <b>Readings</b>
   <ul>
+    <li>androidVersion - aktuell installierte Androidversion</li>
     <li>automagicState - Statusmeldungen von der AutomagicApp <b>(Voraussetzung Android >4.3). Wer ein Android >4.3 hat und im Reading steht "wird nicht unterst&uuml;tzt", mu&szlig; in den Androideinstellungen unter Ton und Benachrichtigungen -> Benachrichtigungszugriff ein Haken setzen f&uuml;r Automagic</b></li>
     <li>bluetooth on/off - ist auf dem Ger&auml;t Bluetooth an oder aus</li>
     <li>checkActiveTask - Zustand einer zuvor definierten APP. 0=nicht aktiv oder nicht aktiv im Vordergrund, 1=aktiv im Vordergrund, <b>siehe Hinweis unten</b></li>
@@ -165,6 +168,7 @@
   <a name="AMADset"></a>
   <b>Set</b>
   <ul>
+    <li>activateVoiceInput - schaltet die Spracheingabe ein</li>
     <li>bluetooth - Schaltet Bluetooth on/off</li>
     <li>clearNotificationBar - (All,Automagic) l&ouml;scht alle Meldungen oder nur die Automagic Meldungen in der Statusleiste</li>
     <li>deviceState - setzt den Device Status Online/Offline. Siehe Readings</li>
@@ -217,11 +221,4 @@
     Wohnzimmer Handger&auml;t signalisiert.
   </ul>
   <br><br><br>
-  <b><u>Und zu guter letzt m&ouml;chte ich mich noch bedanken.</u><br>
-  Der gr&ouml;&szlig;te Dank geht an meinen Mentor Andre (justme1968), er hat mir mit hilfreichen Tips geholfen Perlcode zu verstehen und Spa&szlig; am programmieren zu haben.<br>
-  Auch m&ouml;chte ich mich bei Jens bedanken (jensb) welcher mir ebenfalls mit hilfreichen Tips bei meinen aller ersten Gehversuchen beim Perlcode schreiben unterst&uuml;tzt hat.<br>
-  So und nun noch ein besonderer Dank an pah (Prof. Dr. Peter Henning ), ohne seine Aussage "Keine Ahnung hatten wir alle mal, das ist keine Ausrede" h&auml;tte ich bestimmt nicht angefangen Interesse an
-  Modulentwicklung zu zeigen :-)<br>
-  Danke an J&uuml;rgen(ujaudio) der sich um die &Uuml;bersetzung der Commandref ins Englische gek&uuml;mmert hat und hoffentlich weiter k&uuml;mmern wird :-)<br>
-  Danke auch an Ronny(RoBra81) f&uuml;r seine tollte Idee und Umsetzung von eigenen AMAD Readings aus externen Flows.</b>
 </ul>

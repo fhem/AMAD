@@ -35,7 +35,7 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-my $version = "0.9.9";
+my $version = "1.0.0";
 
 
 
@@ -1271,11 +1271,6 @@ sub AMAD_Header2Hash($) {
     My 10 "Tablet in the living room is media player for the living room with Bluetooth speakers. The volume is automatically set down when the Fritzbox signals a incoming call on the living room handset.
   </ul>
   <br><br><br>
-  <b><u>And finally I would like to say thank you.</u><br>
-  The biggest thank is for my mentor Andre (justme1968), who told me lots of useful hints that helped me to understandPerl code and made programming a real fun.<br>
-  I would also like to thank Jens (jensb) who has supported me when I made my first steps in Perl code.<br>
-  And lastbut not least a special thank to PAH (Prof. Dr. Peter Henning), without his statement "Keine Ahnung hatten wir alle mal, das ist keine Ausrede" (We had all times of 'I do not know', that's no excuse), - I would not have started to get interested in module development of FHEM :-)<br><br>
-  Thanks to J&uuml;rgen (ujaudio) for the english translation</b>
 </ul>
 
 =end html
@@ -1505,13 +1500,6 @@ sub AMAD_Header2Hash($) {
     Wohnzimmer Handger&auml;t signalisiert.
   </ul>
   <br><br><br>
-  <b><u>Und zu guter letzt m&ouml;chte ich mich noch bedanken.</u><br>
-  Der gr&ouml;&szlig;te Dank geht an meinen Mentor Andre (justme1968), er hat mir mit hilfreichen Tips geholfen Perlcode zu verstehen und Spa&szlig; am programmieren zu haben.<br>
-  Auch m&ouml;chte ich mich bei Jens bedanken (jensb) welcher mir ebenfalls mit hilfreichen Tips bei meinen aller ersten Gehversuchen beim Perlcode schreiben unterst&uuml;tzt hat.<br>
-  So und nun noch ein besonderer Dank an pah (Prof. Dr. Peter Henning ), ohne seine Aussage "Keine Ahnung hatten wir alle mal, das ist keine Ausrede" h&auml;tte ich bestimmt nicht angefangen Interesse an
-  Modulentwicklung zu zeigen :-)<br>
-  Danke an J&uuml;rgen(ujaudio) der sich um die &Uuml;bersetzung der Commandref ins Englische gek&uuml;mmert hat und hoffentlich weiter k&uuml;mmern wird :-)<br>
-  Danke auch an Ronny(RoBra81) f&uuml;r seine tolle Idee und Umsetzung von eigenen AMAD Readings aus externen Flows.</b>
 </ul>
 
 =end html_DE
