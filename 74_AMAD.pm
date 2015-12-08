@@ -1333,8 +1333,7 @@ sub AMAD_Header2Hash($) {
     <li>Medienlautst&auml;rke regeln</li>  
   </ul>
   <br><br> 
-  F&uuml;r all diese Aktionen und Informationen wird auf dem Androidger&auml;t Automagic und ein so genannter Flow ben&ouml;tigt. Die App m&uuml;&szlig;t
-  Ihr Euch besorgen, die Flows bekommt Ihr von mir zusammen mit dem AMAD Modul.
+  F&uuml;r all diese Aktionen und Informationen wird auf dem Androidger&auml;t Automagic und ein so genannter Flow ben&ouml;tigt. Die App ist über den Google PlayStore zu beziehen. Das benötigte Flowset bekommt Ihr aus dem FHEM Update.
   <br><br>
   <b>Wie genau verwendet man nun AMAD?</b>
   <ul>
