@@ -35,7 +35,11 @@ use Time::HiRes qw(gettimeofday);
 use HttpUtils;
 use TcpServerUtils;
 
-my $version = "1.0.0";
+use Encode qw(encode);
+
+
+my $version = "1.1.1";
+
 
 
 
@@ -55,6 +59,7 @@ sub AMAD_Initialize($) {
 			  "setScreenOrientation:0,1 ".
 			  "setScreenBrightness:0,1 ".
 			  "setBluetoothDevice ".
+			  "setScreenlockPIN ".
 			  "root:0,1 ".
 			  "interval ".
 			  "port ".
@@ -142,6 +147,8 @@ sub AMAD_Attr(@) {
 
 my ( $cmd, $name, $attrName, $attrVal ) = @_;
     my $hash = $defs{$name};
+    
+    my $orig = $attrVal;
 
     if( $attrName eq "disable" ) {
 	if( $cmd eq "set" ) {
@@ -154,25 +161,17 @@ my ( $cmd, $name, $attrName, $attrVal ) = @_;
 		readingsSingleUpdate ( $hash, "state", "disabled", 1 );
 		RemoveInternalTimer( $hash );
 		Log3 $name, 3, "AMAD ($name) - disabled";
-	    }
-	}
-	elsif( $cmd eq "del" ) {
+            }
+            
+        } else {
 	    RemoveInternalTimer( $hash );
 	    InternalTimer( gettimeofday()+2, "AMAD_GetUpdateTimer", $hash, 0 ) if( ReadingsVal( $hash->{NAME}, "state", 0 ) eq "disabled" );
 	    readingsSingleUpdate ( $hash, "state", "active", 1 );
 	    Log3 $name, 3, "AMAD ($name) - enabled";
-
-	} else {
-	    if($cmd eq "set") {
-		$attr{$name}{$attrName} = $attrVal;
-		Log3 $name, 3, "AMAD ($name) - $attrName : $attrVal";
-	    }
-	    elsif( $cmd eq "del" ) {
-	    }
-	}
+        }
     }
     
-    if( $attrName eq "interval" ) {
+    elsif( $attrName eq "interval" ) {
 	if( $cmd eq "set" ) {
 	    if( $attrVal < 60 ) {
 		Log3 $name, 3, "AMAD ($name) - interval too small, please use something > 60 (sec), default is 180 (sec)";
@@ -181,41 +180,38 @@ my ( $cmd, $name, $attrName, $attrVal ) = @_;
 		$hash->{INTERVAL} = $attrVal;
 		Log3 $name, 3, "AMAD ($name) - set interval to $attrVal";
 	    }
-	}
-	elsif( $cmd eq "del" ) {
+	    
+	} else {
 	    $hash->{INTERVAL} = 180;
 	    Log3 $name, 3, "AMAD ($name) - set interval to default";
-	
-	} else {
-	    if( $cmd eq "set" ) {
-		$attr{$name}{$attrName} = $attrVal;
-		Log3 $name, 3, "AMAD ($name) - $attrName : $attrVal";
-	    }
-	    elsif( $cmd eq "del" ) {
-	    }
 	}
     }
     
-    if( $attrName eq "port" ) {
+    elsif( $attrName eq "port" ) {
 	if( $cmd eq "set" ) {
 	    $hash->{PORT} = $attrVal;
 	    Log3 $name, 3, "AMAD ($name) - set port to $attrVal";
-	}
-	elsif( $cmd eq "del" ) {
+
+        } else {
 	    $hash->{PORT} = 8090;
 	    Log3 $name, 3, "AMAD ($name) - set port to default";
-	
-	} else {
-	    if( $cmd eq "set" ) {
-		$attr{$name}{$attrName} = $attrVal;
-		Log3 $name, 3, "AMAD ($name) - $attrName : $attrVal";
-	    }
-	    elsif( $cmd eq "del" ) {
-	    }
-	}
+        }
+    }
+    
+    elsif( $attrName eq "setScreenlockPIN" ) {
+	if( $cmd eq "set" && $attrVal ) {
+	    $attrVal = AMAD_encrypt($attrVal);
+        }
+    }
+    
+    if( $cmd eq "set" ) {
+        if( $attrVal && $orig ne $attrVal ) {
+            $attr{$name}{$attrName} = $attrVal;
+            return $attrName ." set to ". $attrVal if( $init_done );
+        }
     }
 
-    return undef;
+    return;
 }
 
 sub AMAD_GetUpdateLocal($) {
@@ -465,6 +461,8 @@ sub AMAD_Set($$@) {
 	$list .= "clearNotificationBar:All,Automagic ";
 	$list .= "changetoBTDevice:$btdev " if( AttrVal( $name, "setBluetoothDevice", "none" ) ne "none" );
 	$list .= "activateVoiceInput:noArg ";
+	$list .= "screenLock:on,off " if( AttrVal( $name, "setScreenlockPIN", "none" ) ne "none" );
+	$list .= "notifiVolume:slider,0,1,7 ";
 
 	if( lc $cmd eq 'screenmsg'
 	    || lc $cmd eq 'ttsmsg'
@@ -484,6 +482,8 @@ sub AMAD_Set($$@) {
 	    || lc $cmd eq 'changetobtdevice'
 	    || lc $cmd eq 'clearnotificationbar'
 	    || lc $cmd eq 'activatevoiceinput'
+	    || lc $cmd eq 'notifivolume'
+	    || lc $cmd eq 'screenlock'
 	    || lc $cmd eq 'statusrequest' ) {
 
 	    Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
@@ -555,6 +555,16 @@ sub AMAD_SelectSetCmd($$@) {
 	my $vol = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setVolume?volume=$vol";
+
+	readingsSingleUpdate( $hash, $cmd, $vol, 1 );
+	
+	return AMAD_HTTP_POST( $hash, $url );
+    }
+    
+    elsif( lc $cmd eq 'notifivolume' ) {
+	my $vol = join( " ", @data );
+
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setNotifiVolume?notifivolume=$vol";
 
 	readingsSingleUpdate( $hash, $cmd, $vol, 1 );
 	
@@ -690,6 +700,16 @@ sub AMAD_SelectSetCmd($$@) {
 	my $appname = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/clearnotificationbar?app=$appname";
+    
+	return AMAD_HTTP_POST( $hash,$url );
+    }
+    
+    elsif( lc $cmd eq 'screenlock' ) {
+	my $lockmode = join( " ", @data );
+	my $PIN = AttrVal( $name, "setScreenlockPIN", undef );
+	my $PIN = AMAD_decrypt($PIN);
+
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/screenlock?mode=".$lockmode."&lockPIN=".$PIN;
     
 	return AMAD_HTTP_POST( $hash,$url );
     }
@@ -1037,7 +1057,8 @@ sub AMAD_CommBridge_Read($) {
         $response;
 }
 
-sub AMAD_Header2Hash($) {       
+sub AMAD_Header2Hash($) {
+
     my ( $string ) = @_;
     my %hash = ();
 
@@ -1050,6 +1071,40 @@ sub AMAD_Header2Hash($) {
     }     
         
     return \%hash;
+}
+
+sub AMAD_encrypt($) {
+
+    my ($decodedPIN) = @_;
+    my $key = getUniqueId();
+    my $encodedPIN;
+    
+    return $decodedPIN if( $decodedPIN =~ /^crypt:(.*)/ );
+
+    for my $char (split //, $decodedPIN) {
+        my $encode = chop($key);
+        $encodedPIN .= sprintf("%.2x",ord($char)^ord($encode));
+        $key = $encode.$key;
+    }
+    
+    return 'crypt:'. $encodedPIN;
+}
+
+sub AMAD_decrypt($) {
+
+    my ($encodedPIN) = @_;
+    my $key = getUniqueId();
+    my $decodedPIN;
+
+    $encodedPIN = $1 if( $encodedPIN =~ /^crypt:(.*)/ );
+
+    for my $char (map { pack('C', hex($_)) } ($encodedPIN =~ /(..)/g)) {
+        my $decode = chop($key);
+        $decodedPIN .= chr(ord($char)^ord($decode));
+        $key = $decode.$key;
+    }
+
+    return $decodedPIN;
 }
 
 
