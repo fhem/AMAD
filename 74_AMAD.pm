@@ -37,7 +37,7 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $version = "1.1.7";
+my $version = "1.1.8";
 
 
 
@@ -464,7 +464,7 @@ sub AMAD_Set($$@) {
 	$list .= "changetoBTDevice:$btdev " if( AttrVal( $name, "setBluetoothDevice", "none" ) ne "none" );
 	$list .= "activateVoiceInput:noArg ";
 	$list .= "screenLock:on,off " if( AttrVal( $name, "setScreenlockPIN", "none" ) ne "none" );
-	$list .= "notifiVolume:slider,0,1,7 ";
+	$list .= "volumeNotification:slider,0,1,7 ";
 
 	if( lc $cmd eq 'screenmsg'
 	    || lc $cmd eq 'ttsmsg'
@@ -484,7 +484,7 @@ sub AMAD_Set($$@) {
 	    || lc $cmd eq 'changetobtdevice'
 	    || lc $cmd eq 'clearnotificationbar'
 	    || lc $cmd eq 'activatevoiceinput'
-	    || lc $cmd eq 'notifivolume'
+	    || lc $cmd eq 'volumenotification'
 	    || lc $cmd eq 'screenlock'
 	    || lc $cmd eq 'statusrequest' ) {
 
@@ -563,7 +563,7 @@ sub AMAD_SelectSetCmd($$@) {
 	return AMAD_HTTP_POST( $hash, $url );
     }
     
-    elsif( lc $cmd eq 'notifivolume' ) {
+    elsif( lc $cmd eq 'volumenotification' ) {
 	my $vol = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setNotifiVolume?notifivolume=$vol";
@@ -711,7 +711,7 @@ sub AMAD_SelectSetCmd($$@) {
 	my $PIN = AttrVal( $name, "setScreenlockPIN", undef );
         $PIN = AMAD_decrypt($PIN);
 
-	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/screenlock?mode=".$lockmod."&lockPIN=".$PIN;
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/screenlock?lockmod=".$lockmod."&lockPIN=".$PIN;
 
         readingsSingleUpdate( $hash, $cmd, $lockmod, 1 );
 	return AMAD_HTTP_POST( $hash,$url );
