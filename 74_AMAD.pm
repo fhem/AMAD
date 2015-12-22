@@ -37,7 +37,7 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $version = "1.1.3";
+my $version = "1.1.7";
 
 
 
@@ -200,6 +200,9 @@ my ( $cmd, $name, $attrName, $attrVal ) = @_;
     elsif( $attrName eq "setScreenlockPIN" ) {
 	if( $cmd eq "set" && $attrVal ) {
 	    $attrVal = AMAD_encrypt($attrVal);
+	    
+        } else {
+            CommandDeleteReading( undef, "$name screenLock" );
         }
     }
     
@@ -704,12 +707,13 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif( lc $cmd eq 'screenlock' ) {
-	my $lockmode = join( " ", @data );
+	my $lockmod = join( " ", @data );
 	my $PIN = AttrVal( $name, "setScreenlockPIN", undef );
-	my $PIN = AMAD_decrypt($PIN);
+        $PIN = AMAD_decrypt($PIN);
 
-	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/screenlock?mode=".$lockmode."&lockPIN=".$PIN;
-    
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/screenlock?mode=".$lockmod."&lockPIN=".$PIN;
+
+        readingsSingleUpdate( $hash, $cmd, $lockmod, 1 );
 	return AMAD_HTTP_POST( $hash,$url );
     }
 
