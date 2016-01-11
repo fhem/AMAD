@@ -199,7 +199,12 @@ my ( $cmd, $name, $attrName, $attrVal ) = @_;
     
     elsif( $attrName eq "setScreenlockPIN" ) {
 	if( $cmd eq "set" && $attrVal ) {
-	    $attrVal = AMAD_encrypt($attrVal);
+            my $pinlenght = length($attrVal);
+            if( $attrVal =~ /^\d+$/ && $pinlenght > 3 && $pinlenght < 17 ) {
+                $attrVal = AMAD_encrypt($attrVal);
+            } else {
+                return "Failed to set the pin. There are only allowed numbers and it must be more than 4 and less as 16 points";
+            }
 	    
         } else {
             CommandDeleteReading( undef, "$name screenLock" );
@@ -1238,6 +1243,7 @@ sub AMAD_decrypt($) {
     <li>screen - screen on/off</li>
     <li>Screen Brightness - Screen Brightness from 0-255</li>
     <li>Screen fullscreen - fullscreen mode (On, Off)</li>
+    <li>screenLock - Pin-Lock (On,Off)</li>
     <li>screenOrientation - screen orientation (Auto, Landscape, Portrait)</li>
     <li>volume - volume value which was set on "Set volume".</li>
     <li>volume Music Bluetooth - Media volume of the Bluetooth speakers</li>
@@ -1297,6 +1303,7 @@ sub AMAD_decrypt($) {
     <li>Status Request - calls for a new Status Report in Device to</li>
     <li>ttsMsg - sends a message which is output as a voice message</li>
     <li>volume - sets the media volume. Either the internal speakers or when connected the Bluetooth speaker</li>
+    <li>volumeNotification - sets die the notification volume.</li>
   </ul>
   <br>
   <b>Set depending on set attributes</b>
@@ -1307,6 +1314,7 @@ sub AMAD_decrypt($) {
     <li>screen Brightness - sets the screen brightness, 0-255 <b>Attribute setScreenBrightness</b></li>
     If you want to use the "set screen brightness", a small adjustment in the flow SetCommands must be made. Opens the action (one of the squares very bottom) Set System Settings: System and makes a check "I have checked the settings, I know what I'm doing".
     <li>screen fullscreen - Switches to full screen mode on / off. <b>Attribute SetFullscreen </b></li>
+    <li>screenLock - locked Screen my set Pinlock. <b>Attribute setScreenlockPIN - There are only allowed numbers and it must be more than 4 and less as 16 points</b></li>
     <li>screenOrientation - Switches the screen orientation Auto / Landscape / Portrait. <b>Attribute setScreenOrientation</b></li>
     <li>system - set system commands from (only rooted devices). Reboot <b>Attribut root</b>, in the Auto Magic Settings "root function" must be set</li>
     In order to use openApp you need an attribute where separated by a comma, several app names are set in order to use openapp. The app name is arbitrary and only required for recognition. The same app name must be used in the flow in SetCommands on the left below the hash expression: "openapp" be in one of the 5 paths (one app per path) entered in both diamonds. Thereafter, in the quadrangle selected the app which app through the attribute names should be started.<br><br>
@@ -1458,6 +1466,7 @@ sub AMAD_decrypt($) {
     <li>screen - Bildschirm An oderAus</li>
     <li>screenBrightness - Bildschirmhelligkeit von 0-255</li>
     <li>screenFullscreen - Vollbildmodus (On,Off)</li>
+    <li>screenLock - Pin-Sperre (On,Off)</li>
     <li>screenOrientation - Bildschirmausrichtung (Auto,Landscape,Portrait)</li>
     <li>volume - Lautst&auml;rkewert welcher &uuml;ber "set volume" gesetzt wurde.</li>
     <li>volumeMusikBluetooth - Media Lautst&auml;rke von angeschlossenden Bluetooth Lautsprechern</li>
@@ -1518,6 +1527,7 @@ sub AMAD_decrypt($) {
     <li>statusRequest - Fordert einen neuen Statusreport beim Device an</li>
     <li>ttsMsg - versendet eine Nachricht welche als Sprachnachricht ausgegeben wird</li>
     <li>volume - setzt die Medialautst&auml;rke. Entweder die internen Lautsprecher oder sofern angeschlossen die Bluetoothlautsprecher</li>
+    <li>volumeNotification - setzt die Benachrichtigungslautstärke.</li>
   </ul>
   <br>
   <b>Set abh&auml;ngig von gesetzten Attributen</b>
@@ -1529,6 +1539,7 @@ sub AMAD_decrypt($) {
     Wenn Ihr das "set screenBrightness" verwenden wollt, muss eine kleine Anpassung im Flow SetCommands vorgenommen werden. &Ouml;ffnet die Aktion (eines der Vierecke ganz ganz unten)
     SetzeSystemeinstellung:System und macht einen Haken bei "Ich habe die Einstellungen &uuml;berpr&uuml;ft, ich weiss was ich tue".
     <li>screenFullscreen - Schaltet den Vollbildmodus on/off. <b>Attribut setFullscreen</b></li>
+    <li>screenLock - Sperrt den Bildschirm mit Pinabfrage. <b>Attribut setScreenlockPIN - hier die Pin dafür eingeben. Erlaubt sind nur Zahlen. Es müßen mindestens 4 bis max 16 Zahlen sein.</b></li>
     <li>screenOrientation - Schaltet die Bildschirmausrichtung Auto/Landscape/Portait. <b>Attribut setScreenOrientation</b></li>
     <li>system - setzt Systembefehle ab (nur bei gerootetet Ger&auml;en). Reboot <b>Attribut root</b>, in den Automagic Einstellungen muss "Root Funktion" gesetzt werden</li>
     <br>
