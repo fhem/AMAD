@@ -316,11 +316,6 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
 	    
 	    Log3 $name, 4, "AMAD ($name) - Informations Flow on your Device is inactive, will try to reactivate";
 	}
-	elsif($hash->{helper}{infoErrorCounter} > 4 && ReadingsVal( $name, "flow_Informations", "active" ) eq "active" ){
-	    readingsBulkUpdate( $hash, "lastStatusRequestError", "check automagicApp on your device" );
-	    
-	    Log3 $name, 4, "AMAD ($name) - Please check the AutomagicAPP on your Device";
-	}
 	elsif( $hash->{helper}{infoErrorCounter} > 9 ) {
 	    readingsBulkUpdate( $hash, "lastStatusRequestError", "to many errors, check your network or device configuration" );
 	    
@@ -330,6 +325,12 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
 	    readingsBulkUpdate ( $hash, "state", "To many Errors, device set offline");
 	    $hash->{helper}{infoErrorCounter} = 0;
 	}
+	elsif($hash->{helper}{infoErrorCounter} > 4 && ReadingsVal( $name, "flow_Informations", "active" ) eq "active" ){
+	    readingsBulkUpdate( $hash, "lastStatusRequestError", "check automagicApp on your device" );
+	    
+	    Log3 $name, 4, "AMAD ($name) - Please check the AutomagicAPP on your Device";
+	}
+	
 	readingsEndUpdate( $hash, 1 );
     }
     
@@ -787,11 +788,6 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
 	    
 	    Log3 $name, 4, "AMAD ($name) - Flow SetCommands on your Device is inactive, will try to reactivate";
 	}
-	elsif( $hash->{helper}{setCmdErrorCounter} > 4 && ReadingsVal( $name, "flow_SetCommands", "active" ) eq "active" ){
-	    readingsBulkUpdate( $hash, "lastSetCommandError", "check automagicApp on your device" );
-	    
-	    Log3 $name, 4, "AMAD ($name) - Please check the AutomagicAPP on your Device";
-	} 
 	elsif( $hash->{helper}{setCmdErrorCounter} > 9 ) {
 	    readingsBulkUpdate( $hash, "lastSetCommandError", "to many errors, check your network or device configuration" );
 	    
@@ -801,6 +797,12 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
 	    readingsBulkUpdate( $hash, "state", "To many Errors, device set offline" );
 	    $hash->{helper}{setCmdErrorCounter} = 0;
 	}
+	elsif( $hash->{helper}{setCmdErrorCounter} > 4 && ReadingsVal( $name, "flow_SetCommands", "active" ) eq "active" ){
+	    readingsBulkUpdate( $hash, "lastSetCommandError", "check automagicApp on your device" );
+	    
+	    Log3 $name, 4, "AMAD ($name) - Please check the AutomagicAPP on your Device";
+	}
+	
 	readingsEndUpdate( $hash, 1 );
     }
     
