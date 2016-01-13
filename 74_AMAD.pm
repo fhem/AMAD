@@ -37,7 +37,7 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $version = "1.1.11";
+my $version = "1.1.20";
 
 
 
@@ -199,13 +199,7 @@ my ( $cmd, $name, $attrName, $attrVal ) = @_;
     
     elsif( $attrName eq "setScreenlockPIN" ) {
 	if( $cmd eq "set" && $attrVal ) {
-            my $pinlenght = length($attrVal);
-            if( $attrVal =~ /^\d+$/ && $pinlenght > 3 && $pinlenght < 17 ) {
                 $attrVal = AMAD_encrypt($attrVal);
-            } else {
-                return "Failed to set the pin. There are only allowed numbers and it must be more than 4 and less as 16 points";
-            }
-	    
         } else {
             CommandDeleteReading( undef, "$name screenLock" );
         }
@@ -463,7 +457,7 @@ sub AMAD_Set($$@) {
 	$list .= "openApp:$apps " if( AttrVal( $name, "setOpenApp", "none" ) ne "none" );
 	$list .= "nextAlarmTime:time ";
 	$list .= "statusRequest:noArg ";
-	$list .= "system:reboot " if( AttrVal( $name, "root", "1" ) eq "1" );
+	$list .= "system:reboot,shutdown,airplanemode " if( AttrVal( $name, "root", "1" ) eq "1" );
 	$list .= "bluetooth:on,off ";
 	$list .= "notifySndFile ";
 	$list .= "clearNotificationBar:All,Automagic ";
@@ -671,6 +665,9 @@ sub AMAD_SelectSetCmd($$@) {
 	my $systemcmd = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/systemcommand?syscmd=$systemcmd";
+
+	readingsSingleUpdate( $hash, $systemcmd, "on", 1 ) if( $systemcmd eq "airplanemode" );
+	readingsSingleUpdate( $hash, "deviceState", "offline", 1 ) if( $systemcmd eq "airplanemode" || $systemcmd eq "shutdown" );
     
 	return AMAD_HTTP_POST( $hash,$url );
     }
@@ -1318,7 +1315,7 @@ sub AMAD_decrypt($) {
     <li>screen fullscreen - Switches to full screen mode on / off. <b>Attribute SetFullscreen </b></li>
     <li>screenLock - locked Screen by set Pinlock. <b>Attribute setScreenlockPIN - There are only allowed numbers and it must be more than 4 and less as 16 character</b></li>
     <li>screenOrientation - Switches the screen orientation Auto / Landscape / Portrait. <b>Attribute setScreenOrientation</b></li>
-    <li>system - set system commands from (only rooted devices). Reboot <b>Attribut root</b>, in the Auto Magic Settings "root function" must be set</li>
+    <li>system - set system commands from (only rooted devices). reboot,shutdown,airplanemode (activate only) <b>Attribut root</b>, in the Auto Magic Settings "root function" must be set</li>
     In order to use openApp you need an attribute where separated by a comma, several app names are set in order to use openapp. The app name is arbitrary and only required for recognition. The same app name must be used in the flow in SetCommands on the left below the hash expression: "openapp" be in one of the 5 paths (one app per path) entered in both diamonds. Thereafter, in the quadrangle selected the app which app through the attribute names should be started.<br><br>
     To switch between different Bluetooth devices, you need set the attribute setBluetoothDevice accordingly. 
     attr <DEVICE> BTdeviceName1|MAC,BTDeviceName2|MAC 
@@ -1336,8 +1333,7 @@ sub AMAD_decrypt($) {
   <br><br><br>
   <u><b>Application examples:</b></u>
   <ul><br>
-    I have the chargers for my Android devices on wireless switch sockets. a DOIF switches the charger on if the battery is below 30% and switches it off than the battery is charged 90% again. In the morning I'll wake up with music from my tablet in the bedroom. This involves the use of the wakeuptimer the RESIDENTS Modules. I stop the music manually. After that the weather forecast will be told (through TTS).<br>
-    My 10 "Tablet in the living room is media player for the living room with Bluetooth speakers. The volume is automatically set down when the Fritzbox signals a incoming call on the living room handset.
+    <a href="http://www.fhemwiki.de/wiki/AMAD#Anwendungsbeispiele">Do you find in the Wiki entry for AMAD (german only)</a>
   </ul>
   <br><br><br>
 </ul>
@@ -1529,7 +1525,7 @@ sub AMAD_decrypt($) {
     <li>statusRequest - Fordert einen neuen Statusreport beim Device an</li>
     <li>ttsMsg - versendet eine Nachricht welche als Sprachnachricht ausgegeben wird</li>
     <li>volume - setzt die Medialautst&auml;rke. Entweder die internen Lautsprecher oder sofern angeschlossen die Bluetoothlautsprecher</li>
-    <li>volumeNotification - setzt die Benachrichtigungslautstärke.</li>
+    <li>volumeNotification - setzt die Benachrichtigungslautst&auml;rke.</li>
   </ul>
   <br>
   <b>Set abh&auml;ngig von gesetzten Attributen</b>
@@ -1541,9 +1537,9 @@ sub AMAD_decrypt($) {
     Wenn Ihr das "set screenBrightness" verwenden wollt, muss eine kleine Anpassung im Flow SetCommands vorgenommen werden. &Ouml;ffnet die Aktion (eines der Vierecke ganz ganz unten)
     SetzeSystemeinstellung:System und macht einen Haken bei "Ich habe die Einstellungen &uuml;berpr&uuml;ft, ich weiss was ich tue".
     <li>screenFullscreen - Schaltet den Vollbildmodus on/off. <b>Attribut setFullscreen</b></li>
-    <li>screenLock - Sperrt den Bildschirm mit Pinabfrage. <b>Attribut setScreenlockPIN - hier die Pin dafür eingeben. Erlaubt sind nur Zahlen. Es müßen mindestens 4 bis max 16 Zeichen sein.</b></li>
+    <li>screenLock - Sperrt den Bildschirm mit Pinabfrage. <b>Attribut setScreenlockPIN - hier die Pin daf&uuml;r eingeben. Erlaubt sind nur Zahlen. Es m&uuml;&szlig;en mindestens 4 bis max 16 Zeichen sein.</b></li>
     <li>screenOrientation - Schaltet die Bildschirmausrichtung Auto/Landscape/Portait. <b>Attribut setScreenOrientation</b></li>
-    <li>system - setzt Systembefehle ab (nur bei gerootetet Ger&auml;en). Reboot <b>Attribut root</b>, in den Automagic Einstellungen muss "Root Funktion" gesetzt werden</li>
+    <li>system - setzt Systembefehle ab (nur bei gerootetet Ger&auml;en). reboot,shutdown,airplanemode (kann nur aktiviert werden) <b>Attribut root</b>, in den Automagic Einstellungen muss "Root Funktion" gesetzt werden</li>
     <br>
     Um openApp verwenden zu k&ouml;nnen, muss als Attribut ein, oder durch Komma getrennt, mehrere App Namen gesetzt werden. Der App Name ist frei w&auml;hlbar und nur zur Wiedererkennung notwendig.
     Der selbe App Name mu&szlig; im Flow SetCommands auf der linken Seite unterhalb der Raute Expression:"openApp" in einen der 5 Str&auml;nge (eine App pro Strang) in beide Rauten eingetragen werden. Danach wird
@@ -1564,11 +1560,7 @@ sub AMAD_decrypt($) {
   <br><br><br>
   <u><b>Anwendungsbeispiele:</b></u>
   <ul><br>
-    Ich habe die Ladeger&auml;te f&uuml;r meine Androidger&auml;te an Funkschaltsteckdosen. ein DOIF schaltet bei unter 30% die Steckdose ein und bei &uuml;ber 90% wieder aus. Morgens lasse ich mich
-    &uuml;ber mein Tablet im Schlafzimmer mit Musik wecken. Verwendet wird hierzu der wakeuptimer des RESIDENTS Modules. Das abspielen stoppe ich dann von Hand. Danach erfolgt noch eine
-    Ansage wie das Wetter gerade ist und wird.<br>
-    Mein 10" Tablet im Wohnzimmer ist Mediaplayer f&uuml;r das Wohnzimmer mit Bluetoothlautsprechern. Die Lautst&auml;rke wird automatisch runter gesetzt wenn die Fritzbox einen Anruf auf das
-    Wohnzimmer Handger&auml;t signalisiert.
+    <a href="http://www.fhemwiki.de/wiki/AMAD#Anwendungsbeispiele">Hier verweise ich auf den gut gepflegten Wikieintrag</a>
   </ul>
   <br><br><br>
 </ul>
