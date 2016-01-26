@@ -2,7 +2,7 @@
 # 
 # Developed with Kate
 #
-#  (c) 2015 Copyright: Marko Oldenburg (leongaultier at gmail dot com)
+#  (c) 2015-2016 Copyright: Marko Oldenburg (leongaultier at gmail dot com)
 #  All rights reserved
 #
 #  This script is free software; you can redistribute it and/or modify
@@ -37,7 +37,7 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $version = "1.1.20";
+my $version = "1.1.23";
 
 
 
@@ -465,6 +465,7 @@ sub AMAD_Set($$@) {
 	$list .= "activateVoiceInput:noArg ";
 	$list .= "screenLock:on,off " if( AttrVal( $name, "setScreenlockPIN", "none" ) ne "none" );
 	$list .= "volumeNotification:slider,0,1,7 ";
+	$list .= "vibrate:noArg";
 
 	if( lc $cmd eq 'screenmsg'
 	    || lc $cmd eq 'ttsmsg'
@@ -486,7 +487,8 @@ sub AMAD_Set($$@) {
 	    || lc $cmd eq 'activatevoiceinput'
 	    || lc $cmd eq 'volumenotification'
 	    || lc $cmd eq 'screenlock'
-	    || lc $cmd eq 'statusrequest' ) {
+	    || lc $cmd eq 'statusrequest'
+	    || lc $cmd eq 'vibrate') {
 
 	    Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
 	  
@@ -496,7 +498,7 @@ sub AMAD_Set($$@) {
 	    return AMAD_SelectSetCmd( $hash, $cmd, @val ) if( @val ) && ( ReadingsVal( $name, "deviceState", "online" ) eq "offline" ) && ( lc $cmd eq 'devicestate' );
 	    return "Cannot set command, FHEM Device is offline" if( ReadingsVal( $name, "deviceState", "online" ) eq "offline" );
 	  
-	    return AMAD_SelectSetCmd( $hash, $cmd, @val ) if( @val ) || ( lc $cmd eq 'statusrequest' ) || ( lc $cmd eq 'activatevoiceinput' );
+	    return AMAD_SelectSetCmd( $hash, $cmd, @val ) if( @val ) || ( lc $cmd eq 'statusrequest' ) || ( lc $cmd eq 'activatevoiceinput' ) || ( lc $cmd eq 'vibrate' );
 	}
 
 	return "Unknown argument $cmd, bearword as argument or wrong parameter(s), choose one of $list";
@@ -614,7 +616,6 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif( lc $cmd eq 'activatevoiceinput' ) {
-	#my $cmd = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setvoicecmd";
 	
@@ -717,6 +718,13 @@ sub AMAD_SelectSetCmd($$@) {
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/screenlock?lockmod=".$lockmod."&lockPIN=".$PIN;
 
         readingsSingleUpdate( $hash, $cmd, $lockmod, 1 );
+	return AMAD_HTTP_POST( $hash,$url );
+    }
+    
+    elsif( lc $cmd eq 'vibrate' ) {
+
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setvibrate";
+	
 	return AMAD_HTTP_POST( $hash,$url );
     }
 
