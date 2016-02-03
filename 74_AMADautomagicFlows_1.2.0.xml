@@ -159,7 +159,7 @@ global_album = getString("album");</extras>
   <condition type="expression">
     <useDefaultName>false</useDefaultName>
     <name>Expression: Airplanemode</name>
-    <expression>param_syscmd == "airplanemode"</expression>
+    <expression>param_syscmd == "airplanemodeON"</expression>
   </condition>
   <condition type="expression">
     <useDefaultName>false</useDefaultName>
@@ -1317,11 +1317,11 @@ FHEMCMD: statusrequest</customHTTPHeaders>
     <name>Vibrieren: Pattern 2 (-- --)</name>
     <custom>false</custom>
     <vibratePattern>vibrate_pattern_2</vibratePattern>
-    <customPattern></customPattern>
+    <customPattern>0,500</customPattern>
   </action>
   <flow type="flow">
     <name>Informations</name>
-    <group>FHEM Info / Steuerung über AMAD Modul v1.1.x</group>
+    <group>FHEM Info / Steuerung über AMAD Modul v1.2.0</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <emergencyStopCount>240</emergencyStopCount>
@@ -1528,7 +1528,7 @@ FHEMCMD: statusrequest</customHTTPHeaders>
   </flow>
   <flow type="flow">
     <name>SetCommands</name>
-    <group>FHEM Info / Steuerung über AMAD Modul v1.1.x</group>
+    <group>FHEM Info / Steuerung über AMAD Modul v1.2.0</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <emergencyStopCount>240</emergencyStopCount>
@@ -1626,27 +1626,27 @@ FHEMCMD: statusrequest</customHTTPHeaders>
     <conditioncontainer id="t88" x="-3325.0" y="-122.5">Expression: System Command"</conditioncontainer>
     <actioncontainer id="t89" x="-3115.0" y="892.5">Neustart </actioncontainer>
     <conditioncontainer id="t90" x="-3325.0" y="367.5">Expression: Shutdown</conditioncontainer>
-    <conditioncontainer id="t91" x="-3535.0" y="367.5">Expression: Airplanemode</conditioncontainer>
-    <actioncontainer id="t92" x="-3325.0" y="892.5">Herunterfahren</actioncontainer>
-    <actioncontainer id="t93" x="-3535.0" y="892.5">Flugmodus ein-/ausschalten: Ein</actioncontainer>
-    <actioncontainer id="t94" x="-3745.0" y="892.5">Sound: /storage/emulated/0/Notifications/{param_notifyfile} als Benachrichtigung</actioncontainer>
-    <actioncontainer id="t95" x="-3955.0" y="892.5">Benachrichtigung aus Statusbar entfernen: Alle</actioncontainer>
-    <actioncontainer id="t96" x="-4165.0" y="892.5">Benachrichtigung aus Statusbar entfernen: Alle (Automagic)</actioncontainer>
-    <conditioncontainer id="t97" x="-4165.0" y="367.5">Expression: Automagic</conditioncontainer>
-    <conditioncontainer id="t98" x="-3955.0" y="367.5">Expression: All</conditioncontainer>
-    <actioncontainer id="t99" x="-4795.0" y="892.5">Lautstärken setzen param_notifivolume</actioncontainer>
-    <conditioncontainer id="t100" x="-4795.0" y="-122.5">Expression: setNotifiVolume"</conditioncontainer>
-    <conditioncontainer id="t101" x="-4585.0" y="-122.5">Expression: Clear Automagic Meldungen"</conditioncontainer>
-    <conditioncontainer id="t102" x="-3745.0" y="-122.5">Expression: notifysnd"</conditioncontainer>
-    <actioncontainer id="t103" x="-3885.0" y="-297.5">NotificationLautstärke auf Level 7</actioncontainer>
-    <actioncontainer id="t104" x="-3885.0" y="-472.5">Notification Lautstärke Speichern</actioncontainer>
-    <conditioncontainer id="t105" x="-3885.0" y="-647.5">Expression: param_notifyfile == "RedAlert.mp3"</conditioncontainer>
-    <actioncontainer id="t106" x="-3745.0" y="1067.5">Notification Lautstärke Wiederherstellen</actioncontainer>
-    <conditioncontainer id="t107" x="2555.0" y="-122.5">Expression: setVoiceCommand"</conditioncontainer>
-    <actioncontainer id="t108" x="2555.0" y="892.5">Flows ausführen: VoiceControl</actioncontainer>
-    <conditioncontainer id="t109" x="-5005.0" y="-122.500015">Expression: setVibrate"</conditioncontainer>
-    <actioncontainer id="t110" x="-5005.0" y="892.5">Vibrieren: Pattern 2 (-- --)</actioncontainer>
-    <conditioncontainer id="t111" x="-805.0" y="-2047.5">Expression: trigger == "HTTP Request: /fhem-amad/setCommands/*"</conditioncontainer>
+    <actioncontainer id="t91" x="-3325.0" y="892.5">Herunterfahren</actioncontainer>
+    <actioncontainer id="t92" x="-3745.0" y="892.5">Sound: /storage/emulated/0/Notifications/{param_notifyfile} als Benachrichtigung</actioncontainer>
+    <actioncontainer id="t93" x="-3955.0" y="892.5">Benachrichtigung aus Statusbar entfernen: Alle</actioncontainer>
+    <actioncontainer id="t94" x="-4165.0" y="892.5">Benachrichtigung aus Statusbar entfernen: Alle (Automagic)</actioncontainer>
+    <conditioncontainer id="t95" x="-4165.0" y="367.5">Expression: Automagic</conditioncontainer>
+    <conditioncontainer id="t96" x="-3955.0" y="367.5">Expression: All</conditioncontainer>
+    <actioncontainer id="t97" x="-4795.0" y="892.5">Lautstärken setzen param_notifivolume</actioncontainer>
+    <conditioncontainer id="t98" x="-4795.0" y="-122.5">Expression: setNotifiVolume"</conditioncontainer>
+    <conditioncontainer id="t99" x="-3745.0" y="-122.5">Expression: notifysnd"</conditioncontainer>
+    <actioncontainer id="t100" x="-3885.0" y="-297.5">NotificationLautstärke auf Level 7</actioncontainer>
+    <actioncontainer id="t101" x="-3885.0" y="-472.5">Notification Lautstärke Speichern</actioncontainer>
+    <conditioncontainer id="t102" x="-3885.0" y="-647.5">Expression: param_notifyfile == "RedAlert.mp3"</conditioncontainer>
+    <actioncontainer id="t103" x="-3745.0" y="1067.5">Notification Lautstärke Wiederherstellen</actioncontainer>
+    <conditioncontainer id="t104" x="2555.0" y="-122.5">Expression: setVoiceCommand"</conditioncontainer>
+    <actioncontainer id="t105" x="2555.0" y="892.5">Flows ausführen: VoiceControl</actioncontainer>
+    <conditioncontainer id="t106" x="-5005.0" y="-122.5">Expression: setVibrate"</conditioncontainer>
+    <actioncontainer id="t107" x="-5005.0" y="892.5">Vibrieren: Pattern 2 (-- --)</actioncontainer>
+    <conditioncontainer id="t108" x="-805.0" y="-2047.5">Expression: trigger == "HTTP Request: /fhem-amad/setCommands/*"</conditioncontainer>
+    <conditioncontainer id="t109" x="-4585.0" y="-122.50001">Expression: Clear Automagic Meldungen"</conditioncontainer>
+    <actioncontainer id="t110" x="-3535.0" y="892.5">Flugmodus ein-/ausschalten: Ein</actioncontainer>
+    <conditioncontainer id="t111" x="-3535.0" y="367.5">Expression: Airplanemode</conditioncontainer>
     <connection from="t1" to="t81" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t2" to="t41" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t3" to="t40" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -1726,8 +1726,8 @@ FHEMCMD: statusrequest</customHTTPHeaders>
     <connection from="t77" to="t75" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t79" to="t80" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t80" to="t75" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t81" to="t111" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t81" to="t107" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t81" to="t108" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t81" to="t104" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t82" to="t10" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t84" to="t86" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t84" to="t83" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -1735,50 +1735,50 @@ FHEMCMD: statusrequest</customHTTPHeaders>
     <connection from="t87" to="t89" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t88" to="t87" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t88" to="t90" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t88" to="t91" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t90" to="t92" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t91" to="t93" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t94" to="t106" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t95" to="t75" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t96" to="t75" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t96" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t98" to="t95" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t99" to="t75" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t100" to="t99" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t101" to="t98" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t101" to="t97" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t102" to="t105" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t103" to="t94" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t104" to="t103" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t105" to="t104" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t105" to="t94" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t107" to="t108" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t109" to="t110" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t88" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t53" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t79" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t22" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t39" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t3" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t4" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t5" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t71" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t19" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t8" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t45" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t38" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t48" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t102" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t70" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t101" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t107" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t100" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t85" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t109" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t88" to="t111" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t90" to="t91" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t92" to="t103" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t93" to="t75" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t94" to="t75" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t95" to="t94" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t96" to="t93" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t97" to="t75" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t98" to="t97" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t99" to="t102" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t100" to="t92" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t101" to="t100" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t102" to="t101" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t102" to="t92" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t104" to="t105" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t106" to="t107" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t88" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t53" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t79" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t22" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t39" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t3" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t4" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t5" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t71" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t19" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t8" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t45" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t38" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t48" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t99" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t70" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t109" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t104" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t98" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t85" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t106" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t109" to="t96" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t109" to="t95" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t110" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
   </flow>
   <flow type="flow">
     <name>VoiceControl</name>
-    <group>FHEM Info / Steuerung über AMAD Modul v1.1.x</group>
+    <group>FHEM Info / Steuerung über AMAD Modul v1.2.0</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <triggercontainer id="t1" x="70.0" y="-647.5" />

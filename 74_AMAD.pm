@@ -37,7 +37,7 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $version = "1.1.23";
+my $version = "1.2.0";
 
 
 
@@ -457,7 +457,7 @@ sub AMAD_Set($$@) {
 	$list .= "openApp:$apps " if( AttrVal( $name, "setOpenApp", "none" ) ne "none" );
 	$list .= "nextAlarmTime:time ";
 	$list .= "statusRequest:noArg ";
-	$list .= "system:reboot,shutdown,airplanemode " if( AttrVal( $name, "root", "1" ) eq "1" );
+	$list .= "system:reboot,shutdown,airplanemodeON " if( AttrVal( $name, "root", "1" ) eq "1" );
 	$list .= "bluetooth:on,off ";
 	$list .= "notifySndFile ";
 	$list .= "clearNotificationBar:All,Automagic ";
@@ -667,8 +667,8 @@ sub AMAD_SelectSetCmd($$@) {
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/systemcommand?syscmd=$systemcmd";
 
-	readingsSingleUpdate( $hash, $systemcmd, "on", 1 ) if( $systemcmd eq "airplanemode" );
-	readingsSingleUpdate( $hash, "deviceState", "offline", 1 ) if( $systemcmd eq "airplanemode" || $systemcmd eq "shutdown" );
+	readingsSingleUpdate( $hash, $systemcmd, "on", 1 ) if( $systemcmd eq "airplanemodeON" );
+	readingsSingleUpdate( $hash, "deviceState", "offline", 1 ) if( $systemcmd eq "airplanemodeON" || $systemcmd eq "shutdown" );
     
 	return AMAD_HTTP_POST( $hash,$url );
     }
@@ -1158,6 +1158,7 @@ sub AMAD_decrypt($) {
     <li>Default volume</li>
     <li>Media volume device speaker</li>
     <li>Media volume Bluetooth speaker</li>
+    <li>...</li>
   </ul>
   <br>
   With some experience lots of information from the Android device can be shown in FHEM. This requires only small adjustments of the "Informations" flow
@@ -1182,6 +1183,7 @@ sub AMAD_decrypt($) {
     <li>Set system commands (reboot)</li>
     <li>Send a message which will be announced (TTS)</li>
     <li>Default media volume</li>
+    <li>...</li>
   </ul>
   <br><br>
   To trigger actions and to obtain information you need the Android App Automagic and a matching Flow. The App you need to get from the app store (google play), 
@@ -1227,6 +1229,7 @@ sub AMAD_decrypt($) {
   <a name="AMADreadings"></a>
   <b>Readings</b>
   <ul>
+    <li>airplanemode - state of Airplane</li>
     <li>androidVersion - installed Android Version</li>
     <li>automagic state - status messages from the AutomagicApp</li>
     <li>bluetooth on / off - is Bluetooth switched on or off on the device</li>
@@ -1245,16 +1248,18 @@ sub AMAD_decrypt($) {
     <li>lastStatusRequestState statusRequest_done / statusRequest_error - state of last statusRequest command</li>
     <li>nextAlarmDay - active alarm day</li>
     <li>next alarmTime - active alarm time</li>
-    <li>powerlevel - status of the battery in %</li>
+    <li>powerlevel - state of the battery in %</li>
     <li>powerPlugged - connected power supply? 0=NO, 1|2=YES</li>
     <li>screen - screen on/off</li>
-    <li>Screen Brightness - Screen Brightness from 0-255</li>
-    <li>Screen fullscreen - fullscreen mode (On, Off)</li>
+    <li>screenBrightness - Screen Brightness from 0-255</li>
+    <li>screenFullscreen - fullscreen mode (On, Off)</li>
     <li>screenLock - Pin-Lock (On,Off)</li>
     <li>screenOrientation - screen orientation (Auto, Landscape, Portrait)</li>
+    <li>state - state off Devices</li>
     <li>volume - volume value which was set on "Set volume".</li>
-    <li>volume Music Bluetooth - Media volume of the Bluetooth speakers</li>
-    <li>volume music speaker - Media volume of the internal speakers</li>
+    <li>volumeMusicBluetooth - Media volume of the Bluetooth speakers</li>
+    <li>volumeMusicSpeaker - Media volume of the internal speakers</li>
+    <li>volumeNotification - Notification volume of Device</li>
     <br>
     The Readings volume Music Bluetooth and music speaker volume reflect the respective media volume of the closed border is Bluetooth speakers or the internal speaker again.
     Unless one the respective volumes relies exclusively on the Set command, one of the two will always agree with the "volume" Reading a.<br><br>
@@ -1300,8 +1305,10 @@ sub AMAD_decrypt($) {
   <b>Set</b>
   <ul>
     <li>activateVoiceInput - activat Voice Input on Android Device</li>
+    <li>bluetooth - set bluetooth on/off</li>
+    <li>clearNotificationBar - clear the notification on bar. All or Automagic Notofication only</li>
     <li>Device State - sets the Device Status Online / Offline. See Readings</li>
-    <li>Media Player - controls the default media player. Play, Stop, Back Route title, ahead of title.</li>
+    <li>mediaPlayer - controls the default media player. Play, Stop, Back Route title, ahead of title.</li>
     <li>NextAlarm time - sets the alarm time. only within the next 24hrs.</li>
     <li>notifySndFile - plays the specified media file on the Android device. The file to be played must be in the folder /storage/emulated/0/Notifications/.</li>
     <li>openURL - opens a URL in your default browser</li>
@@ -1309,6 +1316,7 @@ sub AMAD_decrypt($) {
     <li>screenMsg - sends a message screen</li>
     <li>Status Request - calls for a new Status Report in Device to</li>
     <li>ttsMsg - sends a message which is output as a voice message</li>
+    <li>vibrate - vibrates the device</li>
     <li>volume - sets the media volume. Either the internal speakers or when connected the Bluetooth speaker</li>
     <li>volumeNotification - sets the notification volume.</li>
   </ul>
@@ -1316,14 +1324,13 @@ sub AMAD_decrypt($) {
   <b>Set depending on set attributes</b>
   <ul>
     <li>changetoBtDevice - changes to another Bluetooth device. The attribute setBluetoothDevice must be set. See hint below!</li>
-    <li>mediaPlayer - controls the default media player. Play, Stop, Back Route title, ahead of title. <b>Attribute fhemServerIP</b></li>
     <li>openapp - opens a selected app. <b>Attribute setOpenApp</b></li>
     <li>screen Brightness - sets the screen brightness, 0-255 <b>Attribute setScreenBrightness</b></li>
     If you want to use the "set screen brightness", a small adjustment in the flow SetCommands must be made. Opens the action (one of the squares very bottom) Set System Settings: System and makes a check "I have checked the settings, I know what I'm doing".
     <li>screen fullscreen - Switches to full screen mode on / off. <b>Attribute SetFullscreen </b></li>
     <li>screenLock - locked Screen by set Pinlock. <b>Attribute setScreenlockPIN - There are only allowed numbers and it must be more than 4 and less as 16 character</b></li>
     <li>screenOrientation - Switches the screen orientation Auto / Landscape / Portrait. <b>Attribute setScreenOrientation</b></li>
-    <li>system - set system commands from (only rooted devices). reboot,shutdown,airplanemode (activate only) <b>Attribut root</b>, in the Auto Magic Settings "root function" must be set</li>
+    <li>system - set system commands from (only rooted devices). reboot,shutdown,airplanemodeON (activate only) <b>Attribut root</b>, in the Auto Magic Settings "root function" must be set</li>
     In order to use openApp you need an attribute where separated by a comma, several app names are set in order to use openapp. The app name is arbitrary and only required for recognition. The same app name must be used in the flow in SetCommands on the left below the hash expression: "openapp" be in one of the 5 paths (one app per path) entered in both diamonds. Thereafter, in the quadrangle selected the app which app through the attribute names should be started.<br><br>
     To switch between different Bluetooth devices, you need set the attribute setBluetoothDevice accordingly. 
     attr <DEVICE> BTdeviceName1|MAC,BTDeviceName2|MAC 
@@ -1378,6 +1385,7 @@ sub AMAD_decrypt($) {
     <li>Standardlautst&auml;rke</li>
     <li>Media Lautst&auml;rke des Lautsprechers am Ger&auml;t</li>
     <li>Media Lautst&auml;rke des Bluetooth Lautsprechers</li>
+    <li>...</li>
   </ul>
   <br>
   Mit etwas Einarbeitung k&ouml;nnen jegliche Informationen welche Automagic bereit stellt in FHEM angezeigt werden. Hierzu bedarf es lediglich
@@ -1402,7 +1410,8 @@ sub AMAD_decrypt($) {
     <li>neuen Statusreport des Ger&auml;tes anfordern</li>
     <li>Systembefehle setzen (Reboot)</li>
     <li>eine Nachricht senden welche <b>angesagt</b> wird (TTS)</li>
-    <li>Medienlautst&auml;rke regeln</li>  
+    <li>Medienlautst&auml;rke regeln</li>
+    <li>...</li>
   </ul>
   <br><br> 
   F&uuml;r all diese Aktionen und Informationen wird auf dem Androidger&auml;t Automagic und ein so genannter Flow ben&ouml;tigt. Die App ist über den Google PlayStore zu beziehen. Das benötigte Flowset bekommt Ihr aus dem FHEM Update.
@@ -1448,6 +1457,7 @@ sub AMAD_decrypt($) {
   <a name="AMADreadings"></a>
   <b>Readings</b>
   <ul>
+    <li>airplanemode - Status des Flugmodus</li>
     <li>androidVersion - aktuell installierte Androidversion</li>
     <li>automagicState - Statusmeldungen von der AutomagicApp <b>(Voraussetzung Android >4.3). Wer ein Android >4.3 hat und im Reading steht "wird nicht unterst&uuml;tzt", mu&szlig; in den Androideinstellungen unter Ton und Benachrichtigungen -> Benachrichtigungszugriff ein Haken setzen f&uuml;r Automagic</b></li>
     <li>bluetooth on/off - ist auf dem Ger&auml;t Bluetooth an oder aus</li>
@@ -1474,9 +1484,11 @@ sub AMAD_decrypt($) {
     <li>screenFullscreen - Vollbildmodus (On,Off)</li>
     <li>screenLock - Pin-Sperre (On,Off)</li>
     <li>screenOrientation - Bildschirmausrichtung (Auto,Landscape,Portrait)</li>
+    <li>state - aktueller Status des Devices</li>
     <li>volume - Lautst&auml;rkewert welcher &uuml;ber "set volume" gesetzt wurde.</li>
     <li>volumeMusikBluetooth - Media Lautst&auml;rke von angeschlossenden Bluetooth Lautsprechern</li>
     <li>volumeMusikSpeaker - Media Lautst&auml;rke der internen Lautsprecher</li>
+    <li>volumeNotification - Benachrichtigungs Lautst&auml;rke</li>
     <br>
     Die Readings volumeMusikBluetooth und volumeMusikSpeaker spiegeln die jeweilige Medialautst&auml;rke der angeschlossenden Bluetoothlautsprecher oder der internen Lautsprecher wieder.
     Sofern man die jeweiligen Lautst&auml;rken ausschlie&szlig;lich &uuml;ber den Set Befehl setzt, wird eine der beiden immer mit dem "volume" Reading &uuml;ber ein stimmen.<br><br>
@@ -1532,6 +1544,7 @@ sub AMAD_decrypt($) {
     <li>screenMsg - versendet eine Bildschirmnachricht</li>
     <li>statusRequest - Fordert einen neuen Statusreport beim Device an</li>
     <li>ttsMsg - versendet eine Nachricht welche als Sprachnachricht ausgegeben wird</li>
+    <li>vibrate - l&auml;sst das Androidger&auml;t vibrieren</li>
     <li>volume - setzt die Medialautst&auml;rke. Entweder die internen Lautsprecher oder sofern angeschlossen die Bluetoothlautsprecher</li>
     <li>volumeNotification - setzt die Benachrichtigungslautst&auml;rke.</li>
   </ul>
@@ -1539,7 +1552,6 @@ sub AMAD_decrypt($) {
   <b>Set abh&auml;ngig von gesetzten Attributen</b>
   <ul>
     <li>changetoBtDevice - wechselt zu einem anderen Bluetooth Ger&auml;t. <b>Attribut setBluetoothDevice mu&szlig; gesetzt sein. Siehe Hinweis unten!</b></li>
-    <li>mediaPlayer - steuert den Standard Mediaplayer. play, stop, Titel z&uuml;r&uuml;ck, Titel vor. <b>Attribut fhemServerIP</b></li>
     <li>openApp - &ouml;ffnet eine ausgew&auml;hlte App. <b>Attribut setOpenApp</b></li>
     <li>screenBrightness - setzt die Bildschirmhelligkeit, von 0-255 <b>Attribut setScreenBrightness</b></li>
     Wenn Ihr das "set screenBrightness" verwenden wollt, muss eine kleine Anpassung im Flow SetCommands vorgenommen werden. &Ouml;ffnet die Aktion (eines der Vierecke ganz ganz unten)
@@ -1547,7 +1559,7 @@ sub AMAD_decrypt($) {
     <li>screenFullscreen - Schaltet den Vollbildmodus on/off. <b>Attribut setFullscreen</b></li>
     <li>screenLock - Sperrt den Bildschirm mit Pinabfrage. <b>Attribut setScreenlockPIN - hier die Pin daf&uuml;r eingeben. Erlaubt sind nur Zahlen. Es m&uuml;&szlig;en mindestens 4 bis max 16 Zeichen sein.</b></li>
     <li>screenOrientation - Schaltet die Bildschirmausrichtung Auto/Landscape/Portait. <b>Attribut setScreenOrientation</b></li>
-    <li>system - setzt Systembefehle ab (nur bei gerootetet Ger&auml;en). reboot,shutdown,airplanemode (kann nur aktiviert werden) <b>Attribut root</b>, in den Automagic Einstellungen muss "Root Funktion" gesetzt werden</li>
+    <li>system - setzt Systembefehle ab (nur bei gerootetet Ger&auml;en). reboot,shutdown,airplanemodeON (kann nur aktiviert werden) <b>Attribut root</b>, in den Automagic Einstellungen muss "Root Funktion" gesetzt werden</li>
     <br>
     Um openApp verwenden zu k&ouml;nnen, muss als Attribut ein, oder durch Komma getrennt, mehrere App Namen gesetzt werden. Der App Name ist frei w&auml;hlbar und nur zur Wiedererkennung notwendig.
     Der selbe App Name mu&szlig; im Flow SetCommands auf der linken Seite unterhalb der Raute Expression:"openApp" in einen der 5 Str&auml;nge (eine App pro Strang) in beide Rauten eingetragen werden. Danach wird
