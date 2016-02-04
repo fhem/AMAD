@@ -37,7 +37,7 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $version = "1.2.0";
+my $version = "1.2.1";
 
 
 
@@ -56,7 +56,7 @@ sub AMAD_Initialize($) {
 			  "checkActiveTask ".
 			  "setFullscreen:0,1 ".
 			  "setScreenOrientation:0,1 ".
-			  "setScreenBrightness:0,1 ".
+			  "setScreenBrightness:noArg ".
 			  "setBluetoothDevice ".
 			  "setScreenlockPIN ".
 			  "root:0,1 ".
@@ -90,6 +90,9 @@ sub AMAD_Define($$) {
     $hash->{VERSION} 	= $version;
     $hash->{helper}{infoErrorCounter} = 0 if( $hash->{HOST} );
     $hash->{helper}{setCmdErrorCounter} = 0 if( $hash->{HOST} );
+
+    
+    
     
     if( ! $hash->{HOST} ) {
 	return "there is already a AMAD Bridge, did you want to define a AMAD host use: define <name> AMAD <HOST>" if( $modules{AMAD}{defptr}{BRIDGE} );
@@ -168,6 +171,11 @@ my ( $cmd, $name, $attrName, $attrVal ) = @_;
 	    readingsSingleUpdate ( $hash, "state", "active", 1 );
 	    Log3 $name, 3, "AMAD ($name) - enabled";
         }
+    }
+    
+    elsif( $attrName eq "setScreenBrightness" ) {
+        Log3 $name, 1, "AMAD ($name) - !!!The Attribut \"setScreenBrightness\" is obsolete and will be remove in the future!!! Please delete the attribut description in your AMAD Device";
+        Log3 $name, 1, "AMAD ($name) - !!!Das Attribut \"setScreenBrightness\" wird nicht mehr benötigt und in zukünftigen Versionen entfernt!!! Bitte lösche die Attributszuweisung aus Deinem AMAD Device";
     }
     
     elsif( $attrName eq "interval" ) {
@@ -414,7 +422,9 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
     my $t;
     my $v;
     while( ( $t, $v ) = each %buffer ) {
+    
 	$v =~ s/null//g;
+	
 	readingsBulkUpdate( $hash, $t, $v ) if( defined( $v ) );
     }
     
@@ -449,7 +459,7 @@ sub AMAD_Set($$@) {
 	$list .= "volume:slider,0,1,15 ";
 	$list .= "deviceState:online,offline ";
 	$list .= "mediaPlayer:play,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
-	$list .= "screenBrightness:slider,0,1,255 " if( AttrVal( $name, "setScreenBrightness", "1" ) eq "1" );
+	$list .= "screenBrightness:slider,0,1,255 ";
 	$list .= "screen:on,off ";
 	$list .= "screenOrientation:auto,landscape,portrait " if( AttrVal( $name, "setScreenOrientation", "1" ) eq "1" );
 	$list .= "screenFullscreen:on,off " if( AttrVal( $name, "setFullscreen", "1" ) eq "1" );
@@ -1313,6 +1323,7 @@ sub AMAD_decrypt($) {
     <li>notifySndFile - plays the specified media file on the Android device. The file to be played must be in the folder /storage/emulated/0/Notifications/.</li>
     <li>openURL - opens a URL in your default browser</li>
     <li>screen - are sets the screen on / off with barrier in the car Magic settings must "Admin Function" set will not work "Screen off".</li>
+    <li>screen Brightness - sets the screen brightness, 0-255</li>
     <li>screenMsg - sends a message screen</li>
     <li>Status Request - calls for a new Status Report in Device to</li>
     <li>ttsMsg - sends a message which is output as a voice message</li>
@@ -1325,7 +1336,6 @@ sub AMAD_decrypt($) {
   <ul>
     <li>changetoBtDevice - changes to another Bluetooth device. The attribute setBluetoothDevice must be set. See hint below!</li>
     <li>openapp - opens a selected app. <b>Attribute setOpenApp</b></li>
-    <li>screen Brightness - sets the screen brightness, 0-255 <b>Attribute setScreenBrightness</b></li>
     If you want to use the "set screen brightness", a small adjustment in the flow SetCommands must be made. Opens the action (one of the squares very bottom) Set System Settings: System and makes a check "I have checked the settings, I know what I'm doing".
     <li>screen fullscreen - Switches to full screen mode on / off. <b>Attribute SetFullscreen </b></li>
     <li>screenLock - locked Screen by set Pinlock. <b>Attribute setScreenlockPIN - There are only allowed numbers and it must be more than 4 and less as 16 character</b></li>
@@ -1542,6 +1552,7 @@ sub AMAD_decrypt($) {
     <li>openURL - &ouml;ffnet eine URL im Standardbrowser</li>
     <li>screen - setzt den Bildschirm on/off mit Sperre, in den Automagic Einstellungen muss "Admin Funktion" gesetzt werden sonst funktioniert "Screen off" nicht.</li>
     <li>screenMsg - versendet eine Bildschirmnachricht</li>
+    <li>screenBrightness - setzt die Bildschirmhelligkeit, von 0-255.</li>
     <li>statusRequest - Fordert einen neuen Statusreport beim Device an</li>
     <li>ttsMsg - versendet eine Nachricht welche als Sprachnachricht ausgegeben wird</li>
     <li>vibrate - l&auml;sst das Androidger&auml;t vibrieren</li>
@@ -1553,7 +1564,6 @@ sub AMAD_decrypt($) {
   <ul>
     <li>changetoBtDevice - wechselt zu einem anderen Bluetooth Ger&auml;t. <b>Attribut setBluetoothDevice mu&szlig; gesetzt sein. Siehe Hinweis unten!</b></li>
     <li>openApp - &ouml;ffnet eine ausgew&auml;hlte App. <b>Attribut setOpenApp</b></li>
-    <li>screenBrightness - setzt die Bildschirmhelligkeit, von 0-255 <b>Attribut setScreenBrightness</b></li>
     Wenn Ihr das "set screenBrightness" verwenden wollt, muss eine kleine Anpassung im Flow SetCommands vorgenommen werden. &Ouml;ffnet die Aktion (eines der Vierecke ganz ganz unten)
     SetzeSystemeinstellung:System und macht einen Haken bei "Ich habe die Einstellungen &uuml;berpr&uuml;ft, ich weiss was ich tue".
     <li>screenFullscreen - Schaltet den Vollbildmodus on/off. <b>Attribut setFullscreen</b></li>
