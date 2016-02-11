@@ -37,7 +37,7 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $version = "1.2.1";
+my $version = "1.3.0";
 
 
 
@@ -405,7 +405,17 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
     ### End Error Handling
 
     $hash->{helper}{infoErrorCounter} = 0;
- 
+    
+    AMAD_ResponseProcessing($hash,$data);
+}
+
+sub AMAD_ResponseProcessing($$) {
+
+    my ( $hash, $data ) = @_;
+    
+    my $name = $hash->{NAME};
+    my $host = $hash->{HOST};
+
     ### Begin Response Processing
     readingsSingleUpdate( $hash, "state", "active", 1) if( ReadingsVal( $name, "state", 0 ) ne "initialized" or ReadingsVal( $name, "state", 0 ) ne "active" );
     
@@ -460,7 +470,7 @@ sub AMAD_Set($$@) {
 	$list .= "deviceState:online,offline ";
 	$list .= "mediaPlayer:play,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
 	$list .= "screenBrightness:slider,0,1,255 ";
-	$list .= "screen:on,off ";
+	$list .= "screen:on,off,lock,unlock ";
 	$list .= "screenOrientation:auto,landscape,portrait " if( AttrVal( $name, "setScreenOrientation", "1" ) eq "1" );
 	$list .= "screenFullscreen:on,off " if( AttrVal( $name, "setFullscreen", "1" ) eq "1" );
 	$list .= "openURL ";
@@ -473,9 +483,9 @@ sub AMAD_Set($$@) {
 	$list .= "clearNotificationBar:All,Automagic ";
 	$list .= "changetoBTDevice:$btdev " if( AttrVal( $name, "setBluetoothDevice", "none" ) ne "none" );
 	$list .= "activateVoiceInput:noArg ";
-	$list .= "screenLock:on,off " if( AttrVal( $name, "setScreenlockPIN", "none" ) ne "none" );
 	$list .= "volumeNotification:slider,0,1,7 ";
-	$list .= "vibrate:noArg";
+	$list .= "vibrate:noArg ";
+	$list .= "sendIntent ";
 
 	if( lc $cmd eq 'screenmsg'
 	    || lc $cmd eq 'ttsmsg'
@@ -498,6 +508,7 @@ sub AMAD_Set($$@) {
 	    || lc $cmd eq 'volumenotification'
 	    || lc $cmd eq 'screenlock'
 	    || lc $cmd eq 'statusrequest'
+	    || lc $cmd eq 'sendintent'
 	    || lc $cmd eq 'vibrate') {
 
 	    Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
@@ -513,8 +524,7 @@ sub AMAD_Set($$@) {
 
 	return "Unknown argument $cmd, bearword as argument or wrong parameter(s), choose one of $list";
     }
-    
-    #elsif( $name eq "$bname" ) {
+
     elsif( $modules{AMAD}{defptr}{BRIDGE} ) {
     
 	my $list = "";
@@ -611,10 +621,25 @@ sub AMAD_SelectSetCmd($$@) {
     
     elsif( lc $cmd eq 'screen' ) {
 	my $mod = join( " ", @data );
+	
+	if ($mod eq "on" || $mod eq "off") {
+            
+            my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setScreenOnOff?screen=$mod" if ($mod eq "on" || $mod eq "off");
+            
+            return AMAD_HTTP_POST( $hash,$url );
+	}
+	
+	elsif ($mod eq "lock" || $mod eq "unlock") {
+	
+            return "Please set \"setScreenlockPIN\" Attribut first" if( AttrVal( $name, "setScreenlockPIN", "none" ) eq "none" );
+            my $PIN = AttrVal( $name, "setScreenlockPIN", undef );
+            $PIN = AMAD_decrypt($PIN);
 
-	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setScreenOnOff?screen=$mod";
+            my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/screenlock?lockmod=".$mod."&lockPIN=".$PIN;
 
-	return AMAD_HTTP_POST( $hash,$url );
+            readingsSingleUpdate( $hash, $cmd, $mod, 1 );
+            return AMAD_HTTP_POST( $hash,$url );
+        }
     }
     
     elsif( lc $cmd eq 'screenorientation' ) {
@@ -720,20 +745,18 @@ sub AMAD_SelectSetCmd($$@) {
 	return AMAD_HTTP_POST( $hash,$url );
     }
     
-    elsif( lc $cmd eq 'screenlock' ) {
-	my $lockmod = join( " ", @data );
-	my $PIN = AttrVal( $name, "setScreenlockPIN", undef );
-        $PIN = AMAD_decrypt($PIN);
-
-	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/screenlock?lockmod=".$lockmod."&lockPIN=".$PIN;
-
-        readingsSingleUpdate( $hash, $cmd, $lockmod, 1 );
-	return AMAD_HTTP_POST( $hash,$url );
-    }
-    
     elsif( lc $cmd eq 'vibrate' ) {
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setvibrate";
+	
+	return AMAD_HTTP_POST( $hash,$url );
+    }
+    
+    elsif( lc $cmd eq 'sendintent' ) {
+        my $intentstring = join( " ", @data );
+        my ( $action, $exkey1, $exval1, $exkey2, $exval2 ) = split( "[ \t][ \t]*", $intentstring );
+
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/sendIntent?action=".$action."&exkey1=".$exkey1."&exval1=".$exval1."&exkey2=".$exkey2."&exval2=".$exval2;
 	
 	return AMAD_HTTP_POST( $hash,$url );
     }
@@ -947,35 +970,12 @@ sub AMAD_CommBridge_Read($) {
 
     if ( $fhemcmd =~ /setreading\b/ ) {
 	my $tv = $data[1];
-	
-	@data = split( '\R',  $data[0] );
 
-		### Begin Response Processing
-		Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: processing receive reading values";
+        ### Begin Response Processing
+        Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: processing receive reading values";
     
-		my @valuestring = split( '@@@@',  $tv );
-		my %buffer;
-
-		foreach( @valuestring ) {
-		    my @values = split( '@@' , $_ );
-		    $buffer{$values[0]} = $values[1];
-		}
-    
-		my $t;
-		my $v;
-                    
-                while( ( $t, $v ) = each %buffer ) {
-                    $v =~ s/null//g;
-
-                    readingsBeginUpdate( $dhash );
-                    readingsBulkUpdate( $dhash, $t, $v ) if( defined( $v ) );
-                }
-                    
-                readingsBulkUpdate( $dhash, "lastStatusRequestState", "statusRequest_done" );
-                readingsEndUpdate( $dhash, 1 );
-                
-		### End Response Processing
-		
+        AMAD_ResponseProcessing($dhash,$tv);
+        
         $response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM was processes\r\n";
         $c = $hash->{CD};
         print $c "HTTP/1.1 200 OK\r\n",
