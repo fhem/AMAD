@@ -37,7 +37,7 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $version = "1.3.0";
+my $version = "1.9.4";
 
 
 
@@ -51,6 +51,7 @@ sub AMAD_Initialize($) {
     $hash->{UndefFn}	= "AMAD_Undef";
     $hash->{AttrFn}	= "AMAD_Attr";
     $hash->{ReadFn}	= "AMAD_CommBridge_Read";
+    $hash->{FW_detailFn}  = "AMAD_FHEM_Webdetails";
     
     $hash->{AttrList} 	= "setOpenApp ".
 			  "checkActiveTask ".
@@ -60,7 +61,6 @@ sub AMAD_Initialize($) {
 			  "setBluetoothDevice ".
 			  "setScreenlockPIN ".
 			  "root:0,1 ".
-			  "interval ".
 			  "port ".
 			  "disable:1 ".
 			  $readingFnAttributes;
@@ -77,16 +77,16 @@ sub AMAD_Define($$) {
     
     my @a = split( "[ \t][ \t]*", $def );
 
-    return "too few parameters: define <name> AMAD <HOST>" if( @a < 2 && @a > 3 );
+    return "too few parameters: define <name> AMAD <HOST-IP> <ACCESSPOINT-SSID>" if( ( @a < 3 || @a > 4 ) && $a[0] ne "AMADCommBridge");
 
     my $name    	= $a[0];
     my $host    	= $a[2];
+    my $apssid          = $a[3];
     my $port		= 8090;
-    my $interval  	= 180;
 
     $hash->{HOST} 	= $host if( $host );
     $hash->{PORT} 	= $port;
-    $hash->{INTERVAL} 	= $interval if( $hash->{HOST} );
+    $hash->{APSSID}     = $apssid if( $hash->{HOST} );
     $hash->{VERSION} 	= $version;
     $hash->{helper}{infoErrorCounter} = 0 if( $hash->{HOST} );
     $hash->{helper}{setCmdErrorCounter} = 0 if( $hash->{HOST} );
@@ -108,13 +108,14 @@ sub AMAD_Define($$) {
 	    CommandDefine( undef, "AMADCommBridge AMAD" );    
 	}   
 
-	Log3 $name, 3, "AMAD ($name) - defined with host $hash->{HOST} on port $hash->{PORT} and interval $hash->{INTERVAL} (sec)";
+	Log3 $name, 3, "AMAD ($name) - defined with host $hash->{HOST} on port $hash->{PORT} and AccessPoint-SSID $hash->{APSSID}";
 	
 	$attr{$name}{room} = "AMAD" if( !defined( $attr{$name}{room} ) );
 	readingsSingleUpdate ( $hash, "state", "initialized", 1 ) if( $hash->{HOST} );
 	readingsSingleUpdate ( $hash, "deviceState", "online", 1 ) if( $hash->{HOST} );
         
-	InternalTimer( gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 0 ) if( $hash->{HOST} );
+        RemoveInternalTimer($hash);
+	InternalTimer( gettimeofday()+15, "AMAD_GetUpdateTimer", $hash, 0 ) if( $hash->{HOST} );
 
 	$modules{AMAD}{defptr}{$hash->{HOST}} = $hash;
 	
@@ -143,6 +144,8 @@ sub AMAD_Undef($$) {
               CommandDelete( undef, $name );
 	}
     }
+    
+    return undef;
 }
 
 sub AMAD_Attr(@) {
@@ -178,22 +181,6 @@ my ( $cmd, $name, $attrName, $attrVal ) = @_;
         Log3 $name, 1, "AMAD ($name) - !!!Das Attribut \"setScreenBrightness\" wird nicht mehr benötigt und in zukünftigen Versionen entfernt!!! Bitte lösche die Attributszuweisung aus Deinem AMAD Device";
     }
     
-    elsif( $attrName eq "interval" ) {
-	if( $cmd eq "set" ) {
-	    if( $attrVal < 60 ) {
-		Log3 $name, 3, "AMAD ($name) - interval too small, please use something > 60 (sec), default is 180 (sec)";
-		return "interval too small, please use something > 60 (sec), default is 180 (sec)";
-	    } else {
-		$hash->{INTERVAL} = $attrVal;
-		Log3 $name, 3, "AMAD ($name) - set interval to $attrVal";
-	    }
-	    
-	} else {
-	    $hash->{INTERVAL} = 180;
-	    Log3 $name, 3, "AMAD ($name) - set interval to default";
-	}
-    }
-    
     elsif( $attrName eq "port" ) {
 	if( $cmd eq "set" ) {
 	    $hash->{PORT} = $attrVal;
@@ -219,31 +206,26 @@ my ( $cmd, $name, $attrName, $attrVal ) = @_;
             return $attrName ." set to ". $attrVal if( $init_done );
         }
     }
-
-    return;
+    
+    return undef;
 }
 
-sub AMAD_GetUpdateLocal($) {
+sub AMAD_GetUpdate($) {
 
 my ( $hash ) = @_;
     my $name = $hash->{NAME};
-
-    AMAD_RetrieveAutomagicInfo( $hash ) if( ReadingsVal( $name, "deviceState", "online" ) eq "online" && ReadingsVal( $hash->{NAME}, "state", 0 ) ne "initialized" && AttrVal( $name, "disable", 0 ) ne "1" );  ### deviceState muß von Hand online/offline gesetzt werden z.B. ueber RESIDENZ Modul
     
-    return 1;
-}
+    RemoveInternalTimer( $hash );
 
-sub AMAD_GetUpdateTimer($) {
+    if( $init_done && ReadingsVal( $name, "deviceState", "online" ) eq "online" && AttrVal( $name, "disable", 0 ) ne "1") {            ### deviceState muß von Hand online/offline gesetzt werden z.B. ueber RESIDENZ Modul
+    
+        AMAD_RetrieveAutomagicInfo( $hash );  
+    } else {
 
-    my ( $hash ) = @_;
-    my $name = $hash->{NAME};
- 
-    AMAD_RetrieveAutomagicInfo( $hash ) if( ReadingsVal( $name, "deviceState", "online" ) eq "online" && AttrVal( $name, "disable", 0 ) ne "1" );  ### deviceState muss von Hand online/offline gesetzt werden z.B. ueber RESIDENZ Modul
-  
-    InternalTimer( gettimeofday()+$hash->{INTERVAL}, "AMAD_GetUpdateTimer", $hash, 1 );
-    Log3 $name, 4, "AMAD ($name) - Call AMAD_GetUpdateTimer";
-
-    return 1;
+        InternalTimer( gettimeofday()+15, "AMAD_GetUpdateTimer", $hash, 0 );
+        Log3 $name, 3, "AMAD ($name) - GetUpdate, FHEM or Device not ready yet";
+    }
+    
 }
 
 sub AMAD_RetrieveAutomagicInfo($) {
@@ -254,6 +236,7 @@ sub AMAD_RetrieveAutomagicInfo($) {
     my $name = $hash->{NAME};
     my $host = $hash->{HOST};
     my $port = $hash->{PORT};
+    my $apssid = $hash->{APSSID};
     my $fhemip = ReadingsVal( $bname, "fhemServerIP", "none" );
     my $activetask = AttrVal( $name, "checkActiveTask", "none" );
     
@@ -266,7 +249,7 @@ sub AMAD_RetrieveAutomagicInfo($) {
 	    timeout	=> 60,
 	    hash	=> $hash,
 	    method	=> "GET",
-	    header	=> "fhemIP: $fhemip\r\nfhemDevice: $name\r\nactiveTask: $activetask",
+	    header	=> "fhemIP: $fhemip\r\nfhemDevice: $name\r\nactiveTask: $activetask\r\napSSID: $apssid",
 	    doTrigger	=> 1,
 	    callback	=> \&AMAD_RetrieveAutomagicInfoFinished,
 	}
@@ -360,7 +343,7 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
 	}
     }
 
-    if( $data eq "" and exists( $param->{code} ) ) {
+    if( $data eq "" and exists( $param->{code} ) && $param->{code} ne 200 ) {
 	readingsBeginUpdate( $hash );
 	readingsBulkUpdate ( $hash, "state", $param->{code} ) if( ReadingsVal( $name, "state", 1 ) ne "initialized" );
 	$hash->{helper}{infoErrorCounter} = ( $hash->{helper}{infoErrorCounter} + 1 );
@@ -432,10 +415,17 @@ sub AMAD_ResponseProcessing($$) {
     my $t;
     my $v;
     while( ( $t, $v ) = each %buffer ) {
-    
-	$v =~ s/null//g;
-	
-	readingsBulkUpdate( $hash, $t, $v ) if( defined( $v ) );
+        if( defined( $v ) ) {
+        
+            readingsBulkUpdate( $hash, "deviceState", "offline" ) if( $t eq "airplanemode" && $v eq "on" );
+            readingsBulkUpdate( $hash, "deviceState", "online" ) if( $t eq "airplanemode" && $v eq "off" );
+            $v =~ s/null/off/g if( ($t eq "nextAlarmDay" || $t eq "nextAlarmTime") && $v eq "null" );
+            
+            
+            $v =~ s/null//g;
+
+            readingsBulkUpdate( $hash, $t, $v );
+        }
     }
     
     readingsBulkUpdate( $hash, "lastStatusRequestState", "statusRequest_done" );
@@ -513,7 +503,7 @@ sub AMAD_Set($$@) {
 
 	    Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
 	  
-	    return "set command only works if state not equal initialized, please wait for next interval run" if( ReadingsVal( $hash->{NAME}, "state", 0 ) eq "initialized");
+	    return "set command only works if state not equal initialized" if( ReadingsVal( $hash->{NAME}, "state", 0 ) eq "initialized");
 	    return "Cannot set command, FHEM Device is disabled" if( AttrVal( $name, "disable", "0" ) eq "1" );
 	    
 	    return AMAD_SelectSetCmd( $hash, $cmd, @val ) if( @val ) && ( ReadingsVal( $name, "deviceState", "online" ) eq "offline" ) && ( lc $cmd eq 'devicestate' );
@@ -579,8 +569,6 @@ sub AMAD_SelectSetCmd($$@) {
 	my $vol = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setVolume?volume=$vol";
-
-	readingsSingleUpdate( $hash, $cmd, $vol, 1 );
 	
 	return AMAD_HTTP_POST( $hash, $url );
     }
@@ -589,8 +577,6 @@ sub AMAD_SelectSetCmd($$@) {
 	my $vol = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setNotifiVolume?notifivolume=$vol";
-
-	readingsSingleUpdate( $hash, $cmd, $vol, 1 );
 	
 	return AMAD_HTTP_POST( $hash, $url );
     }
@@ -637,7 +623,7 @@ sub AMAD_SelectSetCmd($$@) {
 
             my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/screenlock?lockmod=".$mod."&lockPIN=".$PIN;
 
-            readingsSingleUpdate( $hash, $cmd, $mod, 1 );
+            readingsSingleUpdate( $hash, "screenLock", $mod, 1 );
             return AMAD_HTTP_POST( $hash,$url );
         }
     }
@@ -685,7 +671,7 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif( lc $cmd eq 'statusrequest' ) {
-	AMAD_GetUpdateLocal( $hash );
+	AMAD_GetUpdate( $hash );
 	return undef;
     }
     
@@ -702,7 +688,7 @@ sub AMAD_SelectSetCmd($$@) {
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/systemcommand?syscmd=$systemcmd";
 
-	readingsSingleUpdate( $hash, $systemcmd, "on", 1 ) if( $systemcmd eq "airplanemodeON" );
+	readingsSingleUpdate( $hash, "airplanemode", "on", 1 ) if( $systemcmd eq "airplanemodeON" );
 	readingsSingleUpdate( $hash, "deviceState", "offline", 1 ) if( $systemcmd eq "airplanemodeON" || $systemcmd eq "shutdown" );
     
 	return AMAD_HTTP_POST( $hash,$url );
@@ -912,6 +898,12 @@ sub AMAD_CommBridge_Open($) {
 
     my ( $bhash ) = @_;
     my $bname = $bhash->{NAME};
+    
+    if( $bname ne "AMADCommBridge" ) {
+    
+        Log3 $bname, 3, "The name of the CommBridge may be called only AMADCommBridge";
+        return "The name of the CommBridge may be called only AMADCommBridge";
+    }
 
     # Oeffnen des TCP Sockets
     my $bret = TcpServer_Open( $bhash, "8090", "global" );
@@ -1022,19 +1014,6 @@ sub AMAD_CommBridge_Read($) {
 	return;
     }
     
-    elsif ( $fhemcmd eq "statusrequest" ) {
-    
-        $response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM was processes\r\n";
-        $c = $hash->{CD};
-        print $c "HTTP/1.1 200 OK\r\n",
-            "Content-Type: text/plain\r\n",
-            "Content-Length: ".length($response)."\r\n\r\n",
-            $response;
-
-        Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: Call statusRequest";
-        return AMAD_GetUpdateLocal( $dhash );
-    }
-    
     elsif ( $fhemcmd =~ /readingsval\b/ ) {
         my $fhemCmd = $data[1];
         my @datavalue = split( ' ', $data[1] );
@@ -1130,6 +1109,16 @@ sub AMAD_decrypt($) {
     }
 
     return $decodedPIN;
+}
+
+sub AMAD_FHEM_Webdetails($$) {
+
+        my ($FW_wname, $name, $room, $pageHash) = @_;       # pageHash is set for summaryFn.
+        my $hash   = $defs{$name};
+        
+        return if( !defined( $hash->{VERSION} ) );
+        
+        return "<u><b><a href='/fhem?cmd={`cat /opt/fhem/FHEM/lib/74_AMADautomagicFlows_".$version.".xml`}&XHR=1' target='_blank' type='text/xml' download='AMADautomagicFlows_".$version.".xml'>Download FlowSet-$version</a></b></u><br>"
 }
 
 
