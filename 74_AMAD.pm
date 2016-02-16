@@ -37,7 +37,7 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $version = "1.9.4";
+my $version = "1.9.6";
 
 
 
@@ -461,13 +461,13 @@ sub AMAD_Set($$@) {
 	$list .= "mediaPlayer:play,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
 	$list .= "screenBrightness:slider,0,1,255 ";
 	$list .= "screen:on,off,lock,unlock ";
-	$list .= "screenOrientation:auto,landscape,portrait " if( AttrVal( $name, "setScreenOrientation", "1" ) eq "1" );
-	$list .= "screenFullscreen:on,off " if( AttrVal( $name, "setFullscreen", "1" ) eq "1" );
+	$list .= "screenOrientation:auto,landscape,portrait " if( AttrVal( $name, "setScreenOrientation", "0" ) eq "1" );
+	$list .= "screenFullscreen:on,off " if( AttrVal( $name, "setFullscreen", "0" ) eq "1" );
 	$list .= "openURL ";
 	$list .= "openApp:$apps " if( AttrVal( $name, "setOpenApp", "none" ) ne "none" );
 	$list .= "nextAlarmTime:time ";
 	$list .= "statusRequest:noArg ";
-	$list .= "system:reboot,shutdown,airplanemodeON " if( AttrVal( $name, "root", "1" ) eq "1" );
+	$list .= "system:reboot,shutdown,airplanemodeON " if( AttrVal( $name, "root", "0" ) eq "1" );
 	$list .= "bluetooth:on,off ";
 	$list .= "notifySndFile ";
 	$list .= "clearNotificationBar:All,Automagic ";
@@ -623,7 +623,6 @@ sub AMAD_SelectSetCmd($$@) {
 
             my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/screenlock?lockmod=".$mod."&lockPIN=".$PIN;
 
-            readingsSingleUpdate( $hash, "screenLock", $mod, 1 );
             return AMAD_HTTP_POST( $hash,$url );
         }
     }
