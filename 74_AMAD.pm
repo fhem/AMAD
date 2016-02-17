@@ -995,7 +995,7 @@ sub AMAD_CommBridge_Read($) {
     }
     
     elsif ( $fhemcmd =~ /voiceinputvalue\b/ ) {
-        my $fhemCmd = $data[1];
+        my $fhemCmd = lc $data[1];
         
         readingsBeginUpdate( $bhash);
 	readingsBulkUpdate( $bhash, "receiveVoiceCommand", $fhemCmd );
