@@ -37,7 +37,7 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $version = "1.2.1";
+my $version = "1.2.2";
 
 
 
@@ -1004,7 +1004,7 @@ sub AMAD_CommBridge_Read($) {
     }
     
     elsif ( $fhemcmd =~ /voiceinputvalue\b/ ) {
-        my $fhemCmd = $data[1];
+        my $fhemCmd = lc $data[1];
         
         readingsBeginUpdate( $bhash);
 	readingsBulkUpdate( $bhash, "receiveVoiceCommand", $fhemCmd );
