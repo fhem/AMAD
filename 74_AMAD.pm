@@ -37,7 +37,7 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $version = "1.9.6";
+my $version = "1.9.11";
 
 
 
@@ -91,16 +91,17 @@ sub AMAD_Define($$) {
     $hash->{helper}{infoErrorCounter} = 0 if( $hash->{HOST} );
     $hash->{helper}{setCmdErrorCounter} = 0 if( $hash->{HOST} );
 
-    
-    
-    
+
+
+
     if( ! $hash->{HOST} ) {
-	return "there is already a AMAD Bridge, did you want to define a AMAD host use: define <name> AMAD <HOST>" if( $modules{AMAD}{defptr}{BRIDGE} );
+	return "there is already a AMAD Bridge, did you want to define a AMAD host use: define <name> AMAD <HOST-IP> <ACCESSPOINT-SSID>" if( $modules{AMAD}{defptr}{BRIDGE} );
 
 	$hash->{BRIDGE} = 1;
 	$modules{AMAD}{defptr}{BRIDGE} = $hash;
 	$attr{$name}{room} = "AMAD" if( !defined( $attr{$name}{room} ) );
 	Log3 $name, 3, "AMAD ($name) - defined Bridge with Socketport $hash->{PORT}";
+	Log3 $name, 3, "AMAD ($name) - Attention!!! By the first run, dont forget to \"set $name fhemServerIP <IP-FHEM>\"";
 	AMAD_CommBridge_Open( $hash );
 
     } else {
@@ -115,10 +116,12 @@ sub AMAD_Define($$) {
 	readingsSingleUpdate ( $hash, "deviceState", "online", 1 ) if( $hash->{HOST} );
         
         RemoveInternalTimer($hash);
-	InternalTimer( gettimeofday()+15, "AMAD_GetUpdateTimer", $hash, 0 ) if( $hash->{HOST} );
+	InternalTimer( gettimeofday()+15, "AMAD_GetUpdate", $hash, 0 ) if( ($hash->{HOST}) && ($hash->{APSSID}) );
 
 	$modules{AMAD}{defptr}{$hash->{HOST}} = $hash;
-	
+
+
+	return "Your Device was defined without ACCESSPOINT-SSID, please modify the DEF to <HOST-IP> <ACCESSPOINT-SSID>" if( ! $hash->{APSSID} );
 	return undef;
     }
 }
@@ -132,6 +135,7 @@ sub AMAD_Undef($$) {
 	TcpServer_Close( $hash );
 
     } else {
+
         delete $modules{AMAD}{defptr}{$hash->{HOST}};
 	RemoveInternalTimer( $hash );
     
@@ -159,7 +163,7 @@ my ( $cmd, $name, $attrName, $attrVal ) = @_;
 	if( $cmd eq "set" ) {
 	    if( $attrVal eq "0" ) {
 		RemoveInternalTimer( $hash );
-		InternalTimer( gettimeofday()+2, "AMAD_GetUpdateTimer", $hash, 0 ) if( ReadingsVal( $hash->{NAME}, "state", 0 ) eq "disabled" );
+		InternalTimer( gettimeofday()+2, "AMAD_GetUpdate", $hash, 0 ) if( ReadingsVal( $hash->{NAME}, "state", 0 ) eq "disabled" );
 		readingsSingleUpdate ( $hash, "state", "active", 1 );
 		Log3 $name, 3, "AMAD ($name) - enabled";
 	    } else {
@@ -170,7 +174,7 @@ my ( $cmd, $name, $attrName, $attrVal ) = @_;
             
         } else {
 	    RemoveInternalTimer( $hash );
-	    InternalTimer( gettimeofday()+2, "AMAD_GetUpdateTimer", $hash, 0 ) if( ReadingsVal( $hash->{NAME}, "state", 0 ) eq "disabled" );
+	    InternalTimer( gettimeofday()+2, "AMAD_GetUpdate", $hash, 0 ) if( ReadingsVal( $hash->{NAME}, "state", 0 ) eq "disabled" );
 	    readingsSingleUpdate ( $hash, "state", "active", 1 );
 	    Log3 $name, 3, "AMAD ($name) - enabled";
         }
@@ -214,21 +218,24 @@ sub AMAD_GetUpdate($) {
 
 my ( $hash ) = @_;
     my $name = $hash->{NAME};
+    my $bhash = $modules{AMAD}{defptr}{BRIDGE};
+    my $bname = $bhash->{NAME};
     
     RemoveInternalTimer( $hash );
 
-    if( $init_done && ReadingsVal( $name, "deviceState", "online" ) eq "online" && AttrVal( $name, "disable", 0 ) ne "1") {            ### deviceState muß von Hand online/offline gesetzt werden z.B. ueber RESIDENZ Modul
+    if( $init_done && ReadingsVal( $name, "deviceState", "online" ) eq "online" && AttrVal( $name, "disable", 0 ) ne "1" && ReadingsVal( $bname, "fhemServerIP", "not set" ) ne "not set" ) {
     
-        AMAD_RetrieveAutomagicInfo( $hash );  
+        AMAD_statusRequest( $hash );
+        
     } else {
 
-        InternalTimer( gettimeofday()+15, "AMAD_GetUpdateTimer", $hash, 0 );
+        InternalTimer( gettimeofday()+15, "AMAD_GetUpdate", $hash, 0 );
         Log3 $name, 3, "AMAD ($name) - GetUpdate, FHEM or Device not ready yet";
+        Log3 $name, 3, "AMAD ($name) - GetUpdate, Please set \"$bname fhemServerIP <IP-FHEM>\" NOW!";
     }
-    
 }
 
-sub AMAD_RetrieveAutomagicInfo($) {
+sub AMAD_statusRequest($) {
 
     my ($hash) = @_;
     my $bhash = $modules{AMAD}{defptr}{BRIDGE};
@@ -251,42 +258,36 @@ sub AMAD_RetrieveAutomagicInfo($) {
 	    method	=> "GET",
 	    header	=> "fhemIP: $fhemip\r\nfhemDevice: $name\r\nactiveTask: $activetask\r\napSSID: $apssid",
 	    doTrigger	=> 1,
-	    callback	=> \&AMAD_RetrieveAutomagicInfoFinished,
+	    callback	=> \&AMAD_statusRequestErrorHandling,
 	}
     );
-    Log3 $name, 4, "AMAD ($name) - NonblockingGet get URL";
-    Log3 $name, 4, "AMAD ($name) - AMAD_RetrieveAutomagicInfo: calling Host: $host";
 }
 
-sub AMAD_RetrieveAutomagicInfoFinished($$$) {
+sub AMAD_statusRequestErrorHandling($$$) {
     
     my ( $param, $err, $data ) = @_;
     my $hash = $param->{hash};
     my $doTrigger = $param->{doTrigger};
     my $name = $hash->{NAME};
     my $host = $hash->{HOST};
-
-    Log3 $name, 4, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: processed request data";
     
 
-
     ### Begin Error Handling
-    if( $hash->{helper}{infoErrorCounter} > 2 ) {
+    if( $hash->{helper}{infoErrorCounter} > 0 ) {
 	readingsBeginUpdate( $hash );
 	readingsBulkUpdate( $hash, "lastStatusRequestState", "statusRequest_error" );
 	
 	if( ReadingsVal( $name, "flow_Informations", "active" ) eq "inactive" && ReadingsVal( $name, "flow_SetCommands", "active" ) eq "inactive" ) {
-	    readingsBulkUpdate( $hash, "lastStatusRequestError", "AMAD flows on your device inactive, please check your device" );
 	    
-	    Log3 $name, 5, "AMAD ($name) - CHECK THE LAST ERROR READINGS FOR MORE INFO, DEVICE IS SET OFFLINE";
+	    Log3 $name, 5, "AMAD ($name) - statusRequestERROR: CHECK THE LAST ERROR READINGS FOR MORE INFO, DEVICE IS SET OFFLINE";
 	     
 	    readingsBulkUpdate( $hash, "deviceState", "offline" );
 	    readingsBulkUpdate ( $hash, "state", "AMAD Flows inactive, device set offline");
 	}
-	elsif( $hash->{helper}{infoErrorCounter} > 9 && $hash->{helper}{setCmdErrorCounter} > 4 ) {
-	    readingsBulkUpdate( $hash, "lastStatusRequestError", "unknown error, please contact the developer" );
+	
+	elsif( $hash->{helper}{infoErrorCounter} > 7 && $hash->{helper}{setCmdErrorCounter} > 4 ) {
 	    
-	    Log3 $name, 4, "AMAD ($name) - UNKNOWN ERROR, PLEASE CONTACT THE DEVELOPER, DEVICE DISABLED";
+	    Log3 $name, 5, "AMAD ($name) - statusRequestERROR: UNKNOWN ERROR, PLEASE CONTACT THE DEVELOPER, DEVICE DISABLED";
 	    
 	    $attr{$name}{disable} = 1;
 	    readingsBulkUpdate ( $hash, "state", "Unknown Error, device disabled");
@@ -296,24 +297,24 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
 	    
 	    return;
 	}
+	
 	elsif( ReadingsVal( $name, "flow_Informations", "active" ) eq "inactive" ) {
-	    readingsBulkUpdate( $hash, "lastStatusRequestError", "informations flow on your device is inactive, will try to reactivate" );
 	    
-	    Log3 $name, 4, "AMAD ($name) - Informations Flow on your Device is inactive, will try to reactivate";
+	    Log3 $name, 5, "AMAD ($name) - statusRequestERROR: Informations Flow on your Device is inactive, will try to reactivate";
 	}
-	elsif( $hash->{helper}{infoErrorCounter} > 9 ) {
-	    readingsBulkUpdate( $hash, "lastStatusRequestError", "to many errors, check your network or device configuration" );
+	
+	elsif( $hash->{helper}{infoErrorCounter} > 7 ) {
 	    
-	    Log3 $name, 4, "AMAD ($name) - To many Errors please check your Network or Device Configuration, DEVICE IS SET OFFLINE";
+	    Log3 $name, 5, "AMAD ($name) - statusRequestERROR: To many Errors please check your Network or Device Configuration, DEVICE IS SET OFFLINE";
 	    
 	    readingsBulkUpdate( $hash, "deviceState", "offline" );
 	    readingsBulkUpdate ( $hash, "state", "To many Errors, device set offline");
 	    $hash->{helper}{infoErrorCounter} = 0;
 	}
-	elsif($hash->{helper}{infoErrorCounter} > 4 && ReadingsVal( $name, "flow_Informations", "active" ) eq "active" ){
-	    readingsBulkUpdate( $hash, "lastStatusRequestError", "check automagicApp on your device" );
+	
+	elsif($hash->{helper}{infoErrorCounter} > 2 && ReadingsVal( $name, "flow_Informations", "active" ) eq "active" ){
 	    
-	    Log3 $name, 4, "AMAD ($name) - Please check the AutomagicAPP on your Device";
+	    Log3 $name, 5, "AMAD ($name) - statusRequestERROR: Please check the AutomagicAPP on your Device";
 	}
 	
 	readingsEndUpdate( $hash, 1 );
@@ -328,17 +329,23 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
 	    readingsBulkUpdate( $hash, "lastStatusRequestState", "statusRequest_error" );
 	  
 	    if( $err =~ /timed out/ ) {
-		readingsBulkUpdate( $hash, "lastStatusRequestError", "connect to your device is timed out. check network ");
+	    
+		Log3 $name, 5, "AMAD ($name) - statusRequestERROR: connect to your device is timed out. check network";
 	    }
+	    
 	    elsif( ( $err =~ /Keine Route zum Zielrechner/ ) && $hash->{helper}{infoErrorCounter} > 1 ) {
-		readingsBulkUpdate( $hash,"lastStatusRequestError", "no route to target. bad network configuration or network is down ");
+	    
+		Log3 $name, 5, "AMAD ($name) - statusRequestERROR: no route to target. bad network configuration or network is down";
+		
 	    } else {
-		readingsBulkUpdate($hash, "lastStatusRequestError", $err );
+
+		Log3 $name, 5, "AMAD ($name) - statusRequestERROR: $err";
 	    }
 
 	readingsEndUpdate( $hash, 1 );
 	
-	Log3 $name, 4, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: error while requesting AutomagicInfo: $err";
+	Log3 $name, 5, "AMAD ($name) - statusRequestERROR: AMAD_statusRequestErrorHandling: error while requesting AutomagicInfo: $err";
+	
 	return;
 	}
     }
@@ -351,13 +358,13 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
 	readingsBulkUpdate( $hash, "lastStatusRequestState", "statusRequest_error" );
     
 	if( $param->{code} ne 200 ) {
-	    readingsBulkUpdate( $hash," lastStatusRequestError", "http Error ".$param->{code} );
+
+	    Log3 $name, 5, "AMAD ($name) - statusRequestERROR: ".$param->{code};
 	}
-	
-	readingsBulkUpdate( $hash, "lastStatusRequestError", "empty response, check automagicApp on your device" );
+
 	readingsEndUpdate( $hash, 1 );
     
-	Log3 $name, 4, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: received http code ".$param->{code}." without any data after requesting AMAD AutomagicInfo";
+	Log3 $name, 5, "AMAD ($name) - statusRequestERROR: received http code ".$param->{code}." without any data after requesting AMAD AutomagicInfo";
 
 	return;
     }
@@ -370,17 +377,22 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
 	readingsBulkUpdate( $hash, "lastStatusRequestState", "statusRequest_error" );
     
 	    if( $param->{code} eq 404 && ReadingsVal( $name, "flow_Informations", "inactive" ) eq "inactive" ) {
-		readingsBulkUpdate( $hash, "lastStatusRequestError", "check the informations flow on your device" );
+
+		Log3 $name, 5, "AMAD ($name) - statusRequestERROR: check the informations flow on your device";
 	    }
+	    
 	    elsif( $param->{code} eq 404 && ReadingsVal( $name, "flow_Informations", "active" ) eq "active" ) {
-		readingsBulkUpdate( $hash, "lastStatusRequestError", "check the automagicApp on your device" );
+	    
+		Log3 $name, 5, "AMAD ($name) - statusRequestERROR: check the automagicApp on your device";
+		
 	    } else {
-		readingsBulkUpdate( $hash, "lastStatusRequestError", "http error ".$param->{code} );
+
+		Log3 $name, 5, "AMAD ($name) - statusRequestERROR: http error ".$param->{code};
 	    }
 	
 	readingsEndUpdate( $hash, 1 );
     
-	Log3 $name, 4, "AMAD ($name) - AMAD_RetrieveAutomagicInfoFinished: received http code ".$param->{code}." receive Error after requesting AMAD AutomagicInfo";
+	Log3 $name, 5, "AMAD ($name) - statusRequestERROR: received http code ".$param->{code}." receive Error after requesting AMAD AutomagicInfo";
 
 	return;
     }
@@ -388,8 +400,6 @@ sub AMAD_RetrieveAutomagicInfoFinished($$$) {
     ### End Error Handling
 
     $hash->{helper}{infoErrorCounter} = 0;
-    
-    AMAD_ResponseProcessing($hash,$data);
 }
 
 sub AMAD_ResponseProcessing($$) {
@@ -400,6 +410,7 @@ sub AMAD_ResponseProcessing($$) {
     my $host = $hash->{HOST};
 
     ### Begin Response Processing
+    Log3 $name, 4, "AMAD ($name) - Processing data: $data";
     readingsSingleUpdate( $hash, "state", "active", 1) if( ReadingsVal( $name, "state", 0 ) ne "initialized" or ReadingsVal( $name, "state", 0 ) ne "active" );
     
     my @valuestring = split( '@@@@',  $data );
@@ -788,16 +799,15 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
 	readingsBulkUpdate( $hash, "lastSetCommandState", "statusRequest_error" );
 	
 	if( ReadingsVal( $name, "flow_Informations", "active" ) eq "inactive" && ReadingsVal( $name, "flow_SetCommands", "active" ) eq "inactive" ) {
-	    readingsBulkUpdate( $hash, "lastSetCommandError", "AMAD flows on your device inactive, please check your device" );
-	    Log3 $name, 5, "AMAD ($name) - CHECK THE LAST ERROR READINGS FOR MORE INFO, DEVICE IS SET OFFLINE";
+	    Log3 $name, 5, "AMAD ($name) - setCommandERROR: CHECK THE LAST ERROR READINGS FOR MORE INFO, DEVICE IS SET OFFLINE";
 	     
 	    readingsBulkUpdate( $hash, "deviceState", "offline" );
 	    readingsBulkUpdate( $hash, "state", "AMAD Flows inactive, device set offline" );
 	}
-	elsif( $hash->{helper}{infoErrorCounter} > 9 && $hash->{helper}{setCmdErrorCounter} > 4 ) {
-	    readingsBulkUpdate($hash, "lastSetCommandError", "unknown error, please contact the developer" );
+	
+	elsif( $hash->{helper}{infoErrorCounter} > 7 && $hash->{helper}{setCmdErrorCounter} > 4 ) {
 	    
-	    Log3 $name, 4, "AMAD ($name) - UNKNOWN ERROR, PLEASE CONTACT THE DEVELOPER, DEVICE DISABLED";
+	    Log3 $name, 5, "AMAD ($name) - setCommandERROR: UNKNOWN ERROR, PLEASE CONTACT THE DEVELOPER, DEVICE DISABLED";
 	    
 	    $attr{$name}{disable} = 1;
 	    readingsBulkUpdate( $hash, "state", "Unknown Error, device disabled" );
@@ -806,24 +816,24 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
 	    
 	    return;
 	}
+	
 	elsif( ReadingsVal( $name, "flow_SetCommands", "active" ) eq "inactive" ) {
-	    readingsBulkUpdate( $hash, "lastSetCommandError", "setCommands flow on your device is inactive, will try to reactivate" );
 	    
-	    Log3 $name, 4, "AMAD ($name) - Flow SetCommands on your Device is inactive, will try to reactivate";
+	    Log3 $name, 5, "AMAD ($name) - setCommandERROR: Flow SetCommands on your Device is inactive, will try to reactivate";
 	}
+	
 	elsif( $hash->{helper}{setCmdErrorCounter} > 9 ) {
-	    readingsBulkUpdate( $hash, "lastSetCommandError", "to many errors, check your network or device configuration" );
 	    
-	    Log3 $name, 4, "AMAD ($name) - To many Errors please check your Network or Device Configuration, DEVICE IS SET OFFLINE";
+	    Log3 $name, 5, "AMAD ($name) - setCommandERROR: To many Errors please check your Network or Device Configuration, DEVICE IS SET OFFLINE";
 	    
 	    readingsBulkUpdate( $hash, "deviceState", "offline" );
 	    readingsBulkUpdate( $hash, "state", "To many Errors, device set offline" );
 	    $hash->{helper}{setCmdErrorCounter} = 0;
 	}
+	
 	elsif( $hash->{helper}{setCmdErrorCounter} > 4 && ReadingsVal( $name, "flow_SetCommands", "active" ) eq "active" ){
-	    readingsBulkUpdate( $hash, "lastSetCommandError", "check automagicApp on your device" );
 	    
-	    Log3 $name, 4, "AMAD ($name) - Please check the AutomagicAPP on your Device";
+	    Log3 $name, 5, "AMAD ($name) - setCommandERROR: Please check the AutomagicAPP on your Device";
 	}
 	
 	readingsEndUpdate( $hash, 1 );
@@ -835,19 +845,25 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
 	  readingsBulkUpdate( $hash, "state", $err ) if( ReadingsVal( $name, "state", 0 ) ne "initialized" );
 	  $hash->{helper}{setCmdErrorCounter} = ($hash->{helper}{setCmdErrorCounter} + 1);
 	  
-	  readingsBulkUpdate( $hash, "lastSetCommandState", "cmd_error" );
+	  readingsBulkUpdate( $hash, "lastSetCommandState", "setCmd_error" );
 	  
 	  if( $err =~ /timed out/ ) {
-	      readingsBulkUpdate( $hash, "lastSetCommandError", "connect to your device is timed out. check network" );
+	  
+	      Log3 $name, 5, "AMAD ($name) - setCommandERROR: connect to your device is timed out. check network";
 	  }
+	  
 	  elsif( $err =~ /Keine Route zum Zielrechner/ ) {
-	      readingsBulkUpdate( $hash, "lastSetCommandError", "no route to target. bad network configuration or network is down" );
+	  
+	      Log3 $name, 5, "AMAD ($name) - setCommandERROR: no route to target. bad network configuration or network is down";
+	      
 	  } else {
-	      readingsBulkUpdate( $hash, "lastSetCommandError", "$err" );
+	  
+	      Log3 $name, 5, "AMAD ($name) - setCommandERROR: $err";
 	  }
+	  
 	  readingsEndUpdate( $hash, 1 );
 	  
-	  Log3 $name, 5, "AMAD ($name) - AMAD_HTTP_POST: error while POST Command: $err";
+	  Log3 $name, 5, "AMAD ($name) - setCommandERROR: error while POST Command: $err";
 	  
 	  return;
 	}
@@ -859,11 +875,11 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
 	
 	$hash->{helper}{setCmdErrorCounter} = ( $hash->{helper}{setCmdErrorCounter} + 1 );
 
-	readingsBulkUpdate($hash, "lastSetCommandState", "cmd_error" );
-	readingsBulkUpdate($hash, "lastSetCommandError", "http Error ".$param->{code} );
+	readingsBulkUpdate($hash, "lastSetCommandState", "setCmd_error" );
+
 	readingsEndUpdate( $hash, 1 );
     
-	Log3 $name, 5, "AMAD ($name) - AMAD_HTTP_POST: received http code ".$param->{code};
+	Log3 $name, 5, "AMAD ($name) - setCommandERROR: received http code ".$param->{code};
 
 	return;
     }
@@ -874,12 +890,16 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
 	
 	$hash->{helper}{setCmdErrorCounter} = ( $hash->{helper}{setCmdErrorCounter} + 1 );
 
-	readingsBulkUpdate( $hash, "lastSetCommandState", "cmd_error" );
+	readingsBulkUpdate( $hash, "lastSetCommandState", "setCmd_error" );
     
 	    if( $param->{code} eq 404 ) {
-		readingsBulkUpdate( $hash, "lastSetCommandError", "setCommands flow is inactive on your device!" );
+	    
+		readingsBulkUpdate( $hash, "lastSetCommandError", "" );
+		Log3 $name, 5, "AMAD ($name) - setCommandERROR: setCommands flow is inactive on your device!";
+		
 	    } else {
-		readingsBulkUpdate( $hash, "lastSetCommandError", "http error ".$param->{code} );
+	    
+		Log3 $name, 5, "AMAD ($name) - setCommandERROR: http error ".$param->{code};
 	    }
 	
 	return;
@@ -887,7 +907,7 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
     
     ### End Error Handling
     
-    readingsSingleUpdate( $hash, "lastSetCommandState", "cmd_done", 1 );
+    readingsSingleUpdate( $hash, "lastSetCommandState", "setCmd_done", 1 );
     $hash->{helper}{setCmdErrorCounter} = 0;
     
     return undef;
@@ -962,7 +982,6 @@ sub AMAD_CommBridge_Read($) {
     if ( $fhemcmd =~ /setreading\b/ ) {
 	my $tv = $data[1];
 
-        ### Begin Response Processing
         Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: processing receive reading values";
     
         AMAD_ResponseProcessing($dhash,$tv);
