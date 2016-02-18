@@ -231,7 +231,7 @@ my ( $hash ) = @_;
 
         InternalTimer( gettimeofday()+15, "AMAD_GetUpdate", $hash, 0 );
         Log3 $name, 3, "AMAD ($name) - GetUpdate, FHEM or Device not ready yet";
-        Log3 $name, 3, "AMAD ($name) - GetUpdate, Please set \"$bname fhemServerIP <IP-FHEM>\" NOW!";
+        Log3 $name, 3, "AMAD ($name) - GetUpdate, Please set \"$bname fhemServerIP <IP-FHEM>\" NOW!" if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none" );
     }
 }
 
@@ -253,7 +253,7 @@ sub AMAD_statusRequest($) {
     HttpUtils_NonblockingGet(
 	{
 	    url		=> $url,
-	    timeout	=> 60,
+	    timeout	=> 30,
 	    hash	=> $hash,
 	    method	=> "GET",
 	    header	=> "fhemIP: $fhemip\r\nfhemDevice: $name\r\nactiveTask: $activetask\r\napSSID: $apssid",
@@ -261,6 +261,8 @@ sub AMAD_statusRequest($) {
 	    callback	=> \&AMAD_statusRequestErrorHandling,
 	}
     );
+    
+    Log3 $name, 5, "AMAD ($name) - Send statusRequest with URL: \"$url\" and Header: \"fhemIP: $fhemip\r\nfhemDevice: $name\r\nactiveTask: $activetask\r\napSSID: $apssid\"";
 }
 
 sub AMAD_statusRequestErrorHandling($$$) {
@@ -410,7 +412,7 @@ sub AMAD_ResponseProcessing($$) {
     my $host = $hash->{HOST};
 
     ### Begin Response Processing
-    Log3 $name, 4, "AMAD ($name) - Processing data: $data";
+    Log3 $name, 5, "AMAD ($name) - Processing data: $data";
     readingsSingleUpdate( $hash, "state", "active", 1) if( ReadingsVal( $name, "state", 0 ) ne "initialized" or ReadingsVal( $name, "state", 0 ) ne "active" );
     
     my @valuestring = split( '@@@@',  $data );
@@ -982,7 +984,7 @@ sub AMAD_CommBridge_Read($) {
     if ( $fhemcmd =~ /setreading\b/ ) {
 	my $tv = $data[1];
 
-        Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: processing receive reading values";
+        Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: processing receive reading values - Device: $device Data: $tv";
     
         AMAD_ResponseProcessing($dhash,$tv);
         
