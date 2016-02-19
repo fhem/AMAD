@@ -37,7 +37,7 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $version = "1.9.11";
+my $version = "1.9.17";
 
 
 
@@ -77,10 +77,11 @@ sub AMAD_Define($$) {
     
     my @a = split( "[ \t][ \t]*", $def );
 
-    return "too few parameters: define <name> AMAD <HOST-IP> <ACCESSPOINT-SSID>" if( ( @a < 3 || @a > 4 ) && $a[0] ne "AMADCommBridge");
+    return "too few parameters: define <name> AMAD <HOST-IP> <ACCESSPOINT-SSID> has the ACCESPOINT-SSID a space you must space replace @@" if( ( @a < 3 || @a > 4 ) && @a != 2 );
 
     my $name    	= $a[0];
     my $host    	= $a[2];
+    $a[3] =~ s/@@/ /g;
     my $apssid          = $a[3];
     my $port		= 8090;
 
@@ -229,9 +230,10 @@ my ( $hash ) = @_;
         
     } else {
 
-        InternalTimer( gettimeofday()+15, "AMAD_GetUpdate", $hash, 0 );
         Log3 $name, 3, "AMAD ($name) - GetUpdate, FHEM or Device not ready yet";
-        Log3 $name, 3, "AMAD ($name) - GetUpdate, Please set \"$bname fhemServerIP <IP-FHEM>\" NOW!" if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none" );
+        Log3 $name, 3, "AMAD ($name) - GetUpdate, Please set $bname fhemServerIP <IP-FHEM> NOW!" if( ReadingsVal( $bname, "fhemServerIP", "none" ) eq "none" );
+
+        InternalTimer( gettimeofday()+15, "AMAD_GetUpdate", $hash, 0 );
     }
 }
 
@@ -920,11 +922,6 @@ sub AMAD_CommBridge_Open($) {
     my ( $bhash ) = @_;
     my $bname = $bhash->{NAME};
     
-    if( $bname ne "AMADCommBridge" ) {
-    
-        Log3 $bname, 3, "The name of the CommBridge may be called only AMADCommBridge";
-        return "The name of the CommBridge may be called only AMADCommBridge";
-    }
 
     # Oeffnen des TCP Sockets
     my $bret = TcpServer_Open( $bhash, "8090", "global" );
