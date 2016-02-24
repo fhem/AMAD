@@ -37,7 +37,7 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $version = "1.9.17";
+my $version = "1.9.23";
 
 
 
@@ -80,9 +80,9 @@ sub AMAD_Define($$) {
     return "too few parameters: define <name> AMAD <HOST-IP> <ACCESSPOINT-SSID> has the ACCESPOINT-SSID a space you must space replace @@" if( ( @a < 3 || @a > 4 ) && @a != 2 );
 
     my $name    	= $a[0];
-    my $host    	= $a[2];
-    $a[3] =~ s/@@/ /g;
-    my $apssid          = $a[3];
+    my $host    	= $a[2] if( $a[2] );
+    $a[3] =~ s/@@/ /g if( $a[3] );
+    my $apssid          = $a[3] if( $a[3] );
     my $port		= 8090;
 
     $hash->{HOST} 	= $host if( $host );
