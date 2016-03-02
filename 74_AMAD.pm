@@ -37,7 +37,7 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $version = "1.9.24";
+my $version = "1.9.27";
 
 
 
