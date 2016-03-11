@@ -37,7 +37,7 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $version = "1.9.27";
+my $version = "1.9.39";
 
 
 
@@ -110,7 +110,9 @@ sub AMAD_Define($$) {
 	    CommandDefine( undef, "AMADCommBridge AMAD" );    
 	}   
 
-	Log3 $name, 3, "AMAD ($name) - defined with host $hash->{HOST} on port $hash->{PORT} and AccessPoint-SSID $hash->{APSSID}";
+	Log3 $name, 3, "AMAD ($name) - defined with host $hash->{HOST} on port $hash->{PORT} and AccessPoint-SSID $hash->{APSSID}" if(  $hash->{APSSID} );
+	Log3 $name, 3, "AMAD ($name) - defined with host $hash->{HOST} on port $hash->{PORT} and NONE AccessPoint-SSID" if( ! $hash->{APSSID} );
+	Log3 $name, 3, "AMAD ($name) - Attention!!! Your Device was defined without ACCESSPOINT-SSID, please modify the DEF to <HOST-IP> <ACCESSPOINT-SSID>" if( ! $hash->{APSSID} );
 	
 	$attr{$name}{room} = "AMAD" if( !defined( $attr{$name}{room} ) );
 	readingsSingleUpdate ( $hash, "state", "initialized", 1 ) if( $hash->{HOST} );
@@ -121,8 +123,6 @@ sub AMAD_Define($$) {
 
 	$modules{AMAD}{defptr}{$hash->{HOST}} = $hash;
 
-
-	return "Your Device was defined without ACCESSPOINT-SSID, please modify the DEF to <HOST-IP> <ACCESSPOINT-SSID>" if( ! $hash->{APSSID} );
 	return undef;
     }
 }
@@ -417,7 +417,7 @@ sub AMAD_ResponseProcessing($$) {
     Log3 $name, 5, "AMAD ($name) - Processing data: $data";
     readingsSingleUpdate( $hash, "state", "active", 1) if( ReadingsVal( $name, "state", 0 ) ne "initialized" or ReadingsVal( $name, "state", 0 ) ne "active" );
     
-    my @valuestring = split( '@@@@',  $data );
+    my @valuestring = split( '@@@@', $data );
     my %buffer;
     foreach( @valuestring ) {
 	my @values = split( '@@' , $_ );
@@ -570,6 +570,7 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif( lc $cmd eq 'ttsmsg' ) {
+    
 	my $msg = join( " ", @data );
 	
 	$msg =~ s/%/%25/g;
@@ -581,6 +582,7 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif( lc $cmd eq 'volume' ) {
+    
 	my $vol = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setVolume?volume=$vol";
@@ -589,6 +591,7 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif( lc $cmd eq 'volumenotification' ) {
+    
 	my $vol = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setNotifiVolume?notifivolume=$vol";
@@ -597,6 +600,7 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif( lc $cmd eq 'mediaplayer' ) {
+    
 	my $btn = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/mediaPlayer?button=$btn";
@@ -605,6 +609,7 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif( lc $cmd eq 'devicestate' ) {
+    
 	my $v = join( " ", @data );
 
 	readingsSingleUpdate( $hash, $cmd, $v, 1 );
@@ -613,6 +618,7 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif( lc $cmd eq 'screenbrightness' ) {
+    
 	my $bri = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setBrightness?brightness=$bri";
@@ -621,6 +627,7 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif( lc $cmd eq 'screen' ) {
+    
 	my $mod = join( " ", @data );
 	
 	if ($mod eq "on" || $mod eq "off") {
@@ -643,6 +650,7 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif( lc $cmd eq 'screenorientation' ) {
+    
 	my $mod = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setScreenOrientation?orientation=$mod";
@@ -658,6 +666,7 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif( lc $cmd eq 'screenfullscreen' ) {
+    
 	my $mod = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setScreenFullscreen?fullscreen=$mod";
@@ -668,6 +677,7 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif( lc $cmd eq 'openurl' ) {
+    
 	my $openurl = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/openURL?url=$openurl";
@@ -676,6 +686,7 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif (lc $cmd eq 'nextalarmtime') {
+    
 	my $alarmTime = join( " ", @data );
 	my @alarm = split( ":", $alarmTime );
 
@@ -685,11 +696,13 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif( lc $cmd eq 'statusrequest' ) {
+    
 	AMAD_GetUpdate( $hash );
 	return undef;
     }
     
     elsif( lc $cmd eq 'openapp' ) {
+    
 	my $app = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/openApp?app=$app";
@@ -698,6 +711,7 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif( lc $cmd eq 'system' ) {
+    
 	my $systemcmd = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/systemcommand?syscmd=$systemcmd";
@@ -709,6 +723,7 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif( lc $cmd eq 'bluetooth' ) {
+    
 	my $mod = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setbluetooth?bluetooth=$mod";
@@ -717,6 +732,7 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif( lc $cmd eq 'notifysndfile' ) {
+    
 	my $notify = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/playnotifysnd?notifyfile=$notify";
@@ -725,6 +741,7 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif( lc $cmd eq 'changetobtdevice' ) {
+    
 	my $swToBtDevice = join( " ", @data );    
 	my @swToBtMac = split( /\|/, $swToBtDevice );
 	my $btDevices = AttrVal( $name, "setBluetoothDevice", "none" ) if( AttrVal( $name, "setBluetoothDevice", "none" ) ne "none" );
@@ -738,6 +755,7 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif( lc $cmd eq 'clearnotificationbar' ) {
+    
 	my $appname = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/clearnotificationbar?app=$appname";
@@ -753,6 +771,7 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif( lc $cmd eq 'sendintent' ) {
+    
         my $intentstring = join( " ", @data );
         my ( $action, $exkey1, $exval1, $exkey2, $exval2 ) = split( "[ \t][ \t]*", $intentstring );
 
@@ -968,7 +987,7 @@ sub AMAD_CommBridge_Read($) {
     ## Consume Content
     ###
 
-    my @data = split( '\R\R',  $buf );
+    my @data = split( '\R\R', $buf );
     
     my $header = AMAD_Header2Hash( $data[0] );
     my $device = $header->{FHEMDEVICE};
