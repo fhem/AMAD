@@ -37,7 +37,7 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $version = "1.9.39";
+my $version = "1.9.41";
 
 
 
@@ -224,7 +224,7 @@ my ( $hash ) = @_;
     
     RemoveInternalTimer( $hash );
 
-    if( $init_done && ReadingsVal( $name, "deviceState", "online" ) eq "online" && AttrVal( $name, "disable", 0 ) ne "1" && ReadingsVal( $bname, "fhemServerIP", "not set" ) ne "not set" ) {
+    if( $init_done && ReadingsVal( $name, "deviceState", "online" ) eq "online" && AttrVal( $name, "disable", 0 ) ne "1" && ReadingsVal( $bname, "fhemServerIP", "not set" ) ne "not set" && $hash->{APSSID} ) {
     
         AMAD_statusRequest( $hash );
         
@@ -232,6 +232,7 @@ my ( $hash ) = @_;
 
         Log3 $name, 3, "AMAD ($name) - GetUpdate, FHEM or Device not ready yet";
         Log3 $name, 3, "AMAD ($name) - GetUpdate, Please set $bname fhemServerIP <IP-FHEM> NOW!" if( ReadingsVal( $bname, "fhemServerIP", "none" ) eq "none" );
+        Log3 $name, 3, "AMAD ($name) - Attention!!! Your Device was defined without ACCESSPOINT-SSID, please modify the DEF to <HOST-IP> <ACCESSPOINT-SSID>" if( ! $hash->{APSSID} );
 
         InternalTimer( gettimeofday()+15, "AMAD_GetUpdate", $hash, 0 );
     }
@@ -774,6 +775,10 @@ sub AMAD_SelectSetCmd($$@) {
     
         my $intentstring = join( " ", @data );
         my ( $action, $exkey1, $exval1, $exkey2, $exval2 ) = split( "[ \t][ \t]*", $intentstring );
+        $exkey1 = "" if( !$exkey1 );
+        $exval1 = "" if( !$exval1 );
+        $exkey2 = "" if( !$exkey2 );
+        $exval2 = "" if( !$exval2 );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/sendIntent?action=".$action."&exkey1=".$exkey1."&exval1=".$exval1."&exkey2=".$exkey2."&exval2=".$exval2;
 	
