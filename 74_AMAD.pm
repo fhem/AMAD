@@ -37,7 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $version = "1.9.41";
+my $modulversion = "1.9.53";
+my $flowsetversion = "1.9.53";
 
 
 
@@ -67,7 +68,7 @@ sub AMAD_Initialize($) {
     
     foreach my $d(sort keys %{$modules{AMAD}{defptr}}) {
 	my $hash = $modules{AMAD}{defptr}{$d};
-	$hash->{VERSION} 	= $version;
+	$hash->{VERSIONMODUL} 	= $modulversion;
     }
 }
 
@@ -88,7 +89,8 @@ sub AMAD_Define($$) {
     $hash->{HOST} 	= $host if( $host );
     $hash->{PORT} 	= $port;
     $hash->{APSSID}     = $apssid if( $hash->{HOST} );
-    $hash->{VERSION} 	= $version;
+    $hash->{VERSIONMODUL} 	= $modulversion;
+    $hash->{VERSIONFLOWSET} 	= $flowsetversion;
     $hash->{helper}{infoErrorCounter} = 0 if( $hash->{HOST} );
     $hash->{helper}{setCmdErrorCounter} = 0 if( $hash->{HOST} );
 
@@ -482,6 +484,7 @@ sub AMAD_Set($$@) {
 	$list .= "openURL ";
 	$list .= "openApp:$apps " if( AttrVal( $name, "setOpenApp", "none" ) ne "none" );
 	$list .= "nextAlarmTime:time ";
+	$list .= "timer:time ";
 	$list .= "statusRequest:noArg ";
 	$list .= "system:reboot,shutdown,airplanemodeON " if( AttrVal( $name, "root", "0" ) eq "1" );
 	$list .= "bluetooth:on,off ";
@@ -492,6 +495,7 @@ sub AMAD_Set($$@) {
 	$list .= "volumeNotification:slider,0,1,7 ";
 	$list .= "vibrate:noArg ";
 	$list .= "sendIntent ";
+	$list .= "currentFlowsetUpdate:noArg ";
 
 	if( lc $cmd eq 'screenmsg'
 	    || lc $cmd eq 'ttsmsg'
@@ -505,6 +509,7 @@ sub AMAD_Set($$@) {
 	    || lc $cmd eq 'openurl'
 	    || lc $cmd eq 'openapp'
 	    || lc $cmd eq 'nextalarmtime'
+	    || lc $cmd eq 'timer'
 	    || lc $cmd eq 'bluetooth'
 	    || lc $cmd eq 'system'
 	    || lc $cmd eq 'notifysndfile'
@@ -515,6 +520,7 @@ sub AMAD_Set($$@) {
 	    || lc $cmd eq 'screenlock'
 	    || lc $cmd eq 'statusrequest'
 	    || lc $cmd eq 'sendintent'
+	    || lc $cmd eq 'currentflowsetupdate'
 	    || lc $cmd eq 'vibrate') {
 
 	    Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
@@ -525,7 +531,7 @@ sub AMAD_Set($$@) {
 	    return AMAD_SelectSetCmd( $hash, $cmd, @val ) if( @val ) && ( ReadingsVal( $name, "deviceState", "online" ) eq "offline" ) && ( lc $cmd eq 'devicestate' );
 	    return "Cannot set command, FHEM Device is offline" if( ReadingsVal( $name, "deviceState", "online" ) eq "offline" );
 	  
-	    return AMAD_SelectSetCmd( $hash, $cmd, @val ) if( @val ) || ( lc $cmd eq 'statusrequest' ) || ( lc $cmd eq 'activatevoiceinput' ) || ( lc $cmd eq 'vibrate' );
+	    return AMAD_SelectSetCmd( $hash, $cmd, @val ) if( @val ) || ( lc $cmd eq 'statusrequest' ) || ( lc $cmd eq 'activatevoiceinput' ) || ( lc $cmd eq 'vibrate' ) || ( lc $cmd eq 'currentflowsetupdate' );
 	}
 
 	return "Unknown argument $cmd, bearword as argument or wrong parameter(s), choose one of $list";
@@ -696,6 +702,15 @@ sub AMAD_SelectSetCmd($$@) {
 	return AMAD_HTTP_POST( $hash, $url );
     }
     
+    elsif (lc $cmd eq 'timer') {
+    
+	my $timer = join( " ", @data );
+
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setTimer?minute=".$timer;
+	
+	return AMAD_HTTP_POST( $hash, $url );
+    }
+    
     elsif( lc $cmd eq 'statusrequest' ) {
     
 	AMAD_GetUpdate( $hash );
@@ -781,6 +796,13 @@ sub AMAD_SelectSetCmd($$@) {
         $exval2 = "" if( !$exval2 );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/sendIntent?action=".$action."&exkey1=".$exkey1."&exval1=".$exval1."&exkey2=".$exkey2."&exval2=".$exval2;
+	
+	return AMAD_HTTP_POST( $hash,$url );
+    }
+    
+    elsif( lc $cmd eq 'currentflowsetupdate' ) {
+
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/currentFlowsetUpdate";
 	
 	return AMAD_HTTP_POST( $hash,$url );
     }
@@ -1001,8 +1023,21 @@ sub AMAD_CommBridge_Read($) {
     my $c;
     
     my $fhemcmd = $header->{FHEMCMD};
+    
 
-    if ( $fhemcmd =~ /setreading\b/ ) {
+    if ( $data[0] =~ /currentFlowsetUpdate.xml/ ) {
+
+        $response = qx(cat /opt/fhem/FHEM/lib/74_AMADautomagicFlows_$flowsetversion.xml);
+        $c = $hash->{CD};
+        print $c "HTTP/1.1 200 OK\r\n",
+            "Content-Type: text/plain\r\n",
+            "Content-Length: ".length($response)."\r\n\r\n",
+            $response;
+
+        return;
+    }
+    
+    elsif ( $fhemcmd =~ /setreading\b/ ) {
 	my $tv = $data[1];
 
         Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: processing receive reading values - Device: $device Data: $tv";
@@ -1157,9 +1192,9 @@ sub AMAD_FHEM_Webdetails($$) {
         my ($FW_wname, $name, $room, $pageHash) = @_;       # pageHash is set for summaryFn.
         my $hash   = $defs{$name};
         
-        return if( !defined( $hash->{VERSION} ) );
+        return if( !defined( $hash->{VERSIONFLOWSET} ) );
         
-        return "<u><b><a href='/fhem?cmd={`cat /opt/fhem/FHEM/lib/74_AMADautomagicFlows_".$version.".xml`}&XHR=1' target='_blank' type='text/xml' download='AMADautomagicFlows_".$version.".xml'>Download FlowSet-$version</a></b></u><br>"
+        return "<br><br><u><b><a href='/fhem?cmd={`cat /opt/fhem/FHEM/lib/74_AMADautomagicFlows_".$flowsetversion.".xml`}&XHR=1' target='_blank' type='text/xml' download='AMADautomagicFlows_".$flowsetversion.".xml'>Download FlowSet-$flowsetversion</a></b></u><br><u><b><a href='/fhem?cmd={`cat /opt/fhem/FHEM/lib/74_AMADautomagicFlowsetUpdater.xml`}&XHR=1' target='_blank' type='text/xml' download='AMADautomagicFlowsetUpdater.xml'>Download FlowSet Updater</a></b></u><br><br>"
 }
 
 

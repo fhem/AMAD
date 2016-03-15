@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<data version="1.30.0">
+  <trigger type="http_request">
+    <useDefaultName>false</useDefaultName>
+    <name>HTTP Request: /fhem-amad/currentFlowsetUpdate</name>
+    <enabled>true</enabled>
+    <path>/fhem-amad/currentFlowsetUpdate</path>
+    <port>8090</port>
+    <acquireWifiLock>true</acquireWifiLock>
+  </trigger>
+  <action type="delete_files">
+    <useDefaultName>true</useDefaultName>
+    <name>Dateien löschen: /storage/emulated/0/Download/currentFlowsetUpdate.xml</name>
+    <pathList>/storage/emulated/0/Download/currentFlowsetUpdate.xml</pathList>
+    <showProgress>true</showProgress>
+  </action>
+  <action type="download_url">
+    <useDefaultName>true</useDefaultName>
+    <name>Download URL: http://{global_fhemip}:8090/currentFlowsetUpdate.xml to /storage/emulated/0/Download</name>
+    <url>http://{global_fhemip}:8090/currentFlowsetUpdate.xml</url>
+    <directory>/storage/emulated/0/Download</directory>
+    <showProgress>true</showProgress>
+  </action>
+  <action type="import_flows">
+    <useDefaultName>true</useDefaultName>
+    <name>Flows/Widgets importieren: /storage/emulated/0/Download/currentFlowsetUpdate.xml</name>
+    <path>/storage/emulated/0/Download/currentFlowsetUpdate.xml</path>
+    <replace>true</replace>
+  </action>
+  <action type="set_flow_state">
+    <useDefaultName>true</useDefaultName>
+    <name>Setze Flow Status: Aktivieren {imported_flow_names,listformat,comma}</name>
+    <enable>true</enable>
+    <includeFlowNamePatternList>{imported_flow_names,listformat,comma}</includeFlowNamePatternList>
+    <excludeFlowNamePatternList></excludeFlowNamePatternList>
+  </action>
+  <flow type="flow">
+    <name>Update AMAD Flowset</name>
+    <group>AMAD2 Flowset Updater</group>
+    <enabled>true</enabled>
+    <executionPolicy>PARALLEL</executionPolicy>
+    <actioncontainer id="t1" x="70.0" y="1067.5">Dateien löschen: /storage/emulated/0/Download/currentFlowsetUpdate.xml</actioncontainer>
+    <triggercontainer id="t2" x="70.0" y="52.5">
+      <trigger>HTTP Request: /fhem-amad/currentFlowsetUpdate</trigger>
+    </triggercontainer>
+    <actioncontainer id="t3" x="70.0" y="787.5">Setze Flow Status: Aktivieren {imported_flow_names,listformat,comma}</actioncontainer>
+    <actioncontainer id="t4" x="70.0" y="577.5">Flows/Widgets importieren: /storage/emulated/0/Download/currentFlowsetUpdate.xml</actioncontainer>
+    <actioncontainer id="t5" x="70.0" y="297.5">Download URL: http://{global_fhemip}:8090/currentFlowsetUpdate.xml to /storage/emulated/0/Download</actioncontainer>
+    <connection from="t2" to="t5" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t3" to="t1" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t4" to="t3" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t5" to="t4" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+  </flow>
+</data>
