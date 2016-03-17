@@ -37,7 +37,7 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "1.9.53";
+my $modulversion = "1.9.57";
 my $flowsetversion = "1.9.53";
 
 
@@ -694,8 +694,8 @@ sub AMAD_SelectSetCmd($$@) {
     
     elsif (lc $cmd eq 'nextalarmtime') {
     
-	my $alarmTime = join( " ", @data );
-	my @alarm = split( ":", $alarmTime );
+	my $value = join( " ", @data );
+	my @alarm = split( ":", $value );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setAlarm?hour=".$alarm[0]."&minute=".$alarm[1];
 	
@@ -704,9 +704,10 @@ sub AMAD_SelectSetCmd($$@) {
     
     elsif (lc $cmd eq 'timer') {
     
-	my $timer = join( " ", @data );
+	my $value = join( " ", @data );
+	my @timer = split( ":", $value );
 
-	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setTimer?minute=".$timer;
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setTimer?minute=".$timer[1];
 	
 	return AMAD_HTTP_POST( $hash, $url );
     }
@@ -1027,7 +1028,7 @@ sub AMAD_CommBridge_Read($) {
 
     if ( $data[0] =~ /currentFlowsetUpdate.xml/ ) {
 
-        $response = qx(cat /opt/fhem/FHEM/lib/74_AMADautomagicFlows_$flowsetversion.xml);
+        $response = qx(cat /opt/fhem/FHEM/lib/74_AMADautomagicFlowset_$flowsetversion.xml);
         $c = $hash->{CD};
         print $c "HTTP/1.1 200 OK\r\n",
             "Content-Type: text/plain\r\n",
@@ -1194,7 +1195,7 @@ sub AMAD_FHEM_Webdetails($$) {
         
         return if( !defined( $hash->{VERSIONFLOWSET} ) );
         
-        return "<br><br><u><b><a href='/fhem?cmd={`cat /opt/fhem/FHEM/lib/74_AMADautomagicFlows_".$flowsetversion.".xml`}&XHR=1' target='_blank' type='text/xml' download='AMADautomagicFlows_".$flowsetversion.".xml'>Download FlowSet-$flowsetversion</a></b></u><br><u><b><a href='/fhem?cmd={`cat /opt/fhem/FHEM/lib/74_AMADautomagicFlowsetUpdater.xml`}&XHR=1' target='_blank' type='text/xml' download='AMADautomagicFlowsetUpdater.xml'>Download FlowSet Updater</a></b></u><br><br>"
+        return "<br><br><u><b><a href='/fhem?cmd={`cat /opt/fhem/FHEM/lib/74_AMADautomagicFlowset_".$flowsetversion.".xml`}&XHR=1' target='_blank' type='text/xml' download='AMADautomagicFlows_".$flowsetversion.".xml'>Download FlowSet-$flowsetversion</a></b></u><br><u><b><a href='/fhem?cmd={`cat /opt/fhem/FHEM/lib/74_AMADautomagicFlowsetUpdater.xml`}&XHR=1' target='_blank' type='text/xml' download='AMADautomagicFlowsetUpdater.xml'>Download FlowSet Updater</a></b></u><br><br>"
 }
 
 
