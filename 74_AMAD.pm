@@ -37,8 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "1.9.57";
-my $flowsetversion = "1.9.53";
+my $modulversion = "1.9.60";
+my $flowsetversion = "1.9.60";
 
 
 
@@ -61,6 +61,7 @@ sub AMAD_Initialize($) {
 			  "setScreenBrightness:noArg ".
 			  "setBluetoothDevice ".
 			  "setScreenlockPIN ".
+			  "setScreenOnForTimer ".
 			  "root:0,1 ".
 			  "port ".
 			  "disable:1 ".
@@ -68,7 +69,8 @@ sub AMAD_Initialize($) {
     
     foreach my $d(sort keys %{$modules{AMAD}{defptr}}) {
 	my $hash = $modules{AMAD}{defptr}{$d};
-	$hash->{VERSIONMODUL} 	= $modulversion;
+	$hash->{VERSIONMODUL}      = $modulversion;
+	$hash->{VERSIONFLOWSET}    = $flowsetversion;
     }
 }
 
@@ -437,10 +439,10 @@ sub AMAD_ResponseProcessing($$) {
         
             readingsBulkUpdate( $hash, "deviceState", "offline" ) if( $t eq "airplanemode" && $v eq "on" );
             readingsBulkUpdate( $hash, "deviceState", "online" ) if( $t eq "airplanemode" && $v eq "off" );
-            $v =~ s/null/off/g if( ($t eq "nextAlarmDay" || $t eq "nextAlarmTime") && $v eq "null" );
+            $v =~ s/\bnull\b/off/g if( ($t eq "nextAlarmDay" || $t eq "nextAlarmTime") && $v eq "null" );
             
             
-            $v =~ s/null//g;
+            $v =~ s/\bnull\b//g;
 
             readingsBulkUpdate( $hash, $t, $v );
         }
@@ -484,7 +486,7 @@ sub AMAD_Set($$@) {
 	$list .= "openURL ";
 	$list .= "openApp:$apps " if( AttrVal( $name, "setOpenApp", "none" ) ne "none" );
 	$list .= "nextAlarmTime:time ";
-	$list .= "timer:time ";
+	$list .= "timer:slider,1,1,60 ";
 	$list .= "statusRequest:noArg ";
 	$list .= "system:reboot,shutdown,airplanemodeON " if( AttrVal( $name, "root", "0" ) eq "1" );
 	$list .= "bluetooth:on,off ";
@@ -496,6 +498,7 @@ sub AMAD_Set($$@) {
 	$list .= "vibrate:noArg ";
 	$list .= "sendIntent ";
 	$list .= "currentFlowsetUpdate:noArg ";
+	$list .= "installFlowSource ";
 
 	if( lc $cmd eq 'screenmsg'
 	    || lc $cmd eq 'ttsmsg'
@@ -521,6 +524,7 @@ sub AMAD_Set($$@) {
 	    || lc $cmd eq 'statusrequest'
 	    || lc $cmd eq 'sendintent'
 	    || lc $cmd eq 'currentflowsetupdate'
+	    || lc $cmd eq 'installFlowSource'
 	    || lc $cmd eq 'vibrate') {
 
 	    Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
@@ -636,10 +640,12 @@ sub AMAD_SelectSetCmd($$@) {
     elsif( lc $cmd eq 'screen' ) {
     
 	my $mod = join( " ", @data );
+	my $scot = AttrVal( $name, "setScreenOnForTimer", undef );
+	$scot = 60 if( !$scot );
 	
 	if ($mod eq "on" || $mod eq "off") {
             
-            my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setScreenOnOff?screen=$mod" if ($mod eq "on" || $mod eq "off");
+            my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setScreenOnOff?screen=".$mod."&screenontime=".$scot if ($mod eq "on" || $mod eq "off");
             
             return AMAD_HTTP_POST( $hash,$url );
 	}
@@ -704,10 +710,9 @@ sub AMAD_SelectSetCmd($$@) {
     
     elsif (lc $cmd eq 'timer') {
     
-	my $value = join( " ", @data );
-	my @timer = split( ":", $value );
+	my $timer = join( " ", @data );
 
-	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setTimer?minute=".$timer[1];
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setTimer?minute=$timer";
 	
 	return AMAD_HTTP_POST( $hash, $url );
     }
@@ -797,6 +802,15 @@ sub AMAD_SelectSetCmd($$@) {
         $exval2 = "" if( !$exval2 );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/sendIntent?action=".$action."&exkey1=".$exkey1."&exval1=".$exval1."&exkey2=".$exkey2."&exval2=".$exval2;
+	
+	return AMAD_HTTP_POST( $hash,$url );
+    }
+    
+    elsif( lc $cmd eq 'installFlowSource' ) {
+    
+        my $flowname = join( " ", @data );
+
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/installFlow?flowname=$flowname";
 	
 	return AMAD_HTTP_POST( $hash,$url );
     }
@@ -1029,6 +1043,18 @@ sub AMAD_CommBridge_Read($) {
     if ( $data[0] =~ /currentFlowsetUpdate.xml/ ) {
 
         $response = qx(cat /opt/fhem/FHEM/lib/74_AMADautomagicFlowset_$flowsetversion.xml);
+        $c = $hash->{CD};
+        print $c "HTTP/1.1 200 OK\r\n",
+            "Content-Type: text/plain\r\n",
+            "Content-Length: ".length($response)."\r\n\r\n",
+            $response;
+
+        return;
+    }
+    
+    if ( $data[0] =~ /^installflow/ ) {
+
+        $response = qx(cat /tmp/installflow.xml);
         $c = $hash->{CD};
         print $c "HTTP/1.1 200 OK\r\n",
             "Content-Type: text/plain\r\n",
