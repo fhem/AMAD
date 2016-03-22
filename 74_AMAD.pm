@@ -37,8 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "1.9.60";
-my $flowsetversion = "1.9.60";
+my $modulversion = "1.9.61";
+my $flowsetversion = "1.9.61";
 
 
 
@@ -120,7 +120,7 @@ sub AMAD_Define($$) {
 	
 	$attr{$name}{room} = "AMAD" if( !defined( $attr{$name}{room} ) );
 	readingsSingleUpdate ( $hash, "state", "initialized", 1 ) if( $hash->{HOST} );
-	readingsSingleUpdate ( $hash, "deviceState", "online", 1 ) if( $hash->{HOST} );
+	#readingsSingleUpdate ( $hash, "deviceState", "online", 1 ) if( $hash->{HOST} );
         
         RemoveInternalTimer($hash);
 	InternalTimer( gettimeofday()+15, "AMAD_GetUpdate", $hash, 0 ) if( ($hash->{HOST}) && ($hash->{APSSID}) );
@@ -141,7 +141,7 @@ sub AMAD_Undef($$) {
 
     } else {
 
-        delete $modules{AMAD}{defptr}{$hash->{HOST}};
+        delete $modules{AMAD}{defptr}{$hash->{HOST}} if( defined($modules{AMAD}{defptr}{$hash->{HOST}}) );
 	RemoveInternalTimer( $hash );
     
 	foreach my $d(sort keys %{$modules{AMAD}{defptr}}) {
