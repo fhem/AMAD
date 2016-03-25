@@ -37,8 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "1.9.61";
-my $flowsetversion = "1.9.61";
+my $modulversion = "1.9.65";
+my $flowsetversion = "1.9.65";
 
 
 
@@ -194,10 +194,26 @@ my ( $cmd, $name, $attrName, $attrVal ) = @_;
 	if( $cmd eq "set" ) {
 	    $hash->{PORT} = $attrVal;
 	    Log3 $name, 3, "AMAD ($name) - set port to $attrVal";
+	    
+	    if( $hash->{BRIDGE} ) {
+                delete $modules{AMAD}{defptr}{BRIDGE};
+                TcpServer_Close( $hash );
+                Log3 $name, 3, "AMAD ($name) - CommBridge Port changed. CommBridge are closed and new open!";
+                
+                AMAD_CommBridge_Open( $hash );
+            }
 
         } else {
 	    $hash->{PORT} = 8090;
 	    Log3 $name, 3, "AMAD ($name) - set port to default";
+	    
+	    if( $hash->{BRIDGE} ) {
+                delete $modules{AMAD}{defptr}{BRIDGE};
+                TcpServer_Close( $hash );
+                Log3 $name, 3, "AMAD ($name) - CommBridge Port changed. CommBridge are closed and new open!";
+                
+                AMAD_CommBridge_Open( $hash );
+            }
         }
     }
     
@@ -250,6 +266,7 @@ sub AMAD_statusRequest($) {
     my $name = $hash->{NAME};
     my $host = $hash->{HOST};
     my $port = $hash->{PORT};
+    my $bport = $bhash->{PORT};
     my $apssid = $hash->{APSSID};
     my $fhemip = ReadingsVal( $bname, "fhemServerIP", "none" );
     my $activetask = AttrVal( $name, "checkActiveTask", "none" );
@@ -263,7 +280,7 @@ sub AMAD_statusRequest($) {
 	    timeout	=> 30,
 	    hash	=> $hash,
 	    method	=> "GET",
-	    header	=> "fhemIP: $fhemip\r\nfhemDevice: $name\r\nactiveTask: $activetask\r\napSSID: $apssid",
+	    header	=> "fhemIP: $fhemip\r\nfhemDevice: $name\r\nactiveTask: $activetask\r\napSSID: $apssid\r\nbport: $bport",
 	    doTrigger	=> 1,
 	    callback	=> \&AMAD_statusRequestErrorHandling,
 	}
@@ -980,22 +997,23 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
 
 sub AMAD_CommBridge_Open($) {
 
-    my ( $bhash ) = @_;
-    my $bname = $bhash->{NAME};
+    my ( $hash ) = @_;
+    my $name = $hash->{NAME};
+    my $port = $hash->{PORT};
     
 
     # Oeffnen des TCP Sockets
-    my $bret = TcpServer_Open( $bhash, "8090", "global" );
+    my $ret = TcpServer_Open( $hash, $port, "global" );
     
-    if( $bret && !$init_done ) {
-	Log3 $bname, 3, "$bret. Exiting.";
+    if( $ret && !$init_done ) {
+	Log3 $name, 3, "$ret. Exiting.";
 	exit(1);
     }
     
-    readingsSingleUpdate ( $bhash, "state", "opened", 1 );
-    Log3 $bname, 5, "Socket wird geöffnet.";
+    readingsSingleUpdate ( $hash, "state", "opened", 1 );
+    Log3 $name, 5, "Socket wird geöffnet.";
     
-    return $bret;
+    return $ret;
 }
 
 sub AMAD_CommBridge_Read($) {
@@ -1024,6 +1042,7 @@ sub AMAD_CommBridge_Read($) {
     
     #### Verarbeitung der Daten welche über die AMADCommBridge kommen ####
 
+    Log3 $bname, 5, "AMAD ($bname) - Receive RAW Message in Debugging Mode: $buf";
     
     ###
     ## Consume Content
@@ -1067,7 +1086,7 @@ sub AMAD_CommBridge_Read($) {
     elsif ( $fhemcmd =~ /setreading\b/ ) {
 	my $tv = $data[1];
 
-        Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: processing receive reading values - Device: $device Data: $tv";
+        Log3 $bname, 4, "AMAD ($bname) - AMAD_CommBridge: processing receive reading values - Device: $device Data: $tv";
     
         AMAD_ResponseProcessing($dhash,$tv);
         
@@ -1086,7 +1105,7 @@ sub AMAD_CommBridge_Read($) {
         
         fhem ("set $fhemCmd") if( ReadingsVal( $bname, "expertMode", 0 ) eq "1" );
 	readingsSingleUpdate( $bhash, "receiveFhemCommand", "set ".$fhemCmd, 0 );
-	Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: set reading receive fhem command";
+	Log3 $bname, 4, "AMAD ($bname) - AMAD_CommBridge: set reading receive fhem command";
 	
 	$response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM execute set command now\r\n";
         $c = $hash->{CD};
@@ -1105,7 +1124,7 @@ sub AMAD_CommBridge_Read($) {
 	readingsBulkUpdate( $bhash, "receiveVoiceCommand", $fhemCmd );
 	readingsBulkUpdate( $bhash, "receiveVoiceDevice", $device );
 	readingsEndUpdate( $bhash, 1 );
-	Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: set reading receive voice command";
+	Log3 $bname, 4, "AMAD ($bname) - AMAD_CommBridge: set reading receive voice command";
 	
 	$response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM was processes\r\n";
         $c = $hash->{CD};
@@ -1128,14 +1147,14 @@ sub AMAD_CommBridge_Read($) {
             "Content-Length: ".length($response)."\r\n\r\n",
             $response;
         
-	Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: response ReadingsVal Value to Automagic Device";
+	Log3 $bname, 4, "AMAD ($bname) - AMAD_CommBridge: response ReadingsVal Value to Automagic Device";
 	return;
     }
     
     elsif ( $fhemcmd =~ /fhemfunc\b/ ) {
         my $fhemCmd = $data[1];
 	
-	Log3 $name, 4, "AMAD ($name) - AMAD_CommBridge: receive fhem-function command";
+	Log3 $bname, 4, "AMAD ($bname) - AMAD_CommBridge: receive fhem-function command";
 	
         if( $fhemcmd =~ /^{.*}$/ ) {
         
