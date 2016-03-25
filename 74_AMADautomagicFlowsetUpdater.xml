@@ -16,8 +16,8 @@
   </action>
   <action type="download_url">
     <useDefaultName>true</useDefaultName>
-    <name>Download URL: http://{global_fhemip}:8090/currentFlowsetUpdate.xml to /storage/emulated/0/Download</name>
-    <url>http://{global_fhemip}:8090/currentFlowsetUpdate.xml</url>
+    <name>Download URL: http://{global_fhemip}:{global_bridgeport}/currentFlowsetUpdate.xml to /storage/emulated/0/Download</name>
+    <url>http://{global_fhemip}:{global_bridgeport}/currentFlowsetUpdate.xml</url>
     <directory>/storage/emulated/0/Download</directory>
     <showProgress>true</showProgress>
   </action>
@@ -40,15 +40,15 @@
     <enabled>true</enabled>
     <executionPolicy>PARALLEL</executionPolicy>
     <actioncontainer id="t1" x="70.0" y="1067.5">Dateien löschen: /storage/emulated/0/Download/currentFlowsetUpdate.xml</actioncontainer>
-    <triggercontainer id="t2" x="70.0" y="52.5">
+    <actioncontainer id="t2" x="70.0" y="787.5">Setze Flow Status: Aktivieren {imported_flow_names,listformat,comma}</actioncontainer>
+    <actioncontainer id="t3" x="70.0" y="577.5">Flows/Widgets importieren: /storage/emulated/0/Download/currentFlowsetUpdate.xml</actioncontainer>
+    <triggercontainer id="t4" x="70.0" y="52.5">
       <trigger>HTTP Request: /fhem-amad/currentFlowsetUpdate</trigger>
     </triggercontainer>
-    <actioncontainer id="t3" x="70.0" y="787.5">Setze Flow Status: Aktivieren {imported_flow_names,listformat,comma}</actioncontainer>
-    <actioncontainer id="t4" x="70.0" y="577.5">Flows/Widgets importieren: /storage/emulated/0/Download/currentFlowsetUpdate.xml</actioncontainer>
-    <actioncontainer id="t5" x="70.0" y="297.5">Download URL: http://{global_fhemip}:8090/currentFlowsetUpdate.xml to /storage/emulated/0/Download</actioncontainer>
-    <connection from="t2" to="t5" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t3" to="t1" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t4" to="t3" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t5" to="t4" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <actioncontainer id="t5" x="70.0" y="297.5">Download URL: http://{global_fhemip}:{global_bridgeport}/currentFlowsetUpdate.xml to /storage/emulated/0/Download</actioncontainer>
+    <connection from="t2" to="t1" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t3" to="t2" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t4" to="t5" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t5" to="t3" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
   </flow>
 </data>
