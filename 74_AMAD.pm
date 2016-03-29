@@ -37,8 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "1.9.65";
-my $flowsetversion = "1.9.67";
+my $modulversion = "1.9.66";
+my $flowsetversion = "1.9.69";
 
 
 
@@ -251,7 +251,7 @@ my ( $hash ) = @_;
     } else {
 
         Log3 $name, 3, "AMAD ($name) - GetUpdate, FHEM or Device not ready yet";
-        Log3 $name, 3, "AMAD ($name) - GetUpdate, Please set $bname fhemServerIP <IP-FHEM> NOW!" if( ReadingsVal( $bname, "fhemServerIP", "none" ) eq "none" );
+        Log3 $name, 3, "AMAD ($bname) - GetUpdate, Please set $bname fhemServerIP <IP-FHEM> NOW!" if( ReadingsVal( $bname, "fhemServerIP", "none" ) eq "none" );
         Log3 $name, 3, "AMAD ($name) - Attention!!! Your Device was defined without ACCESSPOINT-SSID, please modify the DEF to <HOST-IP> <ACCESSPOINT-SSID>" if( ! $hash->{APSSID} );
 
         InternalTimer( gettimeofday()+15, "AMAD_GetUpdate", $hash, 0 );
