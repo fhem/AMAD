@@ -190,6 +190,14 @@ irname=getString("name")</extras>
   </trigger>
   <trigger type="http_request">
     <useDefaultName>false</useDefaultName>
+    <name>HTTP Request: /fhem-amad/currentFlowsetUpdate</name>
+    <enabled>true</enabled>
+    <path>/fhem-amad/currentFlowsetUpdate</path>
+    <port>8090</port>
+    <acquireWifiLock>true</acquireWifiLock>
+  </trigger>
+  <trigger type="http_request">
+    <useDefaultName>false</useDefaultName>
     <name>HTTP Request: /fhem-amad/deviceInfo/</name>
     <enabled>true</enabled>
     <path>/fhem-amad/deviceInfo/</path>
@@ -393,6 +401,11 @@ irname=getString("name")</extras>
     <useDefaultName>true</useDefaultName>
     <name>Expression: global_activetask != "none"</name>
     <expression>global_activetask != "none"</expression>
+  </condition>
+  <condition type="expression">
+    <useDefaultName>false</useDefaultName>
+    <name>Expression: installFlow"</name>
+    <expression>request_path == "/fhem-amad/setCommands/installFlow"</expression>
   </condition>
   <condition type="expression">
     <useDefaultName>true</useDefaultName>
@@ -1167,6 +1180,13 @@ FHEMCMD: setreading</customHTTPHeaders>
     <directory>/storage/emulated/0/Download</directory>
     <showProgress>true</showProgress>
   </action>
+  <action type="download_url">
+    <useDefaultName>true</useDefaultName>
+    <name>Download URL: http://{global_fhemip}:{global_bridgeport}/installFlow_{param_flowname} to /storage/emulated/0/Download</name>
+    <url>http://{global_fhemip}:{global_bridgeport}/installFlow_{param_flowname}</url>
+    <directory>/storage/emulated/0/Download</directory>
+    <showProgress>true</showProgress>
+  </action>
   <action type="http_request">
     <useDefaultName>false</useDefaultName>
     <name>Flow Status Informations</name>
@@ -1732,8 +1752,8 @@ FHEMCMD: setreading</customHTTPHeaders>
   </action>
   <action type="script">
     <useDefaultName>true</useDefaultName>
-    <name>Script: amad_flowset_version = "1.9.69"</name>
-    <script>amad_flowset_version = "1.9.69"</script>
+    <name>Script: amad_flowset_version = "1.9.70"</name>
+    <script>amad_flowset_version = "1.9.70"</script>
   </action>
   <action type="script">
     <useDefaultName>true</useDefaultName>
@@ -2150,7 +2170,7 @@ FHEMCMD: setreading</customHTTPHeaders>
   </action>
   <flow type="flow">
     <name>Informations</name>
-    <group>AMAD2 Info/Control Flowset v1.9.69</group>
+    <group>AMAD2 Info/Control Flowset v1.9.70</group>
     <enabled>true</enabled>
     <executionPolicy>PARALLEL</executionPolicy>
     <emergencyStopCount>500</emergencyStopCount>
@@ -2298,10 +2318,10 @@ FHEMCMD: setreading</customHTTPHeaders>
     <actioncontainer id="t111" x="1260.0" y="192.5">Script: androidVersion = "not supported funktion"</actioncontainer>
     <actioncontainer id="t112" x="735.0" y="17.5">Setze Globale Variablen</actioncontainer>
     <actioncontainer id="t113" x="875.0" y="17.5">Prüfe und setze Bridgeport Variable</actioncontainer>
-    <actioncontainer id="t114" x="1015.0" y="-1522.5">Script: amad_flowset_version = "1.9.69"</actioncontainer>
-    <actioncontainer id="t115" x="1330.0" y="-17.5">Get Android Version</actioncontainer>
+    <actioncontainer id="t114" x="1330.0" y="-17.5">Get Android Version</actioncontainer>
+    <actioncontainer id="t115" x="2450.0" y="-3482.5">Script: notification_text = "not supported from your device"</actioncontainer>
     <conditioncontainer id="t116" x="2310.0" y="-3027.5">Expression: getAndroidSDKVersion() &gt;= "19"</conditioncontainer>
-    <actioncontainer id="t117" x="2450.0" y="-3482.5">Script: notification_text = "not supported from your device"</actioncontainer>
+    <actioncontainer id="t117" x="1015.0" y="-1522.5">Script: amad_flowset_version = "1.9.70"</actioncontainer>
     <connection from="t1" to="t87" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t1" to="t77" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t1" to="t28" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -2403,7 +2423,7 @@ FHEMCMD: setreading</customHTTPHeaders>
     <connection from="t75" to="t37" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t76" to="t3" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t77" to="t112" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t77" to="t115" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t77" to="t114" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t77" to="t63" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t77" to="t15" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t77" to="t5" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -2449,21 +2469,21 @@ FHEMCMD: setreading</customHTTPHeaders>
     <connection from="t87" to="t75" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t87" to="t73" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t87" to="t78" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t87" to="t114" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t87" to="t117" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t87" to="t88" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t88" to="t82" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t111" to="t110" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t114" to="t108" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t115" to="t111" type="EXCEPTION" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t115" to="t110" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t114" to="t111" type="EXCEPTION" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t114" to="t110" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t115" to="t102" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t116" to="t81" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t116" to="t117" type="EXCEPTION" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t116" to="t117" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t117" to="t102" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t116" to="t115" type="EXCEPTION" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t116" to="t115" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t117" to="t108" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
   </flow>
   <flow type="flow">
     <name>SetCommands</name>
-    <group>AMAD2 Info/Control Flowset v1.9.69</group>
+    <group>AMAD2 Info/Control Flowset v1.9.70</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <emergencyStopCount>500</emergencyStopCount>
@@ -2569,23 +2589,23 @@ FHEMCMD: setreading</customHTTPHeaders>
     <conditioncontainer id="t94" x="-805.0" y="-2537.5">WLAN Verbunden: {global_apssid}</conditioncontainer>
     <actioncontainer id="t95" x="-4795.0" y="892.5">Lautstärken setzen param_notifivolume</actioncontainer>
     <actioncontainer id="t96" x="-805.0" y="892.5">Setze Alarm:  um {param_hour}:{param_minute}</actioncontainer>
-    <conditioncontainer id="t97" x="-805.0" y="-2047.5">Expression: trigger == "HTTP Request: /fhem-amad/setCommands/*"</conditioncontainer>
-    <conditioncontainer id="t98" x="-805.0" y="-122.5">Expression: setAlarm"</conditioncontainer>
-    <conditioncontainer id="t99" x="3395.0" y="-122.5">Expression: setTimer"</conditioncontainer>
-    <actioncontainer id="t100" x="3395.0" y="892.5">Setze Timer</actioncontainer>
-    <conditioncontainer id="t101" x="-5005.0" y="-122.5">Expression: setVibrate"</conditioncontainer>
-    <conditioncontainer id="t102" x="-2065.0" y="-122.5">Expression: openApp"</conditioncontainer>
-    <conditioncontainer id="t103" x="-2065.0" y="367.5">App Task läuft:  App (neuster)</conditioncontainer>
-    <actioncontainer id="t104" x="-2065.0" y="892.5">App Starten: App</actioncontainer>
-    <actioncontainer id="t105" x="-2275.0" y="612.5">Setze Flow Status: Aktivieren {imported_flow_names,listformat,comma}</actioncontainer>
-    <actioncontainer id="t106" x="-2275.0" y="892.5">Dateien löschen: /storage/emulated/0/Download/currentFlowsetUpdate.xml</actioncontainer>
-    <conditioncontainer id="t107" x="-2275.0" y="-122.5">Expression: setVibrate"</conditioncontainer>
-    <actioncontainer id="t108" x="-2275.0" y="367.5">Flows/Widgets importieren: /storage/emulated/0/Download/currentFlowsetUpdate.xml</actioncontainer>
-    <actioncontainer id="t109" x="-1435.0" y="892.5">Schalte Display ein: Hell für {param_screenontime}s</actioncontainer>
-    <actioncontainer id="t110" x="-1225.0" y="-1417.5">Flow Status Informations</actioncontainer>
-    <actioncontainer id="t111" x="-2275.0" y="122.5">Download URL: http://{global_fhemip}:{global_bridgeport}/currentFlowsetUpdate.xml to /storage/emulated/0/Download</actioncontainer>
+    <conditioncontainer id="t97" x="-805.0" y="-122.5">Expression: setAlarm"</conditioncontainer>
+    <conditioncontainer id="t98" x="3395.0" y="-122.5">Expression: setTimer"</conditioncontainer>
+    <actioncontainer id="t99" x="3395.0" y="892.5">Setze Timer</actioncontainer>
+    <conditioncontainer id="t100" x="-5005.0" y="-122.5">Expression: setVibrate"</conditioncontainer>
+    <conditioncontainer id="t101" x="-2065.0" y="-122.5">Expression: openApp"</conditioncontainer>
+    <actioncontainer id="t102" x="-2065.0" y="892.5">App Starten: App</actioncontainer>
+    <actioncontainer id="t103" x="-2275.0" y="612.5">Setze Flow Status: Aktivieren {imported_flow_names,listformat,comma}</actioncontainer>
+    <actioncontainer id="t104" x="-2275.0" y="892.5">Dateien löschen: /storage/emulated/0/Download/currentFlowsetUpdate.xml</actioncontainer>
+    <actioncontainer id="t105" x="-2275.0" y="367.5">Flows/Widgets importieren: /storage/emulated/0/Download/currentFlowsetUpdate.xml</actioncontainer>
+    <actioncontainer id="t106" x="-1435.0" y="892.5">Schalte Display ein: Hell für {param_screenontime}s</actioncontainer>
+    <actioncontainer id="t107" x="-1225.0" y="-1417.5">Flow Status Informations</actioncontainer>
+    <conditioncontainer id="t108" x="-2275.0" y="-122.5">Expression: installFlow"</conditioncontainer>
+    <conditioncontainer id="t109" x="-2065.0" y="367.5">App Task läuft:  App (neuster)</conditioncontainer>
+    <actioncontainer id="t110" x="-2275.0" y="122.5">Download URL: http://{global_fhemip}:{global_bridgeport}/installFlow_{param_flowname} to /storage/emulated/0/Download</actioncontainer>
+    <conditioncontainer id="t111" x="-805.0" y="-2047.5">Expression: trigger == "HTTP Request: /fhem-amad/setCommands/*"</conditioncontainer>
     <connection from="t1" to="t94" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t2" to="t109" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t2" to="t106" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t3" to="t78" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t4" to="t6" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t7" to="t28" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -2654,8 +2674,8 @@ FHEMCMD: setreading</customHTTPHeaders>
     <connection from="t76" to="t65" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t79" to="t87" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t81" to="t80" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t82" to="t110" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t83" to="t110" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t82" to="t107" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t83" to="t107" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t84" to="t86" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t85" to="t77" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t86" to="t85" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -2664,45 +2684,62 @@ FHEMCMD: setreading</customHTTPHeaders>
     <connection from="t88" to="t90" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t89" to="t90" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t90" to="t91" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t93" to="t97" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t93" to="t111" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t93" to="t73" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t94" to="t93" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t94" to="t22" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t58" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t102" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t55" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t21" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t23" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t3" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t98" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t4" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t49" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t18" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t7" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t26" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t29" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t68" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t48" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t76" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t73" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t67" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t79" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t101" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t81" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t97" to="t99" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t98" to="t96" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t99" to="t100" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t101" to="t75" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t102" to="t103" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t103" to="t104" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t105" to="t106" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t107" to="t111" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t108" to="t105" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t108" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t97" to="t96" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t98" to="t99" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t100" to="t75" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t101" to="t109" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t103" to="t104" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t105" to="t103" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t110" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t109" to="t102" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t58" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t101" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t55" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t21" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t23" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t3" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t97" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t4" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t49" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t18" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t7" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t26" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t29" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t68" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t48" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t76" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t73" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t67" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t79" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t100" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t81" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t98" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t108" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+  </flow>
+  <flow type="flow">
+    <name>Update AMAD Flowset</name>
+    <group>AMAD2 Flowset Updater v1.0.3</group>
+    <enabled>true</enabled>
+    <executionPolicy>PARALLEL</executionPolicy>
+    <triggercontainer id="t1" x="70.0" y="52.5">
+      <trigger>HTTP Request: /fhem-amad/currentFlowsetUpdate</trigger>
+    </triggercontainer>
+    <actioncontainer id="t2" x="70.0" y="1067.5">Dateien löschen: /storage/emulated/0/Download/currentFlowsetUpdate.xml</actioncontainer>
+    <actioncontainer id="t3" x="70.0" y="787.5">Setze Flow Status: Aktivieren {imported_flow_names,listformat,comma}</actioncontainer>
+    <actioncontainer id="t4" x="70.0" y="577.5">Flows/Widgets importieren: /storage/emulated/0/Download/currentFlowsetUpdate.xml</actioncontainer>
+    <actioncontainer id="t5" x="70.0" y="297.5">Download URL: http://{global_fhemip}:{global_bridgeport}/currentFlowsetUpdate.xml to /storage/emulated/0/Download</actioncontainer>
+    <connection from="t1" to="t5" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t3" to="t2" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t4" to="t3" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t5" to="t4" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
   </flow>
   <flow type="flow">
     <name>VoiceControl</name>
-    <group>AMAD2 Info/Control Flowset v1.9.69</group>
+    <group>AMAD2 Info/Control Flowset v1.9.70</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <emergencyStopCount>60</emergencyStopCount>

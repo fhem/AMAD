@@ -37,8 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "1.9.66";
-my $flowsetversion = "1.9.69";
+my $modulversion = "1.9.67";
+my $flowsetversion = "1.9.70";
 
 
 
@@ -541,7 +541,7 @@ sub AMAD_Set($$@) {
 	    || lc $cmd eq 'statusrequest'
 	    || lc $cmd eq 'sendintent'
 	    || lc $cmd eq 'currentflowsetupdate'
-	    || lc $cmd eq 'installFlowSource'
+	    || lc $cmd eq 'installflowsource'
 	    || lc $cmd eq 'vibrate') {
 
 	    Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
@@ -823,7 +823,7 @@ sub AMAD_SelectSetCmd($$@) {
 	return AMAD_HTTP_POST( $hash,$url );
     }
     
-    elsif( lc $cmd eq 'installFlowSource' ) {
+    elsif( lc $cmd eq 'installflowsource' ) {
     
         my $flowname = join( " ", @data );
 
@@ -1071,16 +1071,18 @@ sub AMAD_CommBridge_Read($) {
         return;
     }
     
-    if ( $data[0] =~ /^installflow/ ) {
+    elsif ( $data[0] =~ /installFlow_([^.]*.xml)/ ) {
 
-        $response = qx(cat /tmp/installflow.xml);
-        $c = $hash->{CD};
-        print $c "HTTP/1.1 200 OK\r\n",
-            "Content-Type: text/plain\r\n",
-            "Content-Length: ".length($response)."\r\n\r\n",
-            $response;
+        if( defined($1) ){
+            $response = qx(cat /tmp/$1);
+            $c = $hash->{CD};
+            print $c "HTTP/1.1 200 OK\r\n",
+                "Content-Type: text/plain\r\n",
+                "Content-Length: ".length($response)."\r\n\r\n",
+                $response;
 
-        return;
+            return;
+        }
     }
     
     elsif ( $fhemcmd =~ /setreading\b/ ) {
