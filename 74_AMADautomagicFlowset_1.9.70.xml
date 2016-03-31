@@ -2602,8 +2602,8 @@ FHEMCMD: setreading</customHTTPHeaders>
     <actioncontainer id="t107" x="-1225.0" y="-1417.5">Flow Status Informations</actioncontainer>
     <conditioncontainer id="t108" x="-2275.0" y="-122.5">Expression: installFlow"</conditioncontainer>
     <conditioncontainer id="t109" x="-2065.0" y="367.5">App Task läuft:  App (neuster)</conditioncontainer>
-    <actioncontainer id="t110" x="-2275.0" y="122.5">Download URL: http://{global_fhemip}:{global_bridgeport}/installFlow_{param_flowname} to /storage/emulated/0/Download</actioncontainer>
-    <conditioncontainer id="t111" x="-805.0" y="-2047.5">Expression: trigger == "HTTP Request: /fhem-amad/setCommands/*"</conditioncontainer>
+    <conditioncontainer id="t110" x="-805.0" y="-2047.5">Expression: trigger == "HTTP Request: /fhem-amad/setCommands/*"</conditioncontainer>
+    <actioncontainer id="t111" x="-2275.0" y="122.5">Download URL: http://{global_fhemip}:{global_bridgeport}/installFlow_{param_flowname} to /storage/emulated/0/Download</actioncontainer>
     <connection from="t1" to="t94" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t2" to="t106" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t3" to="t78" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -2684,7 +2684,7 @@ FHEMCMD: setreading</customHTTPHeaders>
     <connection from="t88" to="t90" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t89" to="t90" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t90" to="t91" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t93" to="t111" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t93" to="t110" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t93" to="t73" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t94" to="t93" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t94" to="t22" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -2694,31 +2694,32 @@ FHEMCMD: setreading</customHTTPHeaders>
     <connection from="t101" to="t109" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t103" to="t104" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t105" to="t103" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t108" to="t110" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t108" to="t111" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t109" to="t102" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t58" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t101" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t55" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t21" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t23" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t3" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t97" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t4" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t49" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t18" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t7" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t26" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t29" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t68" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t48" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t76" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t73" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t67" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t79" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t100" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t81" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t98" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t111" to="t108" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t58" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t101" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t55" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t21" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t23" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t3" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t97" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t4" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t49" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t18" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t7" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t26" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t29" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t68" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t48" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t76" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t73" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t67" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t79" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t100" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t81" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t98" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t110" to="t108" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t111" to="t105" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
   </flow>
   <flow type="flow">
     <name>Update AMAD Flowset</name>
