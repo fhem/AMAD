@@ -3,201 +3,128 @@
   <u><b>AMAD - Automagic Android Device</b></u>
   <br>
   Dieses Modul liefert, <b><u>in Verbindung mit der Android APP Automagic</u></b>, diverse Informationen von Android Ger&auml;ten.
-  Die AndroidAPP Automagic (welche nicht von mir stammt und 2.90Euro kostet) funktioniert wie Tasker, ist aber bei weitem User freundlicher.
-  Im Auslieferungszustand werden folgende Zust&auml;nde dargestellt:
-  <ul>
-    <li>Android Version</li>
-    <li>Zustand von Automagic auf dem Ger&auml;t</li>
-    <li>Bluetooth An/Aus</li>
-    <li>Zustand einer definierten App (l&auml;uft aktiv im Vordergrund oder nicht?)</li>
-    <li>verbundene Bluetoothger&auml;te, inklusive deren MAC Adresse</li>
-    <li>aktuell abgespieltes Musikalbum des verwendeten Mediaplayers</li>
-    <li>aktuell abgespielter Musikinterpret des verwendeten Mediaplayers</li>
-    <li>aktuell abgespielter Musiktitel des verwendeten Mediaplayers</li>
-    <li>Status des Androidger&auml;tes - Online/Offline</li>
-    <li>n&auml;chster Alarmtag</li>
-    <li>n&auml;chste Alarmzeit</li>
-    <li>Batteriestatus in %</li>
-    <li>Ladestatus - Netztei angeschlossen / nicht angeschlossen</li>
-    <li>Bildschirmstatus An/Aus</li>
-    <li>Bildschirmhelligkeit</li>
-    <li>Vollbildmodus An/Aus</li>
-    <li>Bildschirmausrichtung Auto/Landscape/Portrait</li>
-    <li>Standardlautst&auml;rke</li>
-    <li>Media Lautst&auml;rke des Lautsprechers am Ger&auml;t</li>
-    <li>Media Lautst&auml;rke des Bluetooth Lautsprechers</li>
-  </ul>
+  Die AndroidAPP Automagic (welche nicht von mir stammt und 2.90 Euro kostet) funktioniert wie Tasker, ist aber bei weitem User freundlicher.
   <br>
-  Mit etwas Einarbeitung k&ouml;nnen jegliche Informationen welche Automagic bereit stellt in FHEM angezeigt werden. Hierzu bedarf es lediglich
-  einer kleinen Anpassung des "Informations" Flows
-  <br><br>
-  Das Modul gibt Dir auch die M&ouml;glichkeit Deine Androidger&auml;te zu steuern. So k&ouml;nnen folgende Aktionen durchgef&uuml;hrt werden.
-  <ul>
-    <li>aktiviert Spracheingabe</li>
-    <li>Bluetooth Ein/Aus schalten</li>
-    <li>zu einem bestimmten Bluetoothger&auml;t wechseln/verbinden</li>
-    <li>Status des Ger&auml;tes (Online,Offline)</li>
-    <li>Mediaplayer steuern (Play, Stop, n&auml;chster Titel, vorheriger Titel)</li>
-    <li>n&auml;chste Alarmzeit setzen</li>
-    <li>ein Benachrichtigungston abspielen (Notificationsound)</li>
-    <li>eine App auf dem Ger&auml;t &ouml;ffnen</li>
-    <li>eine URL im Browser &ouml;ffnen</li>
-    <li>Bildschirm An/Aus machen</li>
-    <li>Bildschirmhelligkeit einstellen</li>
-    <li>Vollbildmodus einschalten</li>
-    <li>eine Nachricht senden welche am Bildschirm angezeigt wird</li>
-    <li>Bildschirmausrichtung einstellen (Auto,Landscape,Portrait)</li>
-    <li>neuen Statusreport des Ger&auml;tes anfordern</li>
-    <li>Systembefehle setzen (Reboot)</li>
-    <li>eine Nachricht senden welche <b>angesagt</b> wird (TTS)</li>
-    <li>Medienlautst&auml;rke regeln</li>  
-  </ul>
-  <br><br> 
-  F&uuml;r all diese Aktionen und Informationen wird auf dem Androidger&auml;t Automagic und ein so genannter Flow ben&ouml;tigt. Die App m&uuml;&szlig;t
-  Ihr Euch besorgen, die Flows bekommt Ihr von mir zusammen mit dem AMAD Modul.
+  Mit etwas Einarbeitung k&ouml;nnen jegliche Informationen welche Automagic bereit stellt in FHEM angezeigt werden. Hierzu bedarf es lediglich eines eigenen Flows welcher seine Daten an die AMADCommBridge sendet. Das Modul gibt auch die M&ouml;glichkeit Androidger&auml;te zu steuern.
+  <br>
+  F&uuml;r all diese Aktionen und Informationen wird auf dem Androidger&auml;t "Automagic" und ein so genannter Flow ben&ouml;tigt. Die App ist &uuml;ber den Google PlayStore zu beziehen. Das ben&ouml;tigte Flowset bekommt man aus dem FHEM Verzeichnis.
   <br><br>
   <b>Wie genau verwendet man nun AMAD?</b>
   <ul>
-    <li>installiert Euch die App "Automagic Premium" aus dem App Store oder die Testversion von <a href="https://automagic4android.com/de/testversion">hier</a></li>
-    <li>installiert das Flowset 74_AMADautomagicFlows$VERSION.xml aus dem Ordner $INSTALLFHEM/FHEM/lib/ auf Eurem Androidger&auml;t und aktiviert erstmal nur den "Informations" Flow.</li>
+    <li>man installiert die App "Automagic Premium" aus dem PlayStore oder die Testversion von <a href="https://automagic4android.com/de/testversion">hier</a></li>
+    <li>dann installiert man das Flowset 74_AMADautomagicFlowset$VERSION.xml aus dem Ordner $INSTALLFHEM/FHEM/lib/ auf dem Androidger&auml;t. NOCH NICHT die Flows aktivieren</li>
   </ul>
   <br>
-  Nun m&uuml;sst Ihr nur noch ein Device in FHEM anlegen.
+  Es mu&szlig; noch ein Device in FHEM anlegt werden.
   <br><br>
   <a name="AMADdefine"></a>
   <b>Define</b>
   <ul><br>
-    <code>define &lt;name&gt; AMAD &lt;IP-ADRESSE&gt;</code>
+    <code>define &lt;name&gt; AMAD &lt;IP-ADRESSE&gt; &lt;WLANAP-SSID('s)&gt;</code>
     <br><br>
     Beispiel:
     <ul><br>
-      <code>define WandTabletWohnzimmer AMAD 192.168.0.23</code><br>
+      <code>define WandTabletWohnzimmer AMAD 192.168.0.23 TuxNetAP@@OpaZuHause</code><br>
     </ul>
     <br>
-    Diese Anweisung erstellt ein neues AMAD-Device im Raum AMAD.Der Parameter &lt;IP-ADRESSE&lt; legt die IP Adresse des Android Ger&auml;tes fest.<br>
-    Das Standard Abfrageinterval ist 180 Sekunden und kann &uuml;ber das Attribut intervall ge&auml;ndert werden. Wer den Port &auml;ndern m&ouml;chte, kann dies &uuml;ber
-    das Attribut port tun. <b>Ihr solltet aber wissen was Ihr tut, da dieser Port im HTTP Response Trigger der beiden Flows eingestellt ist. Demzufolge mu&szlig; dieser dort
-    auch ver&auml;dert werden.</b><br>
+    Diese Anweisung erstellt zwei neue AMAD-Devices im Raum AMAD.Der Parameter &lt;IP-ADRESSE&lt; legt die IP Adresse des Android Ger&auml;tes fest und der Parameter WLANAP-SSID die SSID des WLAN's welches sich zum FHEM Server verbindet. Es k&ouml;nnen mehrere SSID's mit angegeben werden, welche dann getrennt durch zwei @ eingetragen werden. Das zweite Device ist die AMADCommBridge welche als Kommunikationsbr&uuml;cke vom Androidger&auml;t zu FHEM diehnt.<br>
+    !!!Comming Soon!!! Der Port eines jeden AMAD Devices kann &uuml;ber das Attribut "port" ge&auml;ndert werden. <b>Hier sollte Hintergrundwissen zu Automagic und HTTP Request vorhanden sein, da dieser Port im HTTP Request Trigger der beiden Flows eingestellt ist. Demzufolge mu&szlig; der Port dort auch ver&auml;dert werden.
+    <br>
+    Der Port f&uuml;r die Bridge kann ohne Probleme im Bridge Device mittels dem Attribut "port" ver&auml;ndert werden.</b>
   </ul>
-  <br><br> 
-  <b><u>Fertig! Nach anlegen der Ger&auml;teinstanz sollten nach sp&auml;testens 3 Minuten bereits die ersten Readings reinkommen.</u></b>
-  <br><br><br>
-  <a name="AMADCommBridge"></a>
+  <br><a name="AMADCommBridge"></a>
   <b>AMAD Communication Bridge</b>
   <ul>
-    Beim ersten anlegen einer AMAD Deviceinstanz wird automatisch ein Ger&auml;t Namens AMADCommBridge im Raum AMAD angelegt. <b>BITTE NIEMALS DEN NAMEN DER BRIDGE &Auml;NDERN!!!</b> 
-    Alle anderen Eigenschaften k&ouml;nnen ge&auml;ndert werden. Dieses Ger&auml;t diehnt zur Kommunikation
-    vom Androidger&auml;t zu FHEM ohne das zuvor eine Anfrage von FHEM aus ging. <b>Damit das Androidger&auml;t die IP von FHEM kennt, muss diese sofort nach dem anlegen der Bridge
-    &uuml;ber den set Befehl in ein entsprechendes Reading in die Bridge  geschrieben werden. DAS IST SUPER WICHTIG UND F&Uuml;R DIE FUNKTION DER BRIDGE NOTWENDIG.</b><br>
-    Bitte f&uuml;hrt hierzu folgenden Befehl aus. <i>set AMADCommBridge fhemServerIP &lt;FHEM-IP&gt;.</i><br>
-    Als zweites Reading k&ouml;nnt Ihr <i>expertMode</i>setzen. Mit diesem Reading wird eine unmittelbare Komminikation mit FHEM erreicht ohne die Einschr&auml;nkung &uuml;ber ein
+    Beim ersten anlegen einer AMAD Deviceinstanz wird automatisch ein Ger&auml;t Namens AMADCommBridge im Raum AMAD mit angelegt. Dieses Ger&auml;t diehnt zur Kommunikation vom Androidger&auml;t zu FHEM ohne das zuvor eine Anfrage von FHEM aus ging. <b>Damit das Androidger&auml;t die IP von FHEM kennt, muss diese sofort nach dem anlegen der Bridge &uuml;ber den set Befehl in ein entsprechendes Reading in die Bridge  geschrieben werden. DAS IST SUPER WICHTIG UND F&Uuml;R DIE FUNKTION DER BRIDGE NOTWENDIG.</b><br>
+    Hierf&uuml;r mu&szlig; folgender Befehl ausgef&uuml;hrt werden. <i>set AMADCommBridge fhemServerIP &lt;FHEM-IP&gt;.</i><br>
+    Als zweites Reading kann <i>expertMode</i> gesetzen werden. Mit diesem Reading wird eine unmittelbare Komminikation mit FHEM erreicht ohne die Einschr&auml;nkung &uuml;ber ein
     Notify gehen zu m&uuml;ssen und nur reine set Befehle ausf&uuml;hren zu k&ouml;nnen.
-  </ul>
-  <br><br>
+  </ul><br>
+  <b><u>NUN bitte die Flows AKTIVIEREN!!!</u></b><br>
+  <br>
+  <b><u>Fertig! Nach anlegen der Ger&auml;teinstanz und dem eintragen der fhemServerIP in der CommBridge sollten nach sp&auml;testens 15 Sekunden bereits die ersten Readings reinkommen. Nun wird alle 15 Sekunden probiert einen Status Request erfolgreich ab zu schlie&szlig;en. Wenn der Status sich &uuml;ber einen l&auml;ngeren Zeitraum nicht auf "activ" &auml;ndert, sollte man im Log nach eventuellen Fehlern suchen.</u></b>
+  <br><br><br>
   <a name="AMADreadings"></a>
   <b>Readings</b>
   <ul>
+    <li>airplanemode - Status des Flugmodus</li>
     <li>androidVersion - aktuell installierte Androidversion</li>
-    <li>automagicState - Statusmeldungen von der AutomagicApp <b>(Voraussetzung Android >4.3). Wer ein Android >4.3 hat und im Reading steht "wird nicht unterst&uuml;tzt", mu&szlig; in den Androideinstellungen unter Ton und Benachrichtigungen -> Benachrichtigungszugriff ein Haken setzen f&uuml;r Automagic</b></li>
-    <li>bluetooth on/off - ist auf dem Ger&auml;t Bluetooth an oder aus</li>
+    <li>automagicState - Statusmeldungen von der AutomagicApp <b>(Voraussetzung Android >4.3). Ist Android gr&ouml;&szlig;er 4.3 vorhanden und im Reading steht "wird nicht unterst&uuml;tzt", mu&szlig; in den Androideinstellungen unter Ton und Benachrichtigungen -> Benachrichtigungszugriff ein Haken f&uuml;r Automagic gesetzt werden</b></li>
+    <li>bluetooth - on/off, Bluetooth Status an oder aus</li>
     <li>checkActiveTask - Zustand einer zuvor definierten APP. 0=nicht aktiv oder nicht aktiv im Vordergrund, 1=aktiv im Vordergrund, <b>siehe Hinweis unten</b></li>
     <li>connectedBTdevices - eine Liste der verbundenen Ger&auml;t</li>
     <li>connectedBTdevicesMAC - eine Liste der MAC Adressen aller verbundender BT Ger&auml;te</li>
     <li>currentMusicAlbum - aktuell abgespieltes Musikalbum des verwendeten Mediaplayers</li>
     <li>currentMusicArtist - aktuell abgespielter Musikinterpret des verwendeten Mediaplayers</li>
     <li>currentMusicTrack - aktuell abgespielter Musiktitel des verwendeten Mediaplayers</li>
-    <li>deviceState - Status des Androidger&auml;tes, muss selbst mit setreading gesetzt werden z.B. &uuml;ber die Anwesenheitskontrolle.<br>
-    Ist Offline gesetzt, wird der Intervall zum Informationsabruf aus gesetzt.</li>
-    <li>flow_SetCommands active/inactive - gibt den Status des SetCommands Flow wieder</li>
-    <li>flow_informations active/inactive - gibt den Status des Informations Flow wieder</li>
+    <li>daydream - on/off, Daydream gestartet oder nicht</li>
+    <li>deviceState - Status des Androidger&auml;tes. !!!Gibt nicht den tats&auml;chlichen Status des Ger&auml;tes wieder!!! deviceState muss von Hand selbst  gesetzt werden. (set DEVICE deviceState) z.B. &uuml;ber die Anwesenheitskontrolle.<br> Ist Offline gesetzt, k&ouml;nnen keine set Befehle abgesetzt werden.</li>
+    <li>dockingState - undocked/docked Status ob sich das Ger&auml;t in einer Dockinstation befindet.</li>
+    <li>flow_SetCommands - active/inactive, Status des SetCommands Flow</li>
+    <li>flow_informations - active/inactive, Status des Informations Flow</li>
+    <li>flowsetVersionAtDevice - aktuell installierte Flowsetversion auf dem Device</li>
+    <li>intentRadioName - zuletzt gesrreamter Intent Radio Name</li>
+    <li>intentRadioState - Status des IntentRadio Players</li>
+    <li>keyguardSet - 0/1 Displaysperre gesetzt 0=nein 1=ja, bedeutet nicht das sie gerade aktiv ist</li>
     <li>lastSetCommandError - letzte Fehlermeldung vom set Befehl</li>
     <li>lastSetCommandState - letzter Status vom set Befehl, Befehl erfolgreich/nicht erfolgreich gesendet</li>
     <li>lastStatusRequestError - letzte Fehlermeldung vom statusRequest Befehl</li>
     <li>lastStatusRequestState - letzter Status vom statusRequest Befehl, Befehl erfolgreich/nicht erfolgreich gesendet</li>
     <li>nextAlarmDay - aktiver Alarmtag</li>
+    <li>nextAlarmState - aktueller Status des <i>"Androidinternen"</i> Weckers</li>
     <li>nextAlarmTime - aktive Alarmzeit</li>
     <li>powerLevel - Status der Batterie in %</li>
     <li>powerPlugged - Netzteil angeschlossen? 0=NEIN, 1|2=JA</li>
-    <li>screen - Bildschirm An oderAus</li>
+    <li>screen - on locked/unlocked, off locked/unlocked gibt an ob der Bildschirm an oder aus ist und gleichzeitig gesperrt oder nicht gesperrt</li>
     <li>screenBrightness - Bildschirmhelligkeit von 0-255</li>
-    <li>screenFullscreen - Vollbildmodus (On,Off)</li>
-    <li>screenOrientation - Bildschirmausrichtung (Auto,Landscape,Portrait)</li>
-    <li>volume - Lautst&auml;rkewert welcher &uuml;ber "set volume" gesetzt wurde.</li>
-    <li>volumeMusikBluetooth - Media Lautst&auml;rke von angeschlossenden Bluetooth Lautsprechern</li>
-    <li>volumeMusikSpeaker - Media Lautst&auml;rke der internen Lautsprecher</li>
+    <li>screenFullscreen - on/off, Vollbildmodus (An,Aus)</li>
+    <li>screenOrientation - Landscape,Portrait, Bildschirmausrichtung (Horizontal,Vertikal)</li>
+    <li>screenOrientationMode - auto/manual, Modus f&uuml;r die Ausrichtung (Automatisch, Manuell)</li>
+    <li>state - aktueller Status</li>
+    <li>volume - Media Lautst&auml;rkewert</li>
+    <li>volumeNotification - Benachrichtigungs Lautst&auml;rke</li>
     <br>
-    Die Readings volumeMusikBluetooth und volumeMusikSpeaker spiegeln die jeweilige Medialautst&auml;rke der angeschlossenden Bluetoothlautsprecher oder der internen Lautsprecher wieder.
-    Sofern man die jeweiligen Lautst&auml;rken ausschlie&szlig;lich &uuml;ber den Set Befehl setzt, wird eine der beiden immer mit dem "volume" Reading &uuml;ber ein stimmen.<br><br>
     Beim Reading checkActivTask mu&szlig; zuvor der Packagename der zu pr&uuml;fenden App als Attribut <i>checkActiveTask</i> angegeben werden. Beispiel: <i>attr Nexus10Wohnzimmer
     checkActiveTask com.android.chrome</i> f&uuml;r den Chrome Browser.
     <br><br>
-  </ul>
-  <b>Eigene Readings im AMAD-Device erstellen</b>
-  <ul>
-    Es ist m&ouml;glich, aus beliebigen eigenen Automagic-Flows eigene Readings im AMAD-Device zu erstellen und zu f&uuml;llen. Die &Uuml;bertragung zum FHEM AMAD-Device erfolgt umgehend &uuml;ber die AMADCommBridge - daher sollte auf eine zu h&auml;ufige Aktualisierung verzichtet werden. Die Vorgehensweise in Automagic hierf&uuml;r ist folgende:
-    <ul>
-    <br>
-      <li>zun&auml;chst erstellt man sich, soweit nicht bereits geschehen, einen Automagic-Flow der die Information, die in ein Reading &uuml;bernommen werden soll zur Verf&uuml;gung stellt</li>
-      <li>diese Information speichert man nun mittels Automagic Action Script in eine globale Variable namens global_reading_<Readingname> (beim <Readingname> auf Gro&szlig;- und Kleinschreibung achten):</li>
-    <br>
-    <code>
-      Beispiel: Das Reading Touch soll den Wert "ja" erhalten
-      Action Script: global_reading_Touch="ja"
-    </code>
-    <br><br>
-      <li>abschlie&szlig;end muss noch die &Uuml;bertragung des Wertes initiiert werden. Dies erfolgt, indem der Wert der Variable global_own_reading auf den Wert <Zeitstempel>_<Readingname> gesetzt wird (auch hier auf Gro&szlig;- und Kleinschreibung achten):</li>
-    <br>
-      <code>
-	Beispiel: Das Reading Touch soll &uuml;bertragen werden<br>
-	Action Script: global_own_reading="{getDate()}_Touch"<br>
-	Hinweis: man kann auch beide Aktionen in ein Script packen:
-	<ul>
-	  global_reading_Touch="ja";global_own_reading="{getDate()}_Touch"
-	</ul>
-      </code>
-      <br>
-	<li>M&ouml;chte man nun als n&auml;chstes z.B. eine sofortige Benachrichtigung, wenn das Display des Tablets an- oder ausgeschaltet wird, k&ouml;nnte man sich Flows bauen, welche beim De-/Aktivieren des Display ausgef&uuml;hrt werden:</li>
-      <br>
-	<code>
-	  Action Script beim Aktivieren des Displays: global_reading_Display="an";global_own_reading="{getDate()}_Display"
-	  Action Script beim Deaktivieren des Displays: global_reading_Display="aus";global_own_reading="{getDate()}_Display"
-	</code>
-    </ul>
   </ul>
   <br><br>
   <a name="AMADset"></a>
   <b>Set</b>
   <ul>
-    <li>activateVoiceInput - schaltet die Spracheingabe ein</li>
-    <li>bluetooth - Schaltet Bluetooth on/off</li>
-    <li>clearNotificationBar - (All,Automagic) l&ouml;scht alle Meldungen oder nur die Automagic Meldungen in der Statusleiste</li>
-    <li>deviceState - setzt den Device Status Online/Offline. Siehe Readings</li>
-    <li>mediaPlayer - steuert den Standard Mediaplayer. play, stop, Titel z&uuml;r&uuml;ck, Titel vor.</li>
-    <li>nextAlarmTime - setzt die Alarmzeit. Geht aber nur innerhalb der n&auml;chsten 24Std.</li>
-    <li>notifySndFile - spielt die angegebende Mediadatei auf dem Androidger&auml;t ab. <b>Die aufzurufende Mediadatei mu&szlig; sich im Ordner /storage/emulated/0/Notifications/ befinden.</b></li>
-    <li>openURL - &ouml;ffnet eine URL im Standardbrowser</li>
-    <li>screen - setzt den Bildschirm on/off mit Sperre, in den Automagic Einstellungen muss "Admin Funktion" gesetzt werden sonst funktioniert "Screen off" nicht.</li>
+    <li>activateVoiceInput - aktiviert die Spracheingabe</li>
+    <li>bluetooth - on/off, aktiviert/deaktiviert Bluetooth</li>
+    <li>clearNotificationBar - All,Automagic, l&ouml;scht alle Meldungen oder nur die Automagic Meldungen in der Statusleiste</li>
+    <li>currentFlowsetUpdate - f&uuml;rt ein Flowsetupdate auf dem Device durch</li>
+    <li>deviceState - online/offline, setzt den Device Status . <b>mehr Info unter Readings</b></li>
+    <li>installFlowSource - installiert einen Flow auf dem Device, <u>das XML File muss unter /tmp/ liegen und die Endung xml haben</u>. <b>Bsp:</b> <i>set TabletWohnzimmer installFlowSource WlanUebwerwachen.xml</i></li>
+    <li>mediaPlayer - play, stop, next, back  ,steuert den Standard Mediaplayer</li>
+    <li>nextAlarmTime - setzt die Alarmzeit. gilt aber nur innerhalb der n&auml;chsten 24Std.</li>
+    <li>notifySndFile - spielt die angegebene Mediadatei auf dem Androidger&auml;t ab. <b>Die aufzurufende Mediadatei mu&szlig; sich im Ordner /storage/emulated/0/Notifications/ befinden.</b></li>
+    <li>screenBrightness - setzt die Bildschirmhelligkeit, von 0-255.</li>
     <li>screenMsg - versendet eine Bildschirmnachricht</li>
-    <li>statusRequest - Fordert einen neuen Statusreport beim Device an</li>
+    <li>sendintent - sendet einen Intentstring <u>Bsp:</u><i> set $AMADDEVICE sendIntent org.smblott.intentradio.PLAY url http://stream.klassikradio.de/live/mp3-192/stream.klassikradio.de/play.m3u name Klassikradio</i>, der erste Befehl ist die Aktion und der zweite das Extra. Es k&ouml;nnen immer zwei Extras mitgegeben werden.</li>
+    <li>statusRequest - Fordert einen neuen Statusreport beim Device an. Es k&ouml;nnen nicht von allen Readings per statusRequest die Daten geholt werden. Einige wenige geben nur bei Status&auml;nderung ihren Status wieder.</li>
+    <li>timer - setzt einen Timer innerhalb der als Standard definierten ClockAPP auf dem Device. Es k&ouml;nnen nur Sekunden angegeben werden.</li>
     <li>ttsMsg - versendet eine Nachricht welche als Sprachnachricht ausgegeben wird</li>
-    <li>volume - setzt die Medialautst&auml;rke. Entweder die internen Lautsprecher oder sofern angeschlossen die Bluetoothlautsprecher</li>
+    <li>vibrate - l&auml;sst das Androidger&auml;t vibrieren</li>
+    <li>volume - setzt die Medialautst&auml;rke. Entweder die internen Lautsprecher oder sofern angeschlossen die Bluetoothlautsprecher und per Klinkenstecker angeschlossene Lautsprecher</li>
+    <li>volumeNotification - setzt die Benachrichtigungslautst&auml;rke.</li>
   </ul>
   <br>
   <b>Set abh&auml;ngig von gesetzten Attributen</b>
   <ul>
     <li>changetoBtDevice - wechselt zu einem anderen Bluetooth Ger&auml;t. <b>Attribut setBluetoothDevice mu&szlig; gesetzt sein. Siehe Hinweis unten!</b></li>
-    <li>mediaPlayer - steuert den Standard Mediaplayer. play, stop, Titel z&uuml;r&uuml;ck, Titel vor. <b>Attribut fhemServerIP</b></li>
     <li>openApp - &ouml;ffnet eine ausgew&auml;hlte App. <b>Attribut setOpenApp</b></li>
-    <li>screenBrightness - setzt die Bildschirmhelligkeit, von 0-255 <b>Attribut setScreenBrightness</b></li>
-    Wenn Ihr das "set screenBrightness" verwenden wollt, muss eine kleine Anpassung im Flow SetCommands vorgenommen werden. &Ouml;ffnet die Aktion (eines der Vierecke ganz ganz unten)
-    SetzeSystemeinstellung:System und macht einen Haken bei "Ich habe die Einstellungen &uuml;berpr&uuml;ft, ich weiss was ich tue".
-    <li>screenFullscreen - Schaltet den Vollbildmodus on/off. <b>Attribut setFullscreen</b></li>
-    <li>screenOrientation - Schaltet die Bildschirmausrichtung Auto/Landscape/Portait. <b>Attribut setScreenOrientation</b></li>
-    <li>system - setzt Systembefehle ab (nur bei gerootetet Ger&auml;en). Reboot <b>Attribut root</b>, in den Automagic Einstellungen muss "Root Funktion" gesetzt werden</li>
+    <li>openURL - &ouml;ffnet eine URL im Standardbrowser, sofern kein anderer Browser &uuml;ber das <b>Attribut setOpenUrlBrowser</b> ausgew&auml;hlt wurde.<b> Bsp:</b><i> attr Tablet setOpenUrlBrowser de.ozerov.fully|de.ozerov.fully.MainActivity, das erste ist der Package Name und das zweite der Class Name</i></li>
+    <li>screen - on/off/lock/unlock schaltet den Bildschirm ein/aus oder sperrt/entsperrt ihn, in den Automagic Einstellungen muss "Admin Funktion" gesetzt werden sonst funktioniert "Screen off" nicht. <b>Attribut setScreenOnForTimer</b> &auml;ndert die Zeit wie lange das Display an bleiben soll!</li>
+    <li>screenFullscreen - on/off, (aktiviert/deaktiviert) den Vollbildmodus. <b>Attribut setFullscreen</b></li>
+    <li>screenLock - Sperrt den Bildschirm mit Pinabfrage. <b>Attribut setScreenlockPIN - hier die Pin daf&uuml;r eingeben. Erlaubt sind nur Zahlen. Es m&uuml;&szlig;en mindestens 4, bis max 16 Zeichen verwendet werden.</b></li>
+    <li>screenOrientation - Auto,Landscape,Portait,  aktiviert die Bildschirmausrichtung (Automatisch,Horizontal,Vertikal). <b>Attribut setScreenOrientation</b></li>
+    <li>system - setzt Systembefehle ab (nur bei gerootetet Ger&auml;en). reboot,shutdown,airplanemodeON (kann nur aktiviert werden) <b>Attribut root</b>, in den Automagic Einstellungen muss "Root Funktion" gesetzt werden</li>
     <br>
-    Um openApp verwenden zu k&ouml;nnen, muss als Attribut ein, oder durch Komma getrennt, mehrere App Namen gesetzt werden. Der App Name ist frei w&auml;hlbar und nur zur Wiedererkennung notwendig.
-    Der selbe App Name mu&szlig; im Flow SetCommands auf der linken Seite unterhalb der Raute Expression:"openApp" in einen der 5 Str&auml;nge (eine App pro Strang) in beide Rauten eingetragen werden. Danach wird
-    in das Viereck die App ausgew&auml;lt welche durch den Attribut App Namen gestartet werden soll.<br><br>
+    Um openApp verwenden zu k&ouml;nnen, muss als Attribut der Package Name der App angegeben werden.
+    <br><br>
     Um zwischen Bluetoothger&auml;ten wechseln zu k&ouml;nnen, mu&szlig; das Attribut setBluetoothDevice mit folgender Syntax gesetzt werden. <b>attr &lt;DEVICE&gt; BTdeviceName1|MAC,BTDeviceName2|MAC</b> Es muss
     zwingend darauf geachtet werden das beim BTdeviceName kein Leerzeichen vorhanden ist. Am besten zusammen oder mit Unterstrich. Achtet bei der MAC darauf das Ihr wirklich nach jeder zweiten Zahl auch
     einen : drin habt<br>
@@ -214,11 +141,7 @@
   <br><br><br>
   <u><b>Anwendungsbeispiele:</b></u>
   <ul><br>
-    Ich habe die Ladeger&auml;te f&uuml;r meine Androidger&auml;te an Funkschaltsteckdosen. ein DOIF schaltet bei unter 30% die Steckdose ein und bei &uuml;ber 90% wieder aus. Morgens lasse ich mich
-    &uuml;ber mein Tablet im Schlafzimmer mit Musik wecken. Verwendet wird hierzu der wakeuptimer des RESIDENTS Modules. Das abspielen stoppe ich dann von Hand. Danach erfolgt noch eine
-    Ansage wie das Wetter gerade ist und wird.<br>
-    Mein 10" Tablet im Wohnzimmer ist Mediaplayer f&uuml;r das Wohnzimmer mit Bluetoothlautsprechern. Die Lautst&auml;rke wird automatisch runter gesetzt wenn die Fritzbox einen Anruf auf das
-    Wohnzimmer Handger&auml;t signalisiert.
+    <a href="http://www.fhemwiki.de/wiki/AMAD#Anwendungsbeispiele">Hier verweise ich auf den gut gepflegten Wikieintrag</a>
   </ul>
   <br><br><br>
 </ul>
