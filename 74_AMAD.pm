@@ -280,7 +280,7 @@ sub AMAD_statusRequest($) {
 	    timeout	=> 30,
 	    hash	=> $hash,
 	    method	=> "GET",
-	    header	=> "fhemIP: $fhemip\r\nfhemDevice: $name\r\nactiveTask: $activetask\r\napSSID: $apssid\r\nbport: $bport",
+	    header	=> "fhemip: $fhemip\r\nfhemdevice: $name\r\nactivetask: $activetask\r\napssid: $apssid\r\nbport: $bport",
 	    doTrigger	=> 1,
 	    callback	=> \&AMAD_statusRequestErrorHandling,
 	}
