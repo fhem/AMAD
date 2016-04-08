@@ -37,7 +37,7 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "2.0.0";
+my $modulversion = "2.0.1";
 my $flowsetversion = "2.0.0";
 
 
@@ -61,7 +61,7 @@ sub AMAD_Initialize($) {
 			  "setBluetoothDevice ".
 			  "setScreenlockPIN ".
 			  "setScreenOnForTimer ".
-			  "setOpenUrlBroswer ".
+			  "setOpenUrlBrowser ".
 			  "root:0,1 ".
 			  "port ".
 			  "disable:1 ".
@@ -709,7 +709,7 @@ sub AMAD_SelectSetCmd($$@) {
     elsif( lc $cmd eq 'openurl' ) {
     
 	my $openurl = join( " ", @data );
-	my $browser = AttrVal( $name, "setOpenUrlBroswer", "com.android.chrome|com.google.android.apps.chrome.Main" );
+	my $browser = AttrVal( $name, "setOpenUrlBrowser", "com.android.chrome|com.google.android.apps.chrome.Main" );
 	my @browserapp = split( /\|/, $browser );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/openURL?url=".$openurl."&browserapp=".$browserapp[0]."&browserappclass=".$browserapp[1];
