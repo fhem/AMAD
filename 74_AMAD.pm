@@ -1425,7 +1425,7 @@ sub AMAD_decrypt($) {
     </ul>
     <br>
     Diese Anweisung erstellt zwei neues AMAD-Device im Raum AMAD.Der Parameter &lt;IP-ADRESSE&gt; legt die IP Adresse des Android Ger&auml;tes fest und der Parameter WLANAP-SSID die SSID Deines WLAN's. Es k&ouml;nnen mehrere SSID's mit angegeben werden, welche dann durch Komma getrennt sein m&uuml;ssen. Haben die SSID's Leerzeichen im Namen werde die Leerzeichen durch 2 @ aufgef&uuml;llt. Gibt es Androidger&auml;te welche nicht &uuml;ber WLAN sondern USB-Ethernet angeschlossen sind, ist die WLANAP-SSID mit "usb-ethernet" zu benennen<br>
-    Das zweite Device ist die AMADCommBridge welche als Kommunikationsbr&uuml;cke vom Androidger&auml;t zu FHEM diehnt. !!!Comming Soon!!! Wer den Port &auml;ndern m&ouml;chte, kann dies &uuml;ber das Attribut "port" tun. Ihr solltet aber wissen was Ihr tut, da dieser Port im HTTP Request Trigger der beiden Flows eingestellt ist. Demzufolge mu&szlig; der Port dort auch ge&auml;ndert werden. Der Port f&uuml;r die Bridge kann ohne Probleme im Bridge Device mittels dem Attribut "port" ver&auml;ndert werden.
+    Das zweite Device ist die AMADCommBridge welche als Kommunikationsbr&uuml;cke vom Androidger&auml;t zu FHEM diehnt. !!!Comming Soon!!! Wer den Port &auml;ndern m&ouml;chte, kann dies &uuml;ber das Attribut "port" tun. <b>Ihr solltet aber wissen was Ihr tut, da dieser Port im HTTP Request Trigger der beiden Flows eingestellt ist. Demzufolge mu&szlig; der Port dort auch ge&auml;ndert werden. Der Port f&uuml;r die Bridge kann ohne Probleme im Bridge Device mittels dem Attribut "port" ver&auml;ndert werden.
     <br>
     Der Port f&uuml;r die Bridge kann ohne Probleme im Bridge Device mittels dem Attribut "port" ver&auml;ndert werden.</b>
   </ul>
