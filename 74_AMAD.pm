@@ -37,8 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "2.0.2";
-my $flowsetversion = "2.0.4";
+my $modulversion = "2.0.3";
+my $flowsetversion = "2.0.5";
 
 
 
@@ -62,6 +62,8 @@ sub AMAD_Initialize($) {
 			  "setScreenlockPIN ".
 			  "setScreenOnForTimer ".
 			  "setOpenUrlBrowser ".
+			  "setNotifySndFilePath ".
+			  "setTtsMsgSpeed ".
 			  "root:0,1 ".
 			  "port ".
 			  "disable:1 ".
@@ -159,7 +161,7 @@ sub AMAD_Undef($$) {
 
 sub AMAD_Attr(@) {
 
-my ( $cmd, $name, $attrName, $attrVal ) = @_;
+    my ( $cmd, $name, $attrName, $attrVal ) = @_;
     my $hash = $defs{$name};
     
     my $orig = $attrVal;
@@ -598,13 +600,14 @@ sub AMAD_SelectSetCmd($$@) {
     }
     
     elsif( lc $cmd eq 'ttsmsg' ) {
-    
-	my $msg = join( " ", @data );
+
+        my $msg = join( " ", @data );
+        my $speed = AttrVal( $name, "setTtsMsgSpeed", "1.0" );
 	
 	$msg =~ s/%/%25/g;
 	$msg =~ s/\s/%20/g;    
 	
-	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/ttsMsg?message=$msg";
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/ttsMsg?message=".$msg."&msgspeed=".$speed;
     
 	return AMAD_HTTP_POST( $hash,$url );
     }
@@ -775,8 +778,9 @@ sub AMAD_SelectSetCmd($$@) {
     elsif( lc $cmd eq 'notifysndfile' ) {
     
 	my $notify = join( " ", @data );
+	my $filepath = AttrVal( $name, "setNotifySndFilePath", "/storage/emulated/0/Notifications/" );
 
-	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/playnotifysnd?notifyfile=$notify";
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/playnotifysnd?notifyfile=".$notify."&notifypath=".$filepath;
     
 	return AMAD_HTTP_POST( $hash,$url );
     }
@@ -1063,7 +1067,8 @@ sub AMAD_CommBridge_Read($) {
 
     if ( $data[0] =~ /currentFlowsetUpdate.xml/ ) {
 
-        $response = qx(cat /opt/fhem/FHEM/lib/74_AMADautomagicFlowset_$flowsetversion.xml);
+        my $fhempath = $attr{global}{modpath};
+        $response = qx(cat $fhempath/FHEM/lib/74_AMADautomagicFlowset_$flowsetversion.xml);
         $c = $hash->{CD};
         print $c "HTTP/1.1 200 OK\r\n",
             "Content-Type: text/plain\r\n",
