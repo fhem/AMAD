@@ -37,8 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "2.0.3";
-my $flowsetversion = "2.0.5";
+my $modulversion = "2.1.0";
+my $flowsetversion = "2.1.0";
 
 
 
@@ -497,7 +497,10 @@ sub AMAD_Set($$@) {
 	$list .= "ttsMsg ";
 	$list .= "volume:slider,0,1,15 ";
 	$list .= "deviceState:online,offline ";
-	$list .= "mediaPlayer:play,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
+	$list .= "googleMusic:play,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
+	$list .= "amazonMusic:play,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
+	$list .= "spotifyMusic:play,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
+	$list .= "tuneinRadio:play,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
 	$list .= "screenBrightness:slider,0,1,255 ";
 	$list .= "screen:on,off,lock,unlock ";
 	$list .= "screenOrientation:auto,landscape,portrait " if( AttrVal( $name, "setScreenOrientation", "0" ) eq "1" );
@@ -516,13 +519,17 @@ sub AMAD_Set($$@) {
 	$list .= "volumeNotification:slider,0,1,7 ";
 	$list .= "vibrate:noArg ";
 	$list .= "sendIntent ";
+	$list .= "openCall ";
 	$list .= "currentFlowsetUpdate:noArg ";
 	$list .= "installFlowSource ";
 
 	if( lc $cmd eq 'screenmsg'
 	    || lc $cmd eq 'ttsmsg'
 	    || lc $cmd eq 'volume'
-	    || lc $cmd eq 'mediaplayer'
+	    || lc $cmd eq 'googlemusic'
+	    || lc $cmd eq 'amazonmusic'
+	    || lc $cmd eq 'spotifymusic'
+	    || lc $cmd eq 'tuneinradio'
 	    || lc $cmd eq 'devicestate'
 	    || lc $cmd eq 'screenbrightness'
 	    || lc $cmd eq 'screenorientation'
@@ -544,6 +551,7 @@ sub AMAD_Set($$@) {
 	    || lc $cmd eq 'sendintent'
 	    || lc $cmd eq 'currentflowsetupdate'
 	    || lc $cmd eq 'installflowsource'
+	    || lc $cmd eq 'opencall'
 	    || lc $cmd eq 'vibrate') {
 
 	    Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
@@ -630,11 +638,11 @@ sub AMAD_SelectSetCmd($$@) {
 	return AMAD_HTTP_POST( $hash, $url );
     }
     
-    elsif( lc $cmd eq 'mediaplayer' ) {
+    elsif( lc $cmd eq 'googlemusic' or lc $cmd eq 'amazonmusic' or lc $cmd eq 'spotifymusic' or lc $cmd eq 'tuneinradio' ) {
     
 	my $btn = join( " ", @data );
 
-	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/mediaPlayer?button=$btn";
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/multimediaControl?mplayer=".$cmd."&button=".$btn;
     
 	return AMAD_HTTP_POST( $hash,$url );
     }
@@ -834,6 +842,15 @@ sub AMAD_SelectSetCmd($$@) {
         my $flowname = join( " ", @data );
 
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/installFlow?flowname=$flowname";
+	
+	return AMAD_HTTP_POST( $hash,$url );
+    }
+    
+    elsif( lc $cmd eq 'opencall' ) {
+    
+        my $callnumber = join( " ", @data );
+
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/openCall?callnumber=$callnumber";
 	
 	return AMAD_HTTP_POST( $hash,$url );
     }
