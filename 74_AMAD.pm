@@ -37,8 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "2.1.0";
-my $flowsetversion = "2.1.0";
+my $modulversion = "2.1.1";
+my $flowsetversion = "2.1.1";
 
 
 
@@ -122,10 +122,10 @@ sub AMAD_Define($$) {
 	
 	$attr{$name}{room} = "AMAD" if( !defined( $attr{$name}{room} ) );
 	readingsSingleUpdate ( $hash, "state", "initialized", 1 ) if( $hash->{HOST} );
-	#readingsSingleUpdate ( $hash, "deviceState", "online", 1 ) if( $hash->{HOST} );
+	readingsSingleUpdate ( $hash, "deviceState", "unknown", 1 ) if( $hash->{HOST} );
         
         RemoveInternalTimer($hash);
-	InternalTimer( gettimeofday()+15, "AMAD_GetUpdate", $hash, 0 ) if( ($hash->{HOST}) && ($hash->{APSSID}) );
+	InternalTimer( gettimeofday()+30, "AMAD_GetUpdate", $hash, 0 ) if( ($hash->{HOST}) && ($hash->{APSSID}) );
 
 	$modules{AMAD}{defptr}{$hash->{HOST}} = $hash;
 
@@ -187,9 +187,10 @@ sub AMAD_Attr(@) {
         }
     }
     
-    elsif( $attrName eq "setScreenBrightness" ) {
-        Log3 $name, 1, "AMAD ($name) - !!!The Attribut \"setScreenBrightness\" is obsolete and will be remove in the future!!! Please delete the attribut description in your AMAD Device";
-        Log3 $name, 1, "AMAD ($name) - !!!Das Attribut \"setScreenBrightness\" wird nicht mehr benötigt und in zukünftigen Versionen entfernt!!! Bitte lösche die Attributszuweisung aus Deinem AMAD Device";
+    elsif( $attrName eq "checkActiveTask" ) {
+    
+        AMAD_statusRequest( $hash );
+        Log3 $name, 3, "AMAD ($name) - $cmd $attrName $attrVal and run statusRequest";
     }
     
     elsif( $attrName eq "port" ) {
@@ -246,9 +247,10 @@ my ( $hash ) = @_;
     
     RemoveInternalTimer( $hash );
 
-    if( $init_done && ReadingsVal( $name, "deviceState", "online" ) eq "online" && AttrVal( $name, "disable", 0 ) ne "1" && ReadingsVal( $bname, "fhemServerIP", "not set" ) ne "not set" && $hash->{APSSID} ) {
+    if( $init_done && ( ReadingsVal( $name, "deviceState", "unknown" ) eq "unknown" or ReadingsVal( $name, "deviceState", "online" ) eq "online" ) && AttrVal( $name, "disable", 0 ) ne "1" && ReadingsVal( $bname, "fhemServerIP", "not set" ) ne "not set" && $hash->{APSSID} ) {
     
         AMAD_statusRequest( $hash );
+        AMAD_checkDeviceState( $hash );
         
     } else {
 
@@ -496,7 +498,6 @@ sub AMAD_Set($$@) {
 	$list .= "screenMsg ";
 	$list .= "ttsMsg ";
 	$list .= "volume:slider,0,1,15 ";
-	$list .= "deviceState:online,offline ";
 	$list .= "googleMusic:play,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
 	$list .= "amazonMusic:play,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
 	$list .= "spotifyMusic:play,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
@@ -530,7 +531,6 @@ sub AMAD_Set($$@) {
 	    || lc $cmd eq 'amazonmusic'
 	    || lc $cmd eq 'spotifymusic'
 	    || lc $cmd eq 'tuneinradio'
-	    || lc $cmd eq 'devicestate'
 	    || lc $cmd eq 'screenbrightness'
 	    || lc $cmd eq 'screenorientation'
 	    || lc $cmd eq 'screenfullscreen'
@@ -559,7 +559,7 @@ sub AMAD_Set($$@) {
 	    return "set command only works if state not equal initialized" if( ReadingsVal( $hash->{NAME}, "state", 0 ) eq "initialized");
 	    return "Cannot set command, FHEM Device is disabled" if( AttrVal( $name, "disable", "0" ) eq "1" );
 	    
-	    return AMAD_SelectSetCmd( $hash, $cmd, @val ) if( @val ) && ( ReadingsVal( $name, "deviceState", "online" ) eq "offline" ) && ( lc $cmd eq 'devicestate' );
+	    return "Cannot set command, FHEM Device is unknown" if( ReadingsVal( $name, "deviceState", "online" ) eq "unknown" );
 	    return "Cannot set command, FHEM Device is offline" if( ReadingsVal( $name, "deviceState", "online" ) eq "offline" );
 	  
 	    return AMAD_SelectSetCmd( $hash, $cmd, @val ) if( @val ) || ( lc $cmd eq 'statusrequest' ) || ( lc $cmd eq 'activatevoiceinput' ) || ( lc $cmd eq 'vibrate' ) || ( lc $cmd eq 'currentflowsetupdate' );
@@ -645,15 +645,6 @@ sub AMAD_SelectSetCmd($$@) {
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/multimediaControl?mplayer=".$cmd."&button=".$btn;
     
 	return AMAD_HTTP_POST( $hash,$url );
-    }
-    
-    elsif( lc $cmd eq 'devicestate' ) {
-    
-	my $v = join( " ", @data );
-
-	readingsSingleUpdate( $hash, $cmd, $v, 1 );
-      
-	return undef;
     }
     
     elsif( lc $cmd eq 'screenbrightness' ) {
@@ -749,7 +740,7 @@ sub AMAD_SelectSetCmd($$@) {
     
     elsif( lc $cmd eq 'statusrequest' ) {
     
-	AMAD_GetUpdate( $hash );
+	AMAD_statusRequest( $hash );
 	return undef;
     }
     
@@ -1018,6 +1009,20 @@ sub AMAD_HTTP_POSTerrorHandling($$$) {
     return undef;
 }
 
+sub AMAD_checkDeviceState($) {
+
+    my ( $hash ) = @_;
+    my $name = $hash->{NAME};
+
+    Log3 $name, 4, "AMAD ($name) - AMAD_checkDeviceState: run Check";
+
+    RemoveInternalTimer( $hash );
+    readingsSingleUpdate( $hash, "deviceState", "offline", 1 ) if( ReadingsAge($name,"deviceState",180) > 180 );
+    InternalTimer( gettimeofday()+180, "AMAD_checkDeviceState", $hash, 0 );
+    
+    Log3 $name, 4, "AMAD ($name) - AMAD_checkDeviceState: set new Timer";
+}
+
 sub AMAD_CommBridge_Open($) {
 
     my ( $hash ) = @_;
@@ -1164,7 +1169,7 @@ sub AMAD_CommBridge_Read($) {
     
     elsif ( $fhemcmd =~ /readingsval\b/ ) {
         my $fhemCmd = $data[1];
-        my @datavalue = split( ' ', $data[1] );
+        my @datavalue = split( ' ', $fhemCmd );
 
         $response = ReadingsVal( $datavalue[0], $datavalue[1], $datavalue[2] );
         $c = $hash->{CD};
@@ -1182,7 +1187,7 @@ sub AMAD_CommBridge_Read($) {
 	
 	Log3 $bname, 4, "AMAD ($bname) - AMAD_CommBridge: receive fhem-function command";
 	
-        if( $fhemcmd =~ /^{.*}$/ ) {
+        if( $fhemCmd =~ /^{.*}$/ ) {
         
             $response = $fhemCmd if( ReadingsVal( $bname, "expertMode", 0 ) eq "1" );
             
