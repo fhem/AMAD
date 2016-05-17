@@ -37,8 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "2.1.1";
-my $flowsetversion = "2.1.1";
+my $modulversion = "2.1.3";
+my $flowsetversion = "2.1.4";
 
 
 
@@ -839,9 +839,11 @@ sub AMAD_SelectSetCmd($$@) {
     
     elsif( lc $cmd eq 'opencall' ) {
     
-        my $callnumber = join( " ", @data );
+        my $string = join( " ", @data );
+        my ($callnumber, $time) = split( "[ \t][ \t]*", $string );
+        $time = "none" if( !$time );
 
-	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/openCall?callnumber=$callnumber";
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/openCall?callnumber=".$callnumber."&hanguptime=".$time;
 	
 	return AMAD_HTTP_POST( $hash,$url );
     }
