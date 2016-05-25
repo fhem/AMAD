@@ -37,8 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "2.1.3";
-my $flowsetversion = "2.1.4";
+my $modulversion = "2.1.5";
+my $flowsetversion = "2.1.5";
 
 
 
@@ -97,6 +97,7 @@ sub AMAD_Define($$) {
     $hash->{VERSIONFLOWSET} 	= $flowsetversion;
     $hash->{helper}{infoErrorCounter} = 0 if( $hash->{HOST} );
     $hash->{helper}{setCmdErrorCounter} = 0 if( $hash->{HOST} );
+    $hash->{helper}{deviceStateErrorCounter} = 0 if( $hash->{HOST} );
 
 
 
@@ -138,7 +139,7 @@ sub AMAD_Undef($$) {
     my ( $hash, $arg ) = @_;
     
     if( $hash->{BRIDGE} ) {
-	delete $modules{AMAD}{defptr}{BRIDGE};
+	delete $modules{AMAD}{defptr}{BRIDGE} if(defined($modules{AMAD}{defptr}{BRIDGE}));
 	TcpServer_Close( $hash );
 
     } else {
@@ -478,6 +479,8 @@ sub AMAD_ResponseProcessing($$) {
     
     readingsBulkUpdate( $hash, "state", "active" ) if( ReadingsVal( $name, "state", 0 ) eq "initialized" );
     readingsEndUpdate( $hash, 1 );
+    
+    $hash->{helper}{deviceStateErrorCounter} = 0 if( $hash->{helper}{deviceStateErrorCounter} > 0 and ReadingsVal( $name, "deviceState", "offline") eq "online" );
     
     return undef;
 }
@@ -1019,8 +1022,15 @@ sub AMAD_checkDeviceState($) {
     Log3 $name, 4, "AMAD ($name) - AMAD_checkDeviceState: run Check";
 
     RemoveInternalTimer( $hash );
-    readingsSingleUpdate( $hash, "deviceState", "offline", 1 ) if( ReadingsAge($name,"deviceState",180) > 180 );
-    InternalTimer( gettimeofday()+180, "AMAD_checkDeviceState", $hash, 0 );
+    
+    if( ReadingsAge( $name, "deviceState", 90 ) > 90 ) {
+    
+        AMAD_statusRequest( $hash ) if( $hash->{helper}{deviceStateErrorCounter} == 0 );
+        readingsSingleUpdate( $hash, "deviceState", "offline", 1 ) if( ReadingsAge( $name, "deviceState", 180) > 180 and $hash->{helper}{deviceStateErrorCounter} > 0 );
+        $hash->{helper}{deviceStateErrorCounter} = ( $hash->{helper}{deviceStateErrorCounter} + 1 );
+    }
+    
+    InternalTimer( gettimeofday()+90, "AMAD_checkDeviceState", $hash, 0 );
     
     Log3 $name, 4, "AMAD ($name) - AMAD_checkDeviceState: set new Timer";
 }
@@ -1081,7 +1091,7 @@ sub AMAD_CommBridge_Read($) {
     my @data = split( '\R\R', $buf );
     
     my $header = AMAD_Header2Hash( $data[0] );
-    my $device = $header->{FHEMDEVICE};
+    my $device = $header->{FHEMDEVICE} if(defined($header->{FHEMDEVICE}));
     my $dhash = $defs{$device};
     my $response;
     my $c;
@@ -1289,7 +1299,7 @@ sub AMAD_decrypt($) {
   <b>How to use AMAD?</b>
   <ul>
     <li>install the "Automagic Premium" app from the Google Play store or use the test version from <a href="https://automagic4android.com/de/testversion">here</a></li>
-    <li>install the flowset 74_AMADautomagicFlowset$VERSION.xml from the directory $INSTALLFHEM/FHEM/lib/ on your Android device. Do not yet activate the flows.</li>
+    <li>install the flowset 74_AMADautomagicFlowset$VERSION.xml from the directory $INSTALLFHEM/FHEM/lib/ on your Android device and activate.</li>
   </ul>
   <br>
   Now you need to define a device in FHEM.
@@ -1316,7 +1326,6 @@ sub AMAD_decrypt($) {
     Please us the following command for configuration of the FHEM server IP address in the AMADCommBridge: <i>set AMADCommBridge fhemServerIP &lt;FHEM-IP&gt;.</i><br>
     Additionally the <i>expertMode</i> may be configured. By this setting a direct communication with FHEM will be established without the restriction of needing to make use of a notify to execute set commands.
   </ul><br>
-  <b><u>NOW please activate the flows in Automagic!!!</u></b><br>
   <br>
   <b><u>You are finished now! After 15 seconds latest the readings of your AMAD Android device should be updated. Consequently each 15 seconds a status request will be sent. If the state of your AMAD Android device does not change to "active" over a longer period of time one should take a look into the log file for error messages.</u></b>
   <br><br><br>
@@ -1334,7 +1343,7 @@ sub AMAD_decrypt($) {
     <li>currentMusicArtist - currently playing artist of mediaplayer</li>
     <li>currentMusicTrack - currently playing song title of mediaplayer</li>
     <li>daydream - on/off, daydream currently active</li>
-    <li>deviceState - state of Android devices. !!!It does not show the real state!!! deviceState must be set manually by the command "set DEVICE deviceState" e.g. by your PRESENCE function.<br> In case deviceState is set to "offline" no set commands can be issued.</li>
+    <li>deviceState - state of Android devices. unknown, online, offline.</li>
     <li>dockingState - undocked/docked, Android device in docking station</li>
     <li>flow_SetCommands - active/inactive, state of SetCommands flow</li>
     <li>flow_informations - active/inactive, state of Informations flow</li>
@@ -1369,17 +1378,18 @@ sub AMAD_decrypt($) {
   <b>Set</b>
   <ul>
     <li>activateVoiceInput - start voice input on Android device</li>
+    <li>amazonMusic - play/stop/next/back , controlling the amazon music media player</li>
     <li>bluetooth - on/off, switch bluetooth on/off</li>
     <li>clearNotificationBar - All/Automagic, deletes all or only Automagic notifications in status bar</li>
     <li>currentFlowsetUpdate - start flowset update on Android device</li>
-    <li>deviceState - online/offline, sets device state . <b>For more information see section Readings</b></li>
+    <li>googleMusic - play/stop/next/back , controlling the google play music media player</li>
     <li>installFlowSource - install a Automagic flow on device, <u>XML file must be stored in /tmp/ with extension xml</u>. <b>Example:</b> <i>set TabletWohnzimmer installFlowSource WlanUebwerwachen.xml</i></li>
-    <li>mediaPlayer - play/stop/next/back , controlling the standard media player</li>
     <li>nextAlarmTime - sets the alarm time. Only valid for the next 24 hours.</li>
     <li>notifySndFile - start playing the defined media file on the Android device <b>The media file must be stored in /storage/emulated/0/Notifications/</b></li>
     <li>screenBrightness - 0-255, set screen brighness</li>
     <li>screenMsg - display message on screen of Android device</li>
     <li>sendintent - send intent string <u>Example:</u><i> set $AMADDEVICE sendIntent org.smblott.intentradio.PLAY url http://stream.klassikradio.de/live/mp3-192/stream.klassikradio.de/play.m3u name Klassikradio</i>, first parameter contains the action, second parameter contains the extra. At most two extras can be used.</li>
+    <li>spotifyMusic - play/stop/next/back , controlling the spotify media player</li>
     <li>statusRequest - Get a new status report of Android device. Not all readings can be updated using a statusRequest as some readings are only updated if the value of the reading changes.</li>
     <li>timer - set a countdown timer in the "Clock" stock app. Only seconds are allowed as parameter.</li>
     <li>ttsMsg - send a message which will be played as voice message</li>
@@ -1440,7 +1450,7 @@ sub AMAD_decrypt($) {
   <b>Wie genau verwendet man nun AMAD?</b>
   <ul>
     <li>man installiert die App "Automagic Premium" aus dem PlayStore oder die Testversion von <a href="https://automagic4android.com/de/testversion">hier</a></li>
-    <li>dann installiert man das Flowset 74_AMADautomagicFlowset$VERSION.xml aus dem Ordner $INSTALLFHEM/FHEM/lib/ auf dem Androidger&auml;t. NOCH NICHT die Flows aktivieren</li>
+    <li>dann installiert man das Flowset 74_AMADautomagicFlowset$VERSION.xml aus dem Ordner $INSTALLFHEM/FHEM/lib/ auf dem Androidger&auml;t und aktiviert die Flows.</li>
   </ul>
   <br>
   Es mu&szlig; noch ein Device in FHEM anlegt werden.
@@ -1486,7 +1496,7 @@ sub AMAD_decrypt($) {
     <li>currentMusicArtist - aktuell abgespielter Musikinterpret des verwendeten Mediaplayers</li>
     <li>currentMusicTrack - aktuell abgespielter Musiktitel des verwendeten Mediaplayers</li>
     <li>daydream - on/off, Daydream gestartet oder nicht</li>
-    <li>deviceState - Status des Androidger&auml;tes. !!!Gibt nicht den tats&auml;chlichen Status des Ger&auml;tes wieder!!! deviceState muss von Hand selbst  gesetzt werden. (set DEVICE deviceState) z.B. &uuml;ber die Anwesenheitskontrolle.<br> Ist Offline gesetzt, k&ouml;nnen keine set Befehle abgesetzt werden.</li>
+    <li>deviceState - Status des Androidger&auml;tes. unknown, online, offline.</li>
     <li>dockingState - undocked/docked Status ob sich das Ger&auml;t in einer Dockinstation befindet.</li>
     <li>flow_SetCommands - active/inactive, Status des SetCommands Flow</li>
     <li>flow_informations - active/inactive, Status des Informations Flow</li>
@@ -1521,17 +1531,18 @@ sub AMAD_decrypt($) {
   <b>Set</b>
   <ul>
     <li>activateVoiceInput - aktiviert die Spracheingabe</li>
+    <li>amazonMusic - play, stop, next, back  ,steuert den Amazon Musik Mediaplayer</li>
     <li>bluetooth - on/off, aktiviert/deaktiviert Bluetooth</li>
     <li>clearNotificationBar - All,Automagic, l&ouml;scht alle Meldungen oder nur die Automagic Meldungen in der Statusleiste</li>
     <li>currentFlowsetUpdate - f&uuml;rt ein Flowsetupdate auf dem Device durch</li>
-    <li>deviceState - online/offline, setzt den Device Status . <b>mehr Info unter Readings</b></li>
+    <li>googleMusic - play, stop, next, back  ,steuert den Google Play Musik Mediaplayer</li>
     <li>installFlowSource - installiert einen Flow auf dem Device, <u>das XML File muss unter /tmp/ liegen und die Endung xml haben</u>. <b>Bsp:</b> <i>set TabletWohnzimmer installFlowSource WlanUebwerwachen.xml</i></li>
-    <li>mediaPlayer - play, stop, next, back  ,steuert den Standard Mediaplayer</li>
     <li>nextAlarmTime - setzt die Alarmzeit. gilt aber nur innerhalb der n&auml;chsten 24Std.</li>
     <li>notifySndFile - spielt die angegebene Mediadatei auf dem Androidger&auml;t ab. <b>Die aufzurufende Mediadatei mu&szlig; sich im Ordner /storage/emulated/0/Notifications/ befinden.</b></li>
     <li>screenBrightness - setzt die Bildschirmhelligkeit, von 0-255.</li>
     <li>screenMsg - versendet eine Bildschirmnachricht</li>
     <li>sendintent - sendet einen Intentstring <u>Bsp:</u><i> set $AMADDEVICE sendIntent org.smblott.intentradio.PLAY url http://stream.klassikradio.de/live/mp3-192/stream.klassikradio.de/play.m3u name Klassikradio</i>, der erste Befehl ist die Aktion und der zweite das Extra. Es k&ouml;nnen immer zwei Extras mitgegeben werden.</li>
+    <li>spotifyMusic - play, stop, next, back  ,steuert den Spotify Mediaplayer</li>
     <li>statusRequest - Fordert einen neuen Statusreport beim Device an. Es k&ouml;nnen nicht von allen Readings per statusRequest die Daten geholt werden. Einige wenige geben nur bei Status&auml;nderung ihren Status wieder.</li>
     <li>timer - setzt einen Timer innerhalb der als Standard definierten ClockAPP auf dem Device. Es k&ouml;nnen nur Sekunden angegeben werden.</li>
     <li>ttsMsg - versendet eine Nachricht welche als Sprachnachricht ausgegeben wird</li>

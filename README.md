@@ -12,7 +12,7 @@
   <b>Wie genau verwendet man nun AMAD?</b>
   <ul>
     <li>man installiert die App "Automagic Premium" aus dem PlayStore oder die Testversion von <a href="https://automagic4android.com/de/testversion">hier</a></li>
-    <li>dann installiert man das Flowset 74_AMADautomagicFlowset$VERSION.xml aus dem Ordner $INSTALLFHEM/FHEM/lib/ auf dem Androidger&auml;t. NOCH NICHT die Flows aktivieren</li>
+    <li>dann installiert man das Flowset 74_AMADautomagicFlowset$VERSION.xml aus dem Ordner $INSTALLFHEM/FHEM/lib/ auf dem Androidger&auml;t und aktiviert die Flows</li>
   </ul>
   <br>
   Es mu&szlig; noch ein Device in FHEM anlegt werden.
@@ -40,7 +40,6 @@
     Als zweites Reading kann <i>expertMode</i> gesetzen werden. Mit diesem Reading wird eine unmittelbare Komminikation mit FHEM erreicht ohne die Einschr&auml;nkung &uuml;ber ein
     Notify gehen zu m&uuml;ssen und nur reine set Befehle ausf&uuml;hren zu k&ouml;nnen.
   </ul><br>
-  <b><u>NUN bitte die Flows AKTIVIEREN!!!</u></b><br>
   <br>
   <b><u>Fertig! Nach anlegen der Ger&auml;teinstanz und dem eintragen der fhemServerIP in der CommBridge sollten nach sp&auml;testens 15 Sekunden bereits die ersten Readings reinkommen. Nun wird alle 15 Sekunden probiert einen Status Request erfolgreich ab zu schlie&szlig;en. Wenn der Status sich &uuml;ber einen l&auml;ngeren Zeitraum nicht auf "activ" &auml;ndert, sollte man im Log nach eventuellen Fehlern suchen.</u></b>
   <br><br><br>
@@ -58,7 +57,7 @@
     <li>currentMusicArtist - aktuell abgespielter Musikinterpret des verwendeten Mediaplayers</li>
     <li>currentMusicTrack - aktuell abgespielter Musiktitel des verwendeten Mediaplayers</li>
     <li>daydream - on/off, Daydream gestartet oder nicht</li>
-    <li>deviceState - Status des Androidger&auml;tes. !!!Gibt nicht den tats&auml;chlichen Status des Ger&auml;tes wieder!!! deviceState muss von Hand selbst  gesetzt werden. (set DEVICE deviceState) z.B. &uuml;ber die Anwesenheitskontrolle.<br> Ist Offline gesetzt, k&ouml;nnen keine set Befehle abgesetzt werden.</li>
+    <li>deviceState - Status des Androidger&auml;tes. unknown, online, offline</li>
     <li>dockingState - undocked/docked Status ob sich das Ger&auml;t in einer Dockinstation befindet.</li>
     <li>flow_SetCommands - active/inactive, Status des SetCommands Flow</li>
     <li>flow_informations - active/inactive, Status des Informations Flow</li>
@@ -96,7 +95,6 @@
     <li>bluetooth - on/off, aktiviert/deaktiviert Bluetooth</li>
     <li>clearNotificationBar - All,Automagic, l&ouml;scht alle Meldungen oder nur die Automagic Meldungen in der Statusleiste</li>
     <li>currentFlowsetUpdate - f&uuml;rt ein Flowsetupdate auf dem Device durch</li>
-    <li>deviceState - online/offline, setzt den Device Status . <b>mehr Info unter Readings</b></li>
     <li>installFlowSource - installiert einen Flow auf dem Device, <u>das XML File muss unter /tmp/ liegen und die Endung xml haben</u>. <b>Bsp:</b> <i>set TabletWohnzimmer installFlowSource WlanUebwerwachen.xml</i></li>
     <li>mediaPlayer - play, stop, next, back  ,steuert den Standard Mediaplayer</li>
     <li>nextAlarmTime - setzt die Alarmzeit. gilt aber nur innerhalb der n&auml;chsten 24Std.</li>
