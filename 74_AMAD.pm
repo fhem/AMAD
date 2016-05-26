@@ -38,7 +38,7 @@ use Encode qw(encode);
 
 
 my $modulversion = "2.1.5";
-my $flowsetversion = "2.1.5";
+my $flowsetversion = "2.1.6";
 
 
 
@@ -1340,6 +1340,7 @@ sub AMAD_decrypt($) {
     <li>connectedBTdevices - list of all devices connected via bluetooth</li>
     <li>connectedBTdevicesMAC - list of MAC addresses of all devices connected via bluetooth</li>
     <li>currentMusicAlbum - currently playing album of mediaplayer</li>
+    <li>currentMusicApp - currently playing player app</li>
     <li>currentMusicArtist - currently playing artist of mediaplayer</li>
     <li>currentMusicTrack - currently playing song title of mediaplayer</li>
     <li>daydream - on/off, daydream currently active</li>
@@ -1493,6 +1494,7 @@ sub AMAD_decrypt($) {
     <li>connectedBTdevices - eine Liste der verbundenen Ger&auml;t</li>
     <li>connectedBTdevicesMAC - eine Liste der MAC Adressen aller verbundender BT Ger&auml;te</li>
     <li>currentMusicAlbum - aktuell abgespieltes Musikalbum des verwendeten Mediaplayers</li>
+    <li>currentMusicApp - aktuell verwendeter Mediaplayers</li>
     <li>currentMusicArtist - aktuell abgespielter Musikinterpret des verwendeten Mediaplayers</li>
     <li>currentMusicTrack - aktuell abgespielter Musiktitel des verwendeten Mediaplayers</li>
     <li>daydream - on/off, Daydream gestartet oder nicht</li>

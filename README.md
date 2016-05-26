@@ -92,16 +92,18 @@
   <b>Set</b>
   <ul>
     <li>activateVoiceInput - aktiviert die Spracheingabe</li>
+    <li>amazonMusic - play, stop, next, back  ,steuert den Amazon Musik Mediaplayer</li>
     <li>bluetooth - on/off, aktiviert/deaktiviert Bluetooth</li>
     <li>clearNotificationBar - All,Automagic, l&ouml;scht alle Meldungen oder nur die Automagic Meldungen in der Statusleiste</li>
     <li>currentFlowsetUpdate - f&uuml;rt ein Flowsetupdate auf dem Device durch</li>
+    <li>googleMusic - play, stop, next, back  ,steuert den Google Play Musik Mediaplayer</li>
     <li>installFlowSource - installiert einen Flow auf dem Device, <u>das XML File muss unter /tmp/ liegen und die Endung xml haben</u>. <b>Bsp:</b> <i>set TabletWohnzimmer installFlowSource WlanUebwerwachen.xml</i></li>
-    <li>mediaPlayer - play, stop, next, back  ,steuert den Standard Mediaplayer</li>
     <li>nextAlarmTime - setzt die Alarmzeit. gilt aber nur innerhalb der n&auml;chsten 24Std.</li>
     <li>notifySndFile - spielt die angegebene Mediadatei auf dem Androidger&auml;t ab. <b>Die aufzurufende Mediadatei mu&szlig; sich im Ordner /storage/emulated/0/Notifications/ befinden.</b></li>
     <li>screenBrightness - setzt die Bildschirmhelligkeit, von 0-255.</li>
     <li>screenMsg - versendet eine Bildschirmnachricht</li>
     <li>sendintent - sendet einen Intentstring <u>Bsp:</u><i> set $AMADDEVICE sendIntent org.smblott.intentradio.PLAY url http://stream.klassikradio.de/live/mp3-192/stream.klassikradio.de/play.m3u name Klassikradio</i>, der erste Befehl ist die Aktion und der zweite das Extra. Es k&ouml;nnen immer zwei Extras mitgegeben werden.</li>
+    <li>spotifyMusic - play, stop, next, back  ,steuert den Spotify Mediaplayer</li>
     <li>statusRequest - Fordert einen neuen Statusreport beim Device an. Es k&ouml;nnen nicht von allen Readings per statusRequest die Daten geholt werden. Einige wenige geben nur bei Status&auml;nderung ihren Status wieder.</li>
     <li>timer - setzt einen Timer innerhalb der als Standard definierten ClockAPP auf dem Device. Es k&ouml;nnen nur Sekunden angegeben werden.</li>
     <li>ttsMsg - versendet eine Nachricht welche als Sprachnachricht ausgegeben wird</li>
