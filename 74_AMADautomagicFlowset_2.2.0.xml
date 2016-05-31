@@ -2233,8 +2233,8 @@ FHEMCMD: setreading</customHTTPHeaders>
   </action>
   <action type="script">
     <useDefaultName>true</useDefaultName>
-    <name>Script: amad_flowset_version = "2.1.6"</name>
-    <script>amad_flowset_version = "2.1.6"</script>
+    <name>Script: amad_flowset_version = "2.2.0"</name>
+    <script>amad_flowset_version = "2.2.0"</script>
   </action>
   <action type="script">
     <useDefaultName>true</useDefaultName>
@@ -2672,7 +2672,7 @@ FHEMCMD: setreading</customHTTPHeaders>
   </action>
   <flow type="flow">
     <name>Informations</name>
-    <group>AMAD2 Info/Control Flowset v2.1.6</group>
+    <group>AMAD2 Info/Control Flowset v2.2.0</group>
     <enabled>true</enabled>
     <executionPolicy>PARALLEL</executionPolicy>
     <emergencyStopCount>900</emergencyStopCount>
@@ -2796,11 +2796,11 @@ FHEMCMD: setreading</customHTTPHeaders>
     <actioncontainer id="t118" x="840.0" y="-3832.5">Stromversorgung und Akkustand</actioncontainer>
     <actioncontainer id="t119" x="805.0" y="1417.5">Prüfe und setze globale Variablen</actioncontainer>
     <conditioncontainer id="t120" x="1015.0" y="-1767.5">WLAN Verbunden: {global_apssid}</conditioncontainer>
-    <actioncontainer id="t121" x="1015.0" y="-1382.5">Script: amad_flowset_version = "2.1.6"</actioncontainer>
-    <conditioncontainer id="t122" x="-770.0" y="-2782.5">Expression: trigger == "com.android.music.playstatechanged" or trigger == "com.android.music.metachanged" or trigger == "com.amazon.mp3.metachanged"</conditioncontainer>
-    <actioncontainer id="t123" x="-770.0" y="-3517.5">Script: global_artist = "no player active"; global_track = "no player active"; global_album = "no player active"; global_musicapp = "no player active";</actioncontainer>
-    <actioncontainer id="t124" x="-1120.0" y="-3832.5">Airplainemode</actioncontainer>
-    <actioncontainer id="t125" x="-770.0" y="-3832.5">Reading Music Metachanged.2</actioncontainer>
+    <conditioncontainer id="t121" x="-770.0" y="-2782.5">Expression: trigger == "com.android.music.playstatechanged" or trigger == "com.android.music.metachanged" or trigger == "com.amazon.mp3.metachanged"</conditioncontainer>
+    <actioncontainer id="t122" x="-770.0" y="-3517.5">Script: global_artist = "no player active"; global_track = "no player active"; global_album = "no player active"; global_musicapp = "no player active";</actioncontainer>
+    <actioncontainer id="t123" x="-1120.0" y="-3832.5">Airplainemode</actioncontainer>
+    <actioncontainer id="t124" x="-770.0" y="-3832.5">Reading Music Metachanged.2</actioncontainer>
+    <actioncontainer id="t125" x="-770.0" y="-3097.5">Pause: 3s (Gerät wach halten)</actioncontainer>
     <triggercontainer id="t126" x="1015.0" y="-927.5">
       <trigger>Genereller Broadcast: wenn com.android.deskclock.ALARM_DONE</trigger>
       <trigger>Stromversorgung: Angeschlossen</trigger>
@@ -2826,7 +2826,6 @@ FHEMCMD: setreading</customHTTPHeaders>
       <trigger>Dock Event: Docked</trigger>
       <trigger>Systemeinstellung verändert: System volume_music_bt_a2dp</trigger>
       <trigger>HTTP Request: /fhem-amad/deviceInfo/</trigger>
-      <trigger>Periodischer Timer: alle 30s</trigger>
       <trigger>com.amazon.mp3.metachanged</trigger>
       <trigger>Genereller Broadcast: wenn com.android.deskclock.ALARM_ALERT</trigger>
       <trigger>Benachrichtigung in Statusbar entfernt: ch.gridvision.ppam.androidautomagic</trigger>
@@ -2836,8 +2835,9 @@ FHEMCMD: setreading</customHTTPHeaders>
       <trigger>Display Orientierung: Landscape</trigger>
       <trigger>Flugmodus: Aus</trigger>
       <trigger>Systemeinstellung verändert: System volume_ring_speaker</trigger>
+      <trigger>Periodischer Timer: alle 30s</trigger>
     </triggercontainer>
-    <actioncontainer id="t127" x="-770.0" y="-3097.5">Pause: 3s (Gerät wach halten)</actioncontainer>
+    <actioncontainer id="t127" x="1015.0" y="-1382.5">Script: amad_flowset_version = "2.2.0"</actioncontainer>
     <connection from="t1" to="t3" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t1" to="t4" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t2" to="t33" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -2858,7 +2858,7 @@ FHEMCMD: setreading</customHTTPHeaders>
     <connection from="t13" to="t64" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t14" to="t7" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t15" to="t67" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t16" to="t124" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t16" to="t123" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t17" to="t75" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t18" to="t37" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t19" to="t61" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -2891,8 +2891,8 @@ FHEMCMD: setreading</customHTTPHeaders>
     <connection from="t41" to="t42" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t42" to="t38" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t43" to="t65" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t44" to="t123" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t44" to="t125" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t44" to="t122" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t44" to="t124" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t45" to="t47" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t45" to="t46" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t46" to="t62" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -2920,11 +2920,11 @@ FHEMCMD: setreading</customHTTPHeaders>
     <connection from="t79" to="t120" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t79" to="t87" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t79" to="t32" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t79" to="t121" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t79" to="t127" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t79" to="t76" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t79" to="t74" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t79" to="t103" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t79" to="t122" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t79" to="t121" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t79" to="t88" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t79" to="t13" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t79" to="t43" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -3015,24 +3015,24 @@ FHEMCMD: setreading</customHTTPHeaders>
     <connection from="t120" to="t30" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t120" to="t50" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t120" to="t86" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t120" to="t122" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t120" to="t121" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t120" to="t110" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t120" to="t48" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t120" to="t51" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t120" to="t121" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t120" to="t127" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t120" to="t59" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t120" to="t76" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t120" to="t58" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t120" to="t114" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t121" to="t72" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t122" to="t127" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t123" to="t125" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t121" to="t125" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t122" to="t124" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t125" to="t44" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t126" to="t105" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t127" to="t44" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t127" to="t72" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
   </flow>
   <flow type="flow">
     <name>MultimediaControl</name>
-    <group>AMAD2 Info/Control Flowset v2.1.6</group>
+    <group>AMAD2 Info/Control Flowset v2.2.0</group>
     <enabled>true</enabled>
     <executionPolicy>PARALLEL</executionPolicy>
     <triggercontainer id="t1" x="0.0" y="-1032.5">
@@ -3113,7 +3113,7 @@ FHEMCMD: setreading</customHTTPHeaders>
   </flow>
   <flow type="flow">
     <name>SetCommands</name>
-    <group>AMAD2 Info/Control Flowset v2.1.6</group>
+    <group>AMAD2 Info/Control Flowset v2.2.0</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <emergencyStopCount>900</emergencyStopCount>
@@ -3243,11 +3243,11 @@ FHEMCMD: setreading</customHTTPHeaders>
     <conditioncontainer id="t118" x="3395.0" y="-122.5">Expression: setTimer"</conditioncontainer>
     <conditioncontainer id="t119" x="-805.0" y="-2047.5">Expression: trigger == "HTTP Request: /fhem-amad/setCommands/*"</conditioncontainer>
     <conditioncontainer id="t120" x="3605.0" y="-122.5">Expression: openCall"</conditioncontainer>
-    <actioncontainer id="t121" x="3185.0" y="892.5">Broadcast senden: {param_action} </actioncontainer>
-    <actioncontainer id="t122" x="3605.0" y="367.5">Nummer anrufen: {param_callnumber}</actioncontainer>
-    <conditioncontainer id="t123" x="3605.0" y="577.5">Expression: param_option</conditioncontainer>
-    <actioncontainer id="t124" x="3605.0" y="752.5">Pause: {param_hanguptime}s (Gerät wach halten)</actioncontainer>
-    <actioncontainer id="t125" x="3605.0" y="892.5">Anruf beenden</actioncontainer>
+    <actioncontainer id="t121" x="3605.0" y="367.5">Nummer anrufen: {param_callnumber}</actioncontainer>
+    <conditioncontainer id="t122" x="3605.0" y="577.5">Expression: param_option</conditioncontainer>
+    <actioncontainer id="t123" x="3605.0" y="752.5">Pause: {param_hanguptime}s (Gerät wach halten)</actioncontainer>
+    <actioncontainer id="t124" x="3605.0" y="892.5">Anruf beenden</actioncontainer>
+    <actioncontainer id="t125" x="3185.0" y="892.5">Broadcast senden: {param_action} </actioncontainer>
     <connection from="t1" to="t88" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t2" to="t80" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t3" to="t61" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -3306,7 +3306,7 @@ FHEMCMD: setreading</customHTTPHeaders>
     <connection from="t59" to="t50" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t59" to="t49" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t62" to="t69" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t63" to="t121" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t63" to="t125" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t64" to="t81" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t65" to="t81" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t66" to="t68" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -3379,14 +3379,14 @@ FHEMCMD: setreading</customHTTPHeaders>
     <connection from="t119" to="t118" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t119" to="t89" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t119" to="t120" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t120" to="t122" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t122" to="t123" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t123" to="t124" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t124" to="t125" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t120" to="t121" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t121" to="t122" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t122" to="t123" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t123" to="t124" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
   </flow>
   <flow type="flow">
     <name>Update AMAD Flowset</name>
-    <group>AMAD2 Info/Control Flowset v2.1.6</group>
+    <group>AMAD2 Info/Control Flowset v2.2.0</group>
     <enabled>true</enabled>
     <executionPolicy>PARALLEL</executionPolicy>
     <triggercontainer id="t1" x="420.0" y="-682.5">
@@ -3434,7 +3434,7 @@ FHEMCMD: setreading</customHTTPHeaders>
   </flow>
   <flow type="flow">
     <name>VoiceControl</name>
-    <group>AMAD2 Info/Control Flowset v2.1.6</group>
+    <group>AMAD2 Info/Control Flowset v2.2.0</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <emergencyStopCount>60</emergencyStopCount>

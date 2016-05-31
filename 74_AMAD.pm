@@ -37,8 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "2.1.5";
-my $flowsetversion = "2.1.6";
+my $modulversion = "2.2.0";
+my $flowsetversion = "2.2.0";
 
 
 
@@ -1311,10 +1311,10 @@ sub AMAD_decrypt($) {
     <br><br>
     Example:
     <ul><br>
-      <code>define WandTabletWohnzimmer AMAD 192.168.0.23 TuxNetAP@@OpaZuHause</code><br>
+      <code>define WandTabletWohnzimmer AMAD 192.168.0.23 TuxNetAP,Opa@@Zu@@Hause</code><br>
     </ul>
     <br>
-    With this command two new AMAD devices in a room called AMAD are created. The parameter &lt;IP-ADDRESS&lt; defines the IP address of your Android device, parameter WLANAP-SSID defines the SSID(s) of the WLAN(s) from which the FHEM server can be reached. More than one SSID can be defined which need to be joined by two consequent "@". The second device created is the AMADCommBridge which serves as a communication device from each Android device to FHEM.<br>
+    With this command two new AMAD devices in a room called AMAD are created. The parameter &lt;IP-ADDRESS&lt; defines the IP address of your Android device, parameter WLANAP-SSID defines the SSID(s) of the WLAN(s) from which the FHEM server can be reached. Multiple SSID can be defined. They need to be separated by a comma (,). If a SSID contains spaces replace these spaces by a double at-sign (@@). For Android devices connected by LAN use "usb-ethernet" as SSID. The second device created is the AMADCommBridge which serves as a communication device from each Android device to FHEM.<br>
     !!!Coming Soon!!! The communication port of each AMAD device may be set by the definition of the "port" attribute. <b>One needs background knowledge of Automagic and HTTP requests as this port will be set in the HTTP request trigger of both flows, therefore the port also needs to be set there.
     <br>
     The communication port of the AMADCommBridge device can easily be changed within the attribut "port".</b>
@@ -1386,7 +1386,7 @@ sub AMAD_decrypt($) {
     <li>googleMusic - play/stop/next/back , controlling the google play music media player</li>
     <li>installFlowSource - install a Automagic flow on device, <u>XML file must be stored in /tmp/ with extension xml</u>. <b>Example:</b> <i>set TabletWohnzimmer installFlowSource WlanUebwerwachen.xml</i></li>
     <li>nextAlarmTime - sets the alarm time. Only valid for the next 24 hours.</li>
-    <li>notifySndFile - start playing the defined media file on the Android device <b>The media file must be stored in /storage/emulated/0/Notifications/</b></li>
+    <li>notifySndFile - plays a media-file <b>which by default needs to be stored in the folder "/storage/emulated/0/Notifications/" of the Android device. You may use the attribute setNotifySndFilePath for defining a different folder.</b></li>
     <li>screenBrightness - 0-255, set screen brighness</li>
     <li>screenMsg - display message on screen of Android device</li>
     <li>sendintent - send intent string <u>Example:</u><i> set $AMADDEVICE sendIntent org.smblott.intentradio.PLAY url http://stream.klassikradio.de/live/mp3-192/stream.klassikradio.de/play.m3u name Klassikradio</i>, first parameter contains the action, second parameter contains the extra. At most two extras can be used.</li>
@@ -1463,7 +1463,7 @@ sub AMAD_decrypt($) {
     <br><br>
     Beispiel:
     <ul><br>
-      <code>define WandTabletWohnzimmer AMAD 192.168.0.23 TuxNetAP@@OpaZuHause</code><br>
+      <code>define WandTabletWohnzimmer AMAD 192.168.0.23 TuxNetAP,Opa@@Zu@@Hause</code><br>
     </ul>
     <br>
     Diese Anweisung erstellt zwei neues AMAD-Device im Raum AMAD.Der Parameter &lt;IP-ADRESSE&gt; legt die IP Adresse des Android Ger&auml;tes fest und der Parameter WLANAP-SSID die SSID Deines WLAN's. Es k&ouml;nnen mehrere SSID's mit angegeben werden, welche dann durch Komma getrennt sein m&uuml;ssen. Haben die SSID's Leerzeichen im Namen werde die Leerzeichen durch 2 @ aufgef&uuml;llt. Gibt es Androidger&auml;te welche nicht &uuml;ber WLAN sondern USB-Ethernet angeschlossen sind, ist die WLANAP-SSID mit "usb-ethernet" zu benennen<br>
@@ -1540,7 +1540,6 @@ sub AMAD_decrypt($) {
     <li>googleMusic - play, stop, next, back  ,steuert den Google Play Musik Mediaplayer</li>
     <li>installFlowSource - installiert einen Flow auf dem Device, <u>das XML File muss unter /tmp/ liegen und die Endung xml haben</u>. <b>Bsp:</b> <i>set TabletWohnzimmer installFlowSource WlanUebwerwachen.xml</i></li>
     <li>nextAlarmTime - setzt die Alarmzeit. gilt aber nur innerhalb der n&auml;chsten 24Std.</li>
-    <li>notifySndFile - spielt die angegebene Mediadatei auf dem Androidger&auml;t ab. <b>Die aufzurufende Mediadatei mu&szlig; sich im Ordner /storage/emulated/0/Notifications/ befinden.</b></li>
     <li>screenBrightness - setzt die Bildschirmhelligkeit, von 0-255.</li>
     <li>screenMsg - versendet eine Bildschirmnachricht</li>
     <li>sendintent - sendet einen Intentstring <u>Bsp:</u><i> set $AMADDEVICE sendIntent org.smblott.intentradio.PLAY url http://stream.klassikradio.de/live/mp3-192/stream.klassikradio.de/play.m3u name Klassikradio</i>, der erste Befehl ist die Aktion und der zweite das Extra. Es k&ouml;nnen immer zwei Extras mitgegeben werden.</li>
@@ -1556,6 +1555,7 @@ sub AMAD_decrypt($) {
   <b>Set abh&auml;ngig von gesetzten Attributen</b>
   <ul>
     <li>changetoBtDevice - wechselt zu einem anderen Bluetooth Ger&auml;t. <b>Attribut setBluetoothDevice mu&szlig; gesetzt sein. Siehe Hinweis unten!</b></li>
+    <li>notifySndFile - spielt die angegebene Mediadatei auf dem Androidger&auml;t ab. <b>Die aufzurufende Mediadatei sollte sich im Ordner /storage/emulated/0/Notifications/ befinden. Ist dies nicht der Fall kann man &uuml;ber das Attribut setNotifySndFilePath einen Pfad vorgeben.</b></li>
     <li>openApp - &ouml;ffnet eine ausgew&auml;hlte App. <b>Attribut setOpenApp</b></li>
     <li>openURL - &ouml;ffnet eine URL im Standardbrowser, sofern kein anderer Browser &uuml;ber das <b>Attribut setOpenUrlBrowser</b> ausgew&auml;hlt wurde.<b> Bsp:</b><i> attr Tablet setOpenUrlBrowser de.ozerov.fully|de.ozerov.fully.MainActivity, das erste ist der Package Name und das zweite der Class Name</i></li>
     <li>screen - on/off/lock/unlock schaltet den Bildschirm ein/aus oder sperrt/entsperrt ihn, in den Automagic Einstellungen muss "Admin Funktion" gesetzt werden sonst funktioniert "Screen off" nicht. <b>Attribut setScreenOnForTimer</b> &auml;ndert die Zeit wie lange das Display an bleiben soll!</li>
