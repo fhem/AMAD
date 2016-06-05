@@ -37,8 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "2.2.1";
-my $flowsetversion = "2.2.0";
+my $modulversion = "2.2.2";
+my $flowsetversion = "2.2.1";
 
 
 
@@ -82,7 +82,7 @@ sub AMAD_Define($$) {
     
     my @a = split( "[ \t][ \t]*", $def );
 
-    return "too few parameters: define <name> AMAD <HOST-IP> <ACCESSPOINT-SSID> has the ACCESPOINT-SSID a space you must space replace @@" if( ( @a < 3 || @a > 4 ) && @a != 2 );
+    return "too few parameters: define <name> AMAD <HOST-IP> <ACCESSPOINT-SSID> has the ACCESPOINT-SSID a space you must space replace @@" if( $a[0] ne "AMADCommBridge" and @a != 4 );
 
     my $name    	= $a[0];
     my $host    	= $a[2] if( $a[2] );
@@ -526,6 +526,7 @@ sub AMAD_Set($$@) {
 	$list .= "openCall ";
 	$list .= "currentFlowsetUpdate:noArg ";
 	$list .= "installFlowSource ";
+	$list .= "doNotDisturb:neverDisturb,alwaysDisturb,alarmClockOnly,onlyImportantDisturb ";
 
 	if( lc $cmd eq 'screenmsg'
 	    || lc $cmd eq 'ttsmsg'
@@ -555,6 +556,7 @@ sub AMAD_Set($$@) {
 	    || lc $cmd eq 'currentflowsetupdate'
 	    || lc $cmd eq 'installflowsource'
 	    || lc $cmd eq 'opencall'
+	    || lc $cmd eq 'donotdisturb'
 	    || lc $cmd eq 'vibrate') {
 
 	    Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
@@ -780,6 +782,15 @@ sub AMAD_SelectSetCmd($$@) {
 
 	readingsSingleUpdate( $hash, "airplanemode", "on", 1 ) if( $systemcmd eq "airplanemodeON" );
 	readingsSingleUpdate( $hash, "deviceState", "offline", 1 ) if( $systemcmd eq "airplanemodeON" || $systemcmd eq "shutdown" );
+    
+	return AMAD_HTTP_POST( $hash,$url );
+    }
+    
+    elsif( lc $cmd eq 'donotdisturb' ) {
+    
+	my $disturbmod = join( " ", @data );
+
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/donotdisturb?disturbmod=$disturbmod";
     
 	return AMAD_HTTP_POST( $hash,$url );
     }
