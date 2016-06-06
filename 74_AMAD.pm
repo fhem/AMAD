@@ -526,7 +526,7 @@ sub AMAD_Set($$@) {
 	$list .= "openCall ";
 	$list .= "currentFlowsetUpdate:noArg ";
 	$list .= "installFlowSource ";
-	$list .= "doNotDisturb:neverDisturb,alwaysDisturb,alarmClockOnly,onlyImportantDisturb ";
+	$list .= "doNotDisturb:never,always,alarmClockOnly,onlyImportant ";
 
 	if( lc $cmd eq 'screenmsg'
 	    || lc $cmd eq 'ttsmsg'
