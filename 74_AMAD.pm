@@ -1529,7 +1529,7 @@ sub AMAD_decrypt($) {
     <li>currentMusicTrack - aktuell abgespielter Musiktitel des verwendeten Mediaplayers</li>
     <li>daydream - on/off, Daydream gestartet oder nicht</li>
     <li>deviceState - Status des Androidger&auml;tes. unknown, online, offline.</li>
-    <li>doNotDisturb - aktueller Status des nicht stören Modus</li>
+    <li>doNotDisturb - aktueller Status des nicht st&ouml;ren Modus</li>
     <li>dockingState - undocked/docked Status ob sich das Ger&auml;t in einer Dockinstation befindet.</li>
     <li>flow_SetCommands - active/inactive, Status des SetCommands Flow</li>
     <li>flow_informations - active/inactive, Status des Informations Flow</li>
@@ -1568,7 +1568,7 @@ sub AMAD_decrypt($) {
     <li>bluetooth - on/off, aktiviert/deaktiviert Bluetooth</li>
     <li>clearNotificationBar - All,Automagic, l&ouml;scht alle Meldungen oder nur die Automagic Meldungen in der Statusleiste</li>
     <li>currentFlowsetUpdate - f&uuml;rt ein Flowsetupdate auf dem Device durch</li>
-    <li>doNotDisturb - schaltet den nicht st&ouml;ren Modus, always immer Stören, never niemals stören, alarmClockOnly nur Wecker darf st&ouml;ren, onlyImportant nur wichtige St&ouml;rungen</li>
+    <li>doNotDisturb - schaltet den nicht st&ouml;ren Modus, always immer st&ouml;ren, never niemals st&ouml;ren, alarmClockOnly nur Wecker darf st&ouml;ren, onlyImportant nur wichtige St&ouml;rungen</li>
     <li>googleMusic - play, stop, next, back  ,steuert den Google Play Musik Mediaplayer</li>
     <li>installFlowSource - installiert einen Flow auf dem Device, <u>das XML File muss unter /tmp/ liegen und die Endung xml haben</u>. <b>Bsp:</b> <i>set TabletWohnzimmer installFlowSource WlanUebwerwachen.xml</i></li>
     <li>nextAlarmTime - setzt die Alarmzeit. gilt aber nur innerhalb der n&auml;chsten 24Std.</li>
