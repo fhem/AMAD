@@ -37,8 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "2.2.2";
-my $flowsetversion = "2.2.1";
+my $modulversion = "2.2.3";
+my $flowsetversion = "2.2.2";
 
 
 
@@ -1363,6 +1363,8 @@ sub AMAD_decrypt($) {
     <li>airplanemode - on/off, state of the aeroplane mode</li>
     <li>androidVersion - currently installed version of Android</li>
     <li>automagicState - state of the Automagic App <b>(prerequisite Android >4.3). In case you have Android >4.3 and the reading says "not supported", you need to enable Automagic inside Android / Settings / Sound & notification / Notification access</b></li>
+    <li>batteryHealth - the health of the battery (1=unknown, 2=good, 3=overheat, 4=dead, 5=over voltage, 6=unspecified failure, 7=cold)</li>
+    <li>batterytemperature - the temperature of the battery</li>
     <li>bluetooth - on/off, bluetooth state</li>
     <li>checkActiveTask - state of an app (needs to be defined beforehand). 0=not active or not active in foreground, 1=active in foreground, <b>see note below</b></li>
     <li>connectedBTdevices - list of all devices connected via bluetooth</li>
@@ -1519,6 +1521,8 @@ sub AMAD_decrypt($) {
     <li>airplanemode - Status des Flugmodus</li>
     <li>androidVersion - aktuell installierte Androidversion</li>
     <li>automagicState - Statusmeldungen von der AutomagicApp <b>(Voraussetzung Android >4.3). Ist Android gr&ouml;&szlig;er 4.3 vorhanden und im Reading steht "wird nicht unterst&uuml;tzt", mu&szlig; in den Androideinstellungen unter Ton und Benachrichtigungen -> Benachrichtigungszugriff ein Haken f&uuml;r Automagic gesetzt werden</b></li>
+    <li>batteryHealth - Zustand der Battery (1=unbekannt, 2=gut, 3=&Uuml;berhitzt, 4=tot, 5=&Uumlberspannung, 6=unbekannter Fehler, 7=kalt)</li>
+    <li>batterytemperature - Temperatur der Batterie in Grad Fahrenheit</li>
     <li>bluetooth - on/off, Bluetooth Status an oder aus</li>
     <li>checkActiveTask - Zustand einer zuvor definierten APP. 0=nicht aktiv oder nicht aktiv im Vordergrund, 1=aktiv im Vordergrund, <b>siehe Hinweis unten</b></li>
     <li>connectedBTdevices - eine Liste der verbundenen Ger&auml;t</li>
