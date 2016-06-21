@@ -37,8 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "2.3.5";
-my $flowsetversion = "2.3.5";
+my $modulversion = "2.3.7";
+my $flowsetversion = "2.3.15";
 
 
 
@@ -283,7 +283,7 @@ sub AMAD_statusRequest($) {
     HttpUtils_NonblockingGet(
 	{
 	    url		=> $url,
-	    timeout	=> 30,
+	    timeout	=> 5,
 	    hash	=> $hash,
 	    method	=> "GET",
 	    header	=> "fhemip: $fhemip\r\nfhemdevice: $name\r\nactivetask: $activetask\r\napssid: $apssid\r\nbport: $bport",
@@ -901,7 +901,7 @@ sub AMAD_HTTP_POST($$) {
     HttpUtils_NonblockingGet(
 	{
 	    url		=> $url,
-	    timeout	=> 60,
+	    timeout	=> 15,
 	    hash	=> $hash,
 	    method	=> "POST",
 	    doTrigger	=> 1,
@@ -1092,16 +1092,17 @@ sub AMAD_CommBridge_Read($) {
     my $bname = $bhash->{NAME};
     
     
-    ## Zum testen mal ausgeschalten
-    #  if( $hash->{SERVERSOCKET} ) {   # Accept and create a child
-    #      TcpServer_Accept( $hash, "AMAD" );
-        
-    #      return;
-    #  }
+    
+    if( $hash->{SERVERSOCKET} ) {   # Accept and create a child
+        TcpServer_Accept( $hash, "AMAD" );
+        return;
+    }
 
     # Read 1024 byte of data
     my $buf;
     my $ret = sysread($hash->{CD}, $buf, 1024);
+
+
 
     # When there is an error in connection return
     if( !defined($ret ) || $ret <= 0 ) {
