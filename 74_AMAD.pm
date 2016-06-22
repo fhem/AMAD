@@ -37,8 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "2.3.7";
-my $flowsetversion = "2.3.15";
+my $modulversion = "2.3.10";
+my $flowsetversion = "2.3.16";
 
 
 
@@ -283,10 +283,10 @@ sub AMAD_statusRequest($) {
     HttpUtils_NonblockingGet(
 	{
 	    url		=> $url,
-	    timeout	=> 5,
+	    timeout	=> 15,
 	    hash	=> $hash,
 	    method	=> "GET",
-	    header	=> "fhemip: $fhemip\r\nfhemdevice: $name\r\nactivetask: $activetask\r\napssid: $apssid\r\nbport: $bport",
+	    header	=> "Connection: close\r\nfhemip: $fhemip\r\nfhemdevice: $name\r\nactivetask: $activetask\r\napssid: $apssid\r\nbport: $bport",
 	    doTrigger	=> 1,
 	    callback	=> \&AMAD_statusRequestErrorHandling,
 	}
@@ -904,6 +904,7 @@ sub AMAD_HTTP_POST($$) {
 	    timeout	=> 15,
 	    hash	=> $hash,
 	    method	=> "POST",
+	    header	=> "Connection: close",
 	    doTrigger	=> 1,
 	    callback	=> \&AMAD_HTTP_POSTerrorHandling,
 	}
@@ -1122,13 +1123,14 @@ sub AMAD_CommBridge_Read($) {
     my @data = split( '\R\R', $buf );
     
     my $header = AMAD_Header2Hash( $data[0] );
-    my $device = $header->{FHEMDEVICE} if(defined($header->{FHEMDEVICE}));
-    my $dhash = $defs{$device};
     my $response;
     my $c;
-    
-    my $fhemcmd = $header->{FHEMCMD};
-    
+    my $device = $header->{FHEMDEVICE} if(defined($header->{FHEMDEVICE}));
+    my $fhemcmd = $header->{FHEMCMD} if(defined($header->{FHEMCMD}));
+    my $dhash = $defs{$device};
+
+
+
 
     if ( $data[0] =~ /currentFlowsetUpdate.xml/ ) {
 
@@ -1137,6 +1139,7 @@ sub AMAD_CommBridge_Read($) {
         $c = $hash->{CD};
         print $c "HTTP/1.1 200 OK\r\n",
             "Content-Type: text/plain\r\n",
+            "Connection: close\r\n",
             "Content-Length: ".length($response)."\r\n\r\n",
             $response;
 
@@ -1150,13 +1153,26 @@ sub AMAD_CommBridge_Read($) {
             $c = $hash->{CD};
             print $c "HTTP/1.1 200 OK\r\n",
                 "Content-Type: text/plain\r\n",
+                "Connection: close\r\n",
                 "Content-Length: ".length($response)."\r\n\r\n",
                 $response;
 
             return;
         }
     }
-    
+
+
+
+    elsif( !defined($device) ) {
+        readingsSingleUpdate( $bhash, "transmitterERROR", $name." has no device name sends", 1 );
+        Log3 $name, 4, "AMAD ($name) - ERROR - no device name given. please check your global variable in automagic";
+        return;
+    }
+
+
+
+
+
     elsif ( $fhemcmd =~ /setreading\b/ ) {
 	my $tv = $data[1];
 
@@ -1168,6 +1184,7 @@ sub AMAD_CommBridge_Read($) {
         $c = $hash->{CD};
         print $c "HTTP/1.1 200 OK\r\n",
             "Content-Type: text/plain\r\n",
+            "Connection: close\r\n",
             "Content-Length: ".length($response)."\r\n\r\n",
             $response;
 
@@ -1185,6 +1202,7 @@ sub AMAD_CommBridge_Read($) {
         $c = $hash->{CD};
         print $c "HTTP/1.1 200 OK\r\n",
             "Content-Type: text/plain\r\n",
+            "Connection: close\r\n",
             "Content-Length: ".length($response)."\r\n\r\n",
             $response;
 	
@@ -1204,6 +1222,7 @@ sub AMAD_CommBridge_Read($) {
         $c = $hash->{CD};
         print $c "HTTP/1.1 200 OK\r\n",
             "Content-Type: text/plain\r\n",
+            "Connection: close\r\n",
             "Content-Length: ".length($response)."\r\n\r\n",
             $response;
             
@@ -1218,6 +1237,7 @@ sub AMAD_CommBridge_Read($) {
         $c = $hash->{CD};
         print $c "HTTP/1.1 200 OK\r\n",
             "Content-Type: text/plain\r\n",
+            "Connection: close\r\n",
             "Content-Length: ".length($response)."\r\n\r\n",
             $response;
         
@@ -1242,6 +1262,7 @@ sub AMAD_CommBridge_Read($) {
         $c = $hash->{CD};
         print $c "HTTP/1.1 200 OK\r\n",
             "Content-Type: text/plain\r\n",
+            "Connection: close\r\n",
             "Content-Length: ".length($response)."\r\n\r\n",
             $response;
 	
@@ -1253,6 +1274,7 @@ sub AMAD_CommBridge_Read($) {
     $c = $hash->{CD};
     print $c "HTTP/1.1 200 OK\r\n",
         "Content-Type: text/plain\r\n",
+        "Connection: close\r\n",
         "Content-Length: ".length($response)."\r\n\r\n",
         $response;
 }
