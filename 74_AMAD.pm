@@ -37,8 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "2.3.10";
-my $flowsetversion = "2.3.16";
+my $modulversion = "2.3.12";
+my $flowsetversion = "2.3.17";
 
 
 
@@ -278,7 +278,7 @@ sub AMAD_statusRequest($) {
     my $activetask = AttrVal( $name, "checkActiveTask", "none" );
     
 
-    my $url = "http://" . $host . ":" . $port . "/fhem-amad/deviceInfo/"; # Path muß so im Automagic als http request Trigger drin stehen
+    my $url = "http://" . $host . ":" . $port . "/fhem-amad/deviceInfo/"; # Pfad muß so im Automagic als http request Trigger drin stehen
   
     HttpUtils_NonblockingGet(
 	{
@@ -901,7 +901,7 @@ sub AMAD_HTTP_POST($$) {
     HttpUtils_NonblockingGet(
 	{
 	    url		=> $url,
-	    timeout	=> 15,
+	    timeout	=> 60,
 	    hash	=> $hash,
 	    method	=> "POST",
 	    header	=> "Connection: close",
@@ -1168,8 +1168,6 @@ sub AMAD_CommBridge_Read($) {
         Log3 $name, 4, "AMAD ($name) - ERROR - no device name given. please check your global variable in automagic";
         return;
     }
-
-
 
 
 

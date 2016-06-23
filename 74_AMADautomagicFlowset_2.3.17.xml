@@ -547,6 +547,11 @@ irname=getString("name")</extras>
   </condition>
   <condition type="expression">
     <useDefaultName>true</useDefaultName>
+    <name>Expression: fhemcmd == "voiceinputvalue"</name>
+    <expression>fhemcmd == "voiceinputvalue"</expression>
+  </condition>
+  <condition type="expression">
+    <useDefaultName>true</useDefaultName>
     <name>Expression: getAndroidSDKVersion() &gt;= "16"</name>
     <expression>getAndroidSDKVersion() &gt;= "16"</expression>
   </condition>
@@ -1674,7 +1679,7 @@ androidVersion = "4.0 - 4.0.2 Ice Cream Sandwich"
     <contentType>text/plain</contentType>
     <generalTextData>{fhemdata}</generalTextData>
     <formFieldList>@@@@readingsNameXYZ@@readingsValueABC</formFieldList>
-    <timeout>10000</timeout>
+    <timeout>25000</timeout>
     <setCustomHTTPHeaders>true</setCustomHTTPHeaders>
     <customHTTPHeaders>FHEMDEVICE: {global_fhemdevice}
 FHEMCMD: setreading</customHTTPHeaders>
@@ -1695,7 +1700,7 @@ FHEMCMD: setreading</customHTTPHeaders>
     <contentType>text/plain</contentType>
     <generalTextData>{fhemdata}</generalTextData>
     <formFieldList>@@@@readingsNameXYZ@@readingsValueABC</formFieldList>
-    <timeout>10000</timeout>
+    <timeout>25000</timeout>
     <setCustomHTTPHeaders>true</setCustomHTTPHeaders>
     <customHTTPHeaders>FHEMDEVICE: {global_fhemdevice}
 FHEMCMD: readingsval</customHTTPHeaders>
@@ -1716,7 +1721,7 @@ FHEMCMD: readingsval</customHTTPHeaders>
     <contentType>text/plain</contentType>
     <generalTextData>{fhemdata}</generalTextData>
     <formFieldList>@@@@readingsNameXYZ@@readingsValueABC</formFieldList>
-    <timeout>10000</timeout>
+    <timeout>25000</timeout>
     <setCustomHTTPHeaders>true</setCustomHTTPHeaders>
     <customHTTPHeaders>FHEMDEVICE: {global_fhemdevice}
 FHEMCMD: set</customHTTPHeaders>
@@ -1724,6 +1729,27 @@ FHEMCMD: set</customHTTPHeaders>
     <variable>response</variable>
     <path>/storage/emulated/0/Download/file.bin</path>
     <followRedirects>false</followRedirects>
+  </action>
+  <action type="http_request">
+    <useDefaultName>false</useDefaultName>
+    <name>HTTP Request: send VOICEINPUTVALUE data to AMADCommBridge</name>
+    <url>http://{global_fhemip}:{global_bridgeport}</url>
+    <verifyCertificates>false</verifyCertificates>
+    <basicAuthentication>false</basicAuthentication>
+    <username></username>
+    <httpMethod>POST</httpMethod>
+    <httpContentType>GENERAL_TEXT</httpContentType>
+    <contentType>text/plain</contentType>
+    <generalTextData>{fhemdata}</generalTextData>
+    <formFieldList>@@@@readingsNameXYZ@@readingsValueABC</formFieldList>
+    <timeout>25000</timeout>
+    <setCustomHTTPHeaders>true</setCustomHTTPHeaders>
+    <customHTTPHeaders>FHEMDEVICE: {global_fhemdevice}
+FHEMCMD: voiceinputvalue</customHTTPHeaders>
+    <storeInVariable>true</storeInVariable>
+    <variable>response</variable>
+    <path>/storage/emulated/0/Download/file.bin</path>
+    <followRedirects>true</followRedirects>
   </action>
   <action type="init_variable_next_alarm">
     <useDefaultName>false</useDefaultName>
@@ -2092,6 +2118,18 @@ fhemcmd = "setreading";</script>
   </action>
   <action type="script">
     <useDefaultName>true</useDefaultName>
+    <name>Script: fhemdata = "value"; fhemcmd = "voiceinputvalue";</name>
+    <script>fhemdata = "value";
+fhemcmd = "voiceinputvalue";</script>
+  </action>
+  <action type="script">
+    <useDefaultName>true</useDefaultName>
+    <name>Script: fhemdata = "value"; fhemcmd = {left(value, (indexOf(value, " und ")))};</name>
+    <script>fhemdata = "value";
+fhemcmd = {left(value, (indexOf(value, " und ")))};</script>
+  </action>
+  <action type="script">
+    <useDefaultName>true</useDefaultName>
     <name>Script: flow_informations = "flow_informations@@" + {informationFlow_state}; fhemcmd = "setreading";</name>
     <script>flow_informations = "flow_informations@@" + {informationFlow_state};
 fhemcmd = "setreading";</script>
@@ -2326,7 +2364,7 @@ fhemcmd = "setreading";</script>
   <action type="script">
     <useDefaultName>false</useDefaultName>
     <name>Script: Set FHEMDATA</name>
-    <script>fhemdata = "flowsetVersionAtDevice@@2.3.16@@@@";
+    <script>fhemdata = "flowsetVersionAtDevice@@2.3.17@@@@";
 
 
 
@@ -2441,48 +2479,6 @@ fhemcmd = "setreading";</script>
     <name>Script: volumevalue = "volume@@" + {volume}; fhemcmd = "setreading";</name>
     <script>volumevalue = "volume@@" + {volume};
 fhemcmd = "setreading";</script>
-  </action>
-  <action type="http_request">
-    <useDefaultName>false</useDefaultName>
-    <name>Send Voice Input Value to AMADCommBridge</name>
-    <url>http://{global_fhemip}:{global_bridgeport}</url>
-    <verifyCertificates>false</verifyCertificates>
-    <basicAuthentication>false</basicAuthentication>
-    <username></username>
-    <httpMethod>POST</httpMethod>
-    <httpContentType>GENERAL_TEXT</httpContentType>
-    <contentType>text/plain</contentType>
-    <generalTextData>{value}</generalTextData>
-    <formFieldList>@@@@readingsNameXYZ@@readingsValueABC</formFieldList>
-    <timeout>60000</timeout>
-    <setCustomHTTPHeaders>true</setCustomHTTPHeaders>
-    <customHTTPHeaders>FHEMDEVICE: {global_fhemdevice}
-FHEMCMD: voiceinputvalue</customHTTPHeaders>
-    <storeInVariable>true</storeInVariable>
-    <variable>response</variable>
-    <path>/storage/emulated/0/Download/file.bin</path>
-    <followRedirects>true</followRedirects>
-  </action>
-  <action type="http_request">
-    <useDefaultName>false</useDefaultName>
-    <name>Send Voice Input Value to AMADCommBridge left</name>
-    <url>http://{global_fhemip}:{global_bridgeport}</url>
-    <verifyCertificates>false</verifyCertificates>
-    <basicAuthentication>false</basicAuthentication>
-    <username></username>
-    <httpMethod>POST</httpMethod>
-    <httpContentType>GENERAL_TEXT</httpContentType>
-    <contentType>text/plain</contentType>
-    <generalTextData>{left(value, (indexOf(value, " und ")))}</generalTextData>
-    <formFieldList>@@@@readingsNameXYZ@@readingsValueABC</formFieldList>
-    <timeout>60000</timeout>
-    <setCustomHTTPHeaders>true</setCustomHTTPHeaders>
-    <customHTTPHeaders>FHEMDEVICE: {global_fhemdevice}
-FHEMCMD: voiceinputvalue</customHTTPHeaders>
-    <storeInVariable>true</storeInVariable>
-    <variable>response</variable>
-    <path>/storage/emulated/0/Download/file.bin</path>
-    <followRedirects>true</followRedirects>
   </action>
   <action type="set_alarm">
     <useDefaultName>true</useDefaultName>
@@ -2672,7 +2668,7 @@ FHEMCMD: voiceinputvalue</customHTTPHeaders>
   </action>
   <flow type="flow">
     <name>Informations</name>
-    <group>AMAD2 Info/Control Flowset v2.3.16</group>
+    <group>AMAD2 Info/Control Flowset v2.3.17</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <emergencyStopCount>900</emergencyStopCount>
@@ -2848,20 +2844,20 @@ FHEMCMD: voiceinputvalue</customHTTPHeaders>
     <actioncontainer id="t130" x="3885.0" y="-3832.5">Script: incommingWhatsAppMessage = "incommingWhatsAppMessageFrom@@" + {notification_text}; fhemcmd = "setreading";</actioncontainer>
     <conditioncontainer id="t131" x="3885.0" y="-2782.5">Expression: trigger == "Benachrichtigung in Statusbar angezeigt: com.whatsapp"</conditioncontainer>
     <conditioncontainer id="t132" x="4270.0" y="-2782.5">Expression: trigger == "Genereller Broadcast: wenn org.smblott.intentradio.STATE"</conditioncontainer>
-    <conditioncontainer id="t133" x="-1119.9999" y="-2782.5">Expression: trigger == "Flugmodus: Aus" or trigger == "HTTP Request: /fhem-amad/deviceInfo/"</conditioncontainer>
+    <conditioncontainer id="t133" x="-1120.0" y="-2782.5">Expression: trigger == "Flugmodus: Aus" or trigger == "HTTP Request: /fhem-amad/deviceInfo/"</conditioncontainer>
     <actioncontainer id="t134" x="-665.0" y="997.5">Initialisiere Variable Systemeinstellung: screenBrightness</actioncontainer>
     <actioncontainer id="t135" x="1505.0" y="-3832.5">Script: screenBrightness = "screenBrightness@@" + {screenBrightness}; fhemcmd = "setreading";</actioncontainer>
     <conditioncontainer id="t136" x="1505.0" y="-2782.5">Expression: trigger == "Systemeinstellung verändert: System screen_brightness"</conditioncontainer>
     <conditioncontainer id="t137" x="0.0" y="-2782.5">Expression: trigger == "Systemeinstellung verändert: System volume_ring_speaker"</conditioncontainer>
     <actioncontainer id="t138" x="-455.0" y="997.5">Initialisiere Variable Systemeinstellung: volumeNotification</actioncontainer>
     <actioncontainer id="t139" x="35.0" y="997.5">Initialisiere Variable Systemeinstellung: volumeMusikBluetooth.2</actioncontainer>
-    <actioncontainer id="t140" x="175.00002" y="997.49994">Initialisiere Variable Systemeinstellung: volumeMusikSpeaker.2</actioncontainer>
-    <conditioncontainer id="t141" x="105.000015" y="1102.5">Bluetooth Gerät verbunden: Beliebiges Geräte (Advanced Audio Distribution)</conditioncontainer>
+    <actioncontainer id="t140" x="175.0" y="997.5">Initialisiere Variable Systemeinstellung: volumeMusikSpeaker.2</actioncontainer>
+    <conditioncontainer id="t141" x="105.0" y="1102.5">Bluetooth Gerät verbunden: Beliebiges Geräte (Advanced Audio Distribution)</conditioncontainer>
     <actioncontainer id="t142" x="0.0" y="-3832.5">Script: volumeNotification = "volumeNotification@@" + {volumeNotification}; fhemcmd = "setreading";</actioncontainer>
     <conditioncontainer id="t143" x="210.0" y="-2782.5">Expression: trigger == "Systemeinstellung verändert: System volume_music_bt_a2dp" or trigger == "Systemeinstellung verändert: System volume_music_speaker" or trigger == "Systemeinstellung verändert: System volume_music_headphone"</conditioncontainer>
     <actioncontainer id="t144" x="210.0" y="-3832.5">Script: volumevalue = "volume@@" + {volume}; fhemcmd = "setreading";</actioncontainer>
-    <actioncontainer id="t145" x="35.000088" y="1207.4995">Script: volume = {volumeBT}</actioncontainer>
-    <actioncontainer id="t146" x="175.00018" y="1207.4995">Script: volume = {volumeSP}</actioncontainer>
+    <actioncontainer id="t145" x="35.0" y="1207.5">Script: volume = {volumeBT}</actioncontainer>
+    <actioncontainer id="t146" x="175.0" y="1207.5">Script: volume = {volumeSP}</actioncontainer>
     <connection from="t1" to="t38" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t2" to="t104" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t3" to="t104" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -3094,7 +3090,7 @@ FHEMCMD: voiceinputvalue</customHTTPHeaders>
   </flow>
   <flow type="flow">
     <name>MultimediaControl</name>
-    <group>AMAD2 Info/Control Flowset v2.3.16</group>
+    <group>AMAD2 Info/Control Flowset v2.3.17</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <triggercontainer id="t1" x="0.0" y="-1032.5">
@@ -3175,29 +3171,33 @@ FHEMCMD: voiceinputvalue</customHTTPHeaders>
   </flow>
   <flow type="flow">
     <name>Send Data to AMADCommBridge</name>
-    <group>AMAD2 Info/Control Flowset v2.3.16</group>
+    <group>AMAD2 Info/Control Flowset v2.3.17</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <emergencyStopCount>900</emergencyStopCount>
-    <triggercontainer id="t1" x="-245.0" y="-262.5" />
-    <actioncontainer id="t2" x="0.0" y="682.5">HTTP Request: send READINGSVAL data to AMADCommBridge </actioncontainer>
-    <conditioncontainer id="t3" x="-525.0" y="192.5">Expression: fhemcmd == "setreading"</conditioncontainer>
-    <conditioncontainer id="t4" x="-245.0" y="192.5">Expression: fhemcmd == "set"</conditioncontainer>
-    <conditioncontainer id="t5" x="0.0" y="192.5">Expression: fhemcmd == "readingsval"</conditioncontainer>
-    <actioncontainer id="t6" x="-245.0" y="682.5">HTTP Request: send SET data to AMADCommBridge </actioncontainer>
+    <conditioncontainer id="t1" x="-525.0" y="192.5">Expression: fhemcmd == "setreading"</conditioncontainer>
+    <conditioncontainer id="t2" x="-245.0" y="192.5">Expression: fhemcmd == "set"</conditioncontainer>
+    <conditioncontainer id="t3" x="0.0" y="192.5">Expression: fhemcmd == "readingsval"</conditioncontainer>
+    <conditioncontainer id="t4" x="245.0" y="192.50002">Expression: fhemcmd == "voiceinputvalue"</conditioncontainer>
+    <triggercontainer id="t5" x="-140.00002" y="-297.50003" />
+    <actioncontainer id="t6" x="-525.0" y="402.5">Script: Set FHEMDATA</actioncontainer>
     <actioncontainer id="t7" x="-525.0" y="682.5">HTTP Request: send READINGS data to AMADCommBridge </actioncontainer>
-    <actioncontainer id="t8" x="-525.0" y="402.5">Script: Set FHEMDATA</actioncontainer>
-    <connection from="t1" to="t3" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t1" to="t4" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t1" to="t5" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t3" to="t8" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t4" to="t6" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t5" to="t2" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t8" to="t7" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <actioncontainer id="t8" x="-245.0" y="682.5">HTTP Request: send SET data to AMADCommBridge </actioncontainer>
+    <actioncontainer id="t9" x="0.0" y="682.5">HTTP Request: send READINGSVAL data to AMADCommBridge </actioncontainer>
+    <actioncontainer id="t10" x="245.0" y="682.5">HTTP Request: send VOICEINPUTVALUE data to AMADCommBridge</actioncontainer>
+    <connection from="t1" to="t6" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t2" to="t8" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t3" to="t9" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t4" to="t10" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t5" to="t1" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t5" to="t2" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t5" to="t3" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t5" to="t4" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t6" to="t7" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
   </flow>
   <flow type="flow">
     <name>SetCommands</name>
-    <group>AMAD2 Info/Control Flowset v2.3.16</group>
+    <group>AMAD2 Info/Control Flowset v2.3.17</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <emergencyStopCount>900</emergencyStopCount>
@@ -3492,7 +3492,7 @@ FHEMCMD: voiceinputvalue</customHTTPHeaders>
   </flow>
   <flow type="flow">
     <name>Update AMAD Flowset</name>
-    <group>AMAD2 Info/Control Flowset v2.3.16</group>
+    <group>AMAD2 Info/Control Flowset v2.3.17</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <triggercontainer id="t1" x="420.0" y="-682.5">
@@ -3542,26 +3542,30 @@ FHEMCMD: voiceinputvalue</customHTTPHeaders>
   </flow>
   <flow type="flow">
     <name>VoiceControl</name>
-    <group>AMAD2 Info/Control Flowset v2.3.16</group>
+    <group>AMAD2 Info/Control Flowset v2.3.17</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <triggercontainer id="t1" x="70.0" y="-52.5" />
-    <conditioncontainer id="t2" x="-140.0" y="962.5">Expression: contains(value, " und ")</conditioncontainer>
-    <actioncontainer id="t3" x="-35.0" y="1382.5">Benachrichtigung auf Bildschirm: {value} (lange)</actioncontainer>
-    <conditioncontainer id="t4" x="70.0" y="682.5">Expression: value != ""</conditioncontainer>
-    <actioncontainer id="t5" x="-245.0" y="1382.5">Setze voice Variablen</actioncontainer>
-    <actioncontainer id="t6" x="-35.0" y="1207.5">Send Voice Input Value to AMADCommBridge</actioncontainer>
-    <actioncontainer id="t7" x="280.0" y="962.5">Spracheingabe wurde nicht erkannt</actioncontainer>
-    <actioncontainer id="t8" x="-245.0" y="1207.5">Send Voice Input Value to AMADCommBridge left</actioncontainer>
-    <actioncontainer id="t9" x="70.0" y="437.5">AMAD Voice Control</actioncontainer>
-    <connection from="t1" to="t9" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t2" to="t6" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t2" to="t8" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t4" to="t2" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t4" to="t7" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t5" to="t2" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t6" to="t3" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t8" to="t5" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t9" to="t4" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <conditioncontainer id="t2" x="70.0" y="682.5">Expression: value != ""</conditioncontainer>
+    <actioncontainer id="t3" x="70.0" y="437.5">AMAD Voice Control</actioncontainer>
+    <conditioncontainer id="t4" x="-140.0" y="962.5">Expression: contains(value, " und ")</conditioncontainer>
+    <actioncontainer id="t5" x="3.8146973E-6" y="1137.5">Script: fhemdata = "value"; fhemcmd = "voiceinputvalue";</actioncontainer>
+    <actioncontainer id="t6" x="-7.6293945E-6" y="1347.5">Flows ausführen: Send Data to AMADCommBridge</actioncontainer>
+    <actioncontainer id="t7" x="7.6293945E-6" y="1592.5">Benachrichtigung auf Bildschirm: {value} (lange)</actioncontainer>
+    <actioncontainer id="t8" x="-315.00006" y="1347.5">Flows ausführen: Send Data to AMADCommBridge</actioncontainer>
+    <actioncontainer id="t9" x="-315.00012" y="1137.5">Script: fhemdata = "value"; fhemcmd = {left(value, (indexOf(value, " und ")))};</actioncontainer>
+    <actioncontainer id="t10" x="-315.00006" y="1592.5">Setze voice Variablen</actioncontainer>
+    <actioncontainer id="t11" x="280.00003" y="962.50006">Spracheingabe wurde nicht erkannt</actioncontainer>
+    <connection from="t1" to="t3" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t2" to="t4" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t2" to="t11" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t3" to="t2" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t4" to="t9" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t4" to="t5" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t5" to="t6" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t6" to="t7" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t8" to="t10" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t9" to="t8" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t10" to="t4" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
   </flow>
 </data>
