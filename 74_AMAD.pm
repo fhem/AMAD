@@ -37,8 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "2.3.15";
-my $flowsetversion = "2.3.18";
+my $modulversion = "2.3.17";
+my $flowsetversion = "2.3.19";
 
 
 

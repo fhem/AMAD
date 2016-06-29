@@ -2118,14 +2118,14 @@ fhemcmd = "setreading";</script>
   </action>
   <action type="script">
     <useDefaultName>true</useDefaultName>
-    <name>Script: fhemdata = "value"; fhemcmd = "voiceinputvalue";</name>
-    <script>fhemdata = "value";
+    <name>Script: fhemdata = value; fhemcmd = "voiceinputvalue";</name>
+    <script>fhemdata = value;
 fhemcmd = "voiceinputvalue";</script>
   </action>
   <action type="script">
     <useDefaultName>true</useDefaultName>
-    <name>Script: fhemdata = "value"; fhemcmd = {left(value, (indexOf(value, " und ")))};</name>
-    <script>fhemdata = "value";
+    <name>Script: fhemdata = value; fhemcmd = {left(value, (indexOf(value, " und ")))};</name>
+    <script>fhemdata = value;
 fhemcmd = {left(value, (indexOf(value, " und ")))};</script>
   </action>
   <action type="script">
@@ -2364,7 +2364,7 @@ fhemcmd = "setreading";</script>
   <action type="script">
     <useDefaultName>false</useDefaultName>
     <name>Script: Set FHEMDATA</name>
-    <script>fhemdata = "flowsetVersionAtDevice@@2.3.18@@@@";
+    <script>fhemdata = "flowsetVersionAtDevice@@2.3.19@@@@";
 
 
 
@@ -2668,7 +2668,7 @@ fhemcmd = "setreading";</script>
   </action>
   <flow type="flow">
     <name>Informations</name>
-    <group>AMAD2 Info/Control Flowset v2.3.18</group>
+    <group>AMAD2 Info/Control Flowset v2.3.19</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <emergencyStopCount>900</emergencyStopCount>
@@ -3090,7 +3090,7 @@ fhemcmd = "setreading";</script>
   </flow>
   <flow type="flow">
     <name>MultimediaControl</name>
-    <group>AMAD2 Info/Control Flowset v2.3.18</group>
+    <group>AMAD2 Info/Control Flowset v2.3.19</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <triggercontainer id="t1" x="0.0" y="-1032.5">
@@ -3171,7 +3171,7 @@ fhemcmd = "setreading";</script>
   </flow>
   <flow type="flow">
     <name>Send Data to AMADCommBridge</name>
-    <group>AMAD2 Info/Control Flowset v2.3.18</group>
+    <group>AMAD2 Info/Control Flowset v2.3.19</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <emergencyStopCount>900</emergencyStopCount>
@@ -3197,7 +3197,7 @@ fhemcmd = "setreading";</script>
   </flow>
   <flow type="flow">
     <name>SetCommands</name>
-    <group>AMAD2 Info/Control Flowset v2.3.18</group>
+    <group>AMAD2 Info/Control Flowset v2.3.19</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <emergencyStopCount>900</emergencyStopCount>
@@ -3492,7 +3492,7 @@ fhemcmd = "setreading";</script>
   </flow>
   <flow type="flow">
     <name>Update AMAD Flowset</name>
-    <group>AMAD2 Info/Control Flowset v2.3.18</group>
+    <group>AMAD2 Info/Control Flowset v2.3.19</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <triggercontainer id="t1" x="420.0" y="-682.5">
@@ -3542,30 +3542,30 @@ fhemcmd = "setreading";</script>
   </flow>
   <flow type="flow">
     <name>VoiceControl</name>
-    <group>AMAD2 Info/Control Flowset v2.3.18</group>
+    <group>AMAD2 Info/Control Flowset v2.3.19</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <triggercontainer id="t1" x="70.0" y="-52.5" />
     <conditioncontainer id="t2" x="70.0" y="682.5">Expression: value != ""</conditioncontainer>
     <actioncontainer id="t3" x="70.0" y="437.5">AMAD Voice Control</actioncontainer>
     <conditioncontainer id="t4" x="-140.0" y="962.5">Expression: contains(value, " und ")</conditioncontainer>
-    <actioncontainer id="t5" x="0.0" y="1137.5">Script: fhemdata = "value"; fhemcmd = "voiceinputvalue";</actioncontainer>
-    <actioncontainer id="t6" x="-7.6293945E-6" y="1347.5">Flows ausführen: Send Data to AMADCommBridge</actioncontainer>
-    <actioncontainer id="t7" x="7.6293945E-6" y="1592.5">Benachrichtigung auf Bildschirm: {value} (lange)</actioncontainer>
-    <actioncontainer id="t8" x="-315.00006" y="1347.5">Flows ausführen: Send Data to AMADCommBridge</actioncontainer>
-    <actioncontainer id="t9" x="-315.00012" y="1137.5">Script: fhemdata = "value"; fhemcmd = {left(value, (indexOf(value, " und ")))};</actioncontainer>
-    <actioncontainer id="t10" x="-315.00006" y="1592.5">Setze voice Variablen</actioncontainer>
-    <actioncontainer id="t11" x="280.00003" y="962.50006">Spracheingabe wurde nicht erkannt</actioncontainer>
+    <actioncontainer id="t5" x="0.0" y="1347.5">Flows ausführen: Send Data to AMADCommBridge</actioncontainer>
+    <actioncontainer id="t6" x="0.0" y="1592.5">Benachrichtigung auf Bildschirm: {value} (lange)</actioncontainer>
+    <actioncontainer id="t7" x="-315.0" y="1347.5">Flows ausführen: Send Data to AMADCommBridge</actioncontainer>
+    <actioncontainer id="t8" x="-315.0" y="1592.5">Setze voice Variablen</actioncontainer>
+    <actioncontainer id="t9" x="280.0" y="962.5">Spracheingabe wurde nicht erkannt</actioncontainer>
+    <actioncontainer id="t10" x="-315.0" y="1137.5">Script: fhemdata = value; fhemcmd = {left(value, (indexOf(value, " und ")))};</actioncontainer>
+    <actioncontainer id="t11" x="0.0" y="1137.5">Script: fhemdata = value; fhemcmd = "voiceinputvalue";</actioncontainer>
     <connection from="t1" to="t3" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t2" to="t4" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t2" to="t11" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t2" to="t9" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t3" to="t2" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t4" to="t9" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t4" to="t5" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t4" to="t10" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t4" to="t11" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t5" to="t6" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t6" to="t7" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t8" to="t10" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t9" to="t8" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t10" to="t4" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t7" to="t8" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t8" to="t4" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t10" to="t7" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t11" to="t5" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
   </flow>
 </data>
