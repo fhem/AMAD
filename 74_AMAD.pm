@@ -37,8 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "2.3.17";
-my $flowsetversion = "2.3.19";
+my $modulversion = "2.4.0";
+my $flowsetversion = "2.4.0";
 
 
 
@@ -1094,7 +1094,7 @@ sub AMAD_CommBridge_Read($) {
     
     
     
-    if( $hash->{SERVERSOCKET} ) {   # Accept and create a child
+    if( $hash->{SERVERSOCKET} ) {               # Accept and create a child
         TcpServer_Accept( $hash, "AMAD" );
         return;
     }
