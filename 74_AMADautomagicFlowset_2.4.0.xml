@@ -3177,7 +3177,7 @@ fhemcmd = "setreading";</script>
     <name>Send Data to AMADCommBridge</name>
     <group>AMAD2 Info/Control Flowset v2.4.0</group>
     <enabled>true</enabled>
-    <executionPolicy>QUEUE</executionPolicy>
+    <executionPolicy>PARALLEL</executionPolicy>
     <emergencyStopCount>900</emergencyStopCount>
     <triggercontainer id="t1" x="-140.0" y="-297.5" />
     <conditioncontainer id="t2" x="-245.0" y="192.5">Expression: fhemcmd == "set"</conditioncontainer>
