@@ -1127,7 +1127,7 @@ sub AMAD_CommBridge_Read($) {
     my $c;
     my $device = $header->{FHEMDEVICE} if(defined($header->{FHEMDEVICE}));
     my $fhemcmd = $header->{FHEMCMD} if(defined($header->{FHEMCMD}));
-    my $dhash = $defs{$device};
+    my $dhash = $defs{$device} if( $defs{$device} );
 
 
 
