@@ -37,8 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "2.4.1";
-my $flowsetversion = "2.4.0";
+my $modulversion = "2.4.2";
+my $flowsetversion = "2.4.1";
 
 
 
@@ -1164,7 +1164,7 @@ sub AMAD_CommBridge_Read($) {
 
 
     elsif( !defined($device) ) {
-        readingsSingleUpdate( $bhash, "transmitterERROR", $name." has no device name sends", 1 );
+        readingsSingleUpdate( $bhash, "transmitterERROR", $name." has no device name sends", 1 ) if( ReadingsVal( $bname, "expertMode", 0 ) eq "1" );
         Log3 $name, 4, "AMAD ($name) - ERROR - no device name given. please check your global variable in automagic";
         return;
     }
