@@ -1342,6 +1342,11 @@ sub AMAD_decrypt($) {
 1;
 
 =pod
+
+=item device
+=item summary    Integrates Android devices into FHEM and displays several settings.
+=item summary_DE Integriert Android-Geräte in FHEM und zeigt verschiedene Einstellungen an.
+
 =begin html
 
 <a name="AMAD"></a>
