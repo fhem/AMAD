@@ -37,8 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "2.6.2";
-my $flowsetversion = "2.6.3";
+my $modulversion = "2.6.3";
+my $flowsetversion = "2.6.4";
 
 
 
@@ -528,6 +528,7 @@ sub AMAD_Set($$@) {
 	$list .= "currentFlowsetUpdate:noArg ";
 	$list .= "installFlowSource ";
 	$list .= "doNotDisturb:never,always,alarmClockOnly,onlyImportant ";
+	$list .= "flowState ";
 
 	if( lc $cmd eq 'screenmsg'
 	    || lc $cmd eq 'ttsmsg'
@@ -558,6 +559,7 @@ sub AMAD_Set($$@) {
 	    || lc $cmd eq 'installflowsource'
 	    || lc $cmd eq 'opencall'
 	    || lc $cmd eq 'donotdisturb'
+	    || lc $cmd eq 'flowstate'
 	    || lc $cmd eq 'vibrate') {
 
 	    Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
@@ -622,6 +624,19 @@ sub AMAD_SelectSetCmd($$@) {
 	$msg =~ s/\s/%20/g;    
 	
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/ttsMsg?message=".$msg."&msgspeed=".$speed;
+    
+	return AMAD_HTTP_POST( $hash,$url );
+    }
+    
+    elsif( lc $cmd eq 'flowstate' ) {
+
+        my $datas = join( " ", @data );
+        my ($state,$flow) = split( ";", $datas);
+	
+	$flow =~ s/%/%25/g;
+	$flow =~ s/\s/%20/g;    
+	
+	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/flowState?flowstate=".$state."&flowname=".$flow;
     
 	return AMAD_HTTP_POST( $hash,$url );
     }
@@ -1454,6 +1469,7 @@ sub AMAD_decrypt($) {
     <li>currentFlowsetUpdate - start flowset update on Android device</li>
     <li>installFlowSource - install a Automagic flow on device, <u>XML file must be stored in /tmp/ with extension xml</u>. <b>Example:</b> <i>set TabletWohnzimmer installFlowSource WlanUebwerwachen.xml</i></li>
     <li>doNotDisturb - sets the do not Disturb Mode, always Disturb, never Disturb, alarmClockOnly alarm Clock only, onlyImportant only important Disturbs</li>
+    <li>flowState - set Flow/s active or inactive,<b><i>set Nexus7Wohnzimmer inactive;Badezimmer vorheizen</i> or <i>set Nexus7Wohnzimmer inactive;Badezimmer vorheizen,Nachtlicht Steven</i></b></li>
     <li>mediaAmazonMusic - play/stop/next/back , controlling the amazon music media player</li>
     <li>mediaGoogleMusic - play/stop/next/back , controlling the google play music media player</li>
     <li>mediaSpotifyMusic - play/stop/next/back , controlling the spotify media player</li>
@@ -1613,6 +1629,7 @@ sub AMAD_decrypt($) {
     <li>clearNotificationBar - All,Automagic, l&ouml;scht alle Meldungen oder nur die Automagic Meldungen in der Statusleiste</li>
     <li>currentFlowsetUpdate - f&uuml;rt ein Flowsetupdate auf dem Device durch</li>
     <li>doNotDisturb - schaltet den nicht st&ouml;ren Modus, always immer st&ouml;ren, never niemals st&ouml;ren, alarmClockOnly nur Wecker darf st&ouml;ren, onlyImportant nur wichtige St&ouml;rungen</li>
+    <li>flowState - aktiviert oder deaktiviert einen oder mehrere Flows,<b><i>set Nexus7Wohnzimmer inactive;Badezimmer vorheizen</i> oder <i>set Nexus7Wohnzimmer inactive;Badezimmer vorheizen,Nachtlicht Steven</i></b></li>
     <li>installFlowSource - installiert einen Flow auf dem Device, <u>das XML File muss unter /tmp/ liegen und die Endung xml haben</u>. <b>Bsp:</b> <i>set TabletWohnzimmer installFlowSource WlanUebwerwachen.xml</i></li>
     <li>mediaAmazonMusic - play, stop, next, back  ,steuert den Amazon Musik Mediaplayer</li>
     <li>mediaGoogleMusic - play, stop, next, back  ,steuert den Google Play Musik Mediaplayer</li>
