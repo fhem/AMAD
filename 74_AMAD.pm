@@ -64,6 +64,7 @@ sub AMAD_Initialize($) {
 			  "setOpenUrlBrowser ".
 			  "setNotifySndFilePath ".
 			  "setTtsMsgSpeed ".
+			  "setUserFlowState ".
 			  "root:0,1 ".
 			  "port ".
 			  "disable:1 ".
@@ -190,9 +191,13 @@ sub AMAD_Attr(@) {
     }
     
     elsif( $attrName eq "checkActiveTask" ) {
-    
-        AMAD_statusRequest( $hash );
+        if( $cmd eq "del" ) {
+            CommandDeleteReading( undef, "$name checkActiveTask" ); 
+        }
+        
         Log3 $name, 3, "AMAD ($name) - $cmd $attrName $attrVal and run statusRequest";
+        RemoveInternalTimer( $hash );
+        InternalTimer( gettimeofday(), "AMAD_GetUpdate", $hash, 0 )
     }
     
     elsif( $attrName eq "port" ) {
@@ -224,11 +229,23 @@ sub AMAD_Attr(@) {
     
     elsif( $attrName eq "setScreenlockPIN" ) {
 	if( $cmd eq "set" && $attrVal ) {
-                $attrVal = AMAD_encrypt($attrVal);
+            $attrVal = AMAD_encrypt($attrVal);
         } else {
             CommandDeleteReading( undef, "$name screenLock" );
         }
     }
+    
+    elsif( $attrName eq "setUserFlowState" ) {
+	if( $cmd eq "del" ) {
+            CommandDeleteReading( undef, "$name userFlowState" ); 
+        }
+        
+        Log3 $name, 3, "AMAD ($name) - $cmd $attrName $attrVal and run statusRequest";
+        RemoveInternalTimer( $hash );
+        InternalTimer( gettimeofday(), "AMAD_GetUpdate", $hash, 0 )
+    }
+    
+    
     
     if( $cmd eq "set" ) {
         if( $attrVal && $orig ne $attrVal ) {
@@ -276,6 +293,7 @@ sub AMAD_statusRequest($) {
     my $apssid = $hash->{APSSID};
     my $fhemip = ReadingsVal( $bname, "fhemServerIP", "none" );
     my $activetask = AttrVal( $name, "checkActiveTask", "none" );
+    my $userFlowState = AttrVal( $name, "setUserFlowState", "none" );
     
 
     my $url = "http://" . $host . ":" . $port . "/fhem-amad/deviceInfo/"; # Pfad muß so im Automagic als http request Trigger drin stehen
@@ -286,7 +304,7 @@ sub AMAD_statusRequest($) {
 	    timeout	=> 15,
 	    hash	=> $hash,
 	    method	=> "GET",
-	    header	=> "Connection: close\r\nfhemip: $fhemip\r\nfhemdevice: $name\r\nactivetask: $activetask\r\napssid: $apssid\r\nbport: $bport",
+	    header	=> "Connection: close\r\nfhemip: $fhemip\r\nfhemdevice: $name\r\nactivetask: $activetask\r\napssid: $apssid\r\nbport: $bport\r\nuserflowstate: $userFlowState",
 	    doTrigger	=> 1,
 	    callback	=> \&AMAD_statusRequestErrorHandling,
 	}
@@ -528,7 +546,7 @@ sub AMAD_Set($$@) {
 	$list .= "currentFlowsetUpdate:noArg ";
 	$list .= "installFlowSource ";
 	$list .= "doNotDisturb:never,always,alarmClockOnly,onlyImportant ";
-	$list .= "flowState ";
+	$list .= "userFlowState ";
 
 	if( lc $cmd eq 'screenmsg'
 	    || lc $cmd eq 'ttsmsg'
@@ -559,7 +577,7 @@ sub AMAD_Set($$@) {
 	    || lc $cmd eq 'installflowsource'
 	    || lc $cmd eq 'opencall'
 	    || lc $cmd eq 'donotdisturb'
-	    || lc $cmd eq 'flowstate'
+	    || lc $cmd eq 'userflowstate'
 	    || lc $cmd eq 'vibrate') {
 
 	    Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
@@ -628,13 +646,12 @@ sub AMAD_SelectSetCmd($$@) {
 	return AMAD_HTTP_POST( $hash,$url );
     }
     
-    elsif( lc $cmd eq 'flowstate' ) {
+    elsif( lc $cmd eq 'userflowstate' ) {
 
         my $datas = join( " ", @data );
-        my ($state,$flow) = split( ";", $datas);
-	
-	$flow =~ s/%/%25/g;
-	$flow =~ s/\s/%20/g;    
+        my ($state,$flow) = split( ":", $datas);
+        
+	$flow          =~ s/\s/%20/g;    
 	
 	my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/flowState?flowstate=".$state."&flowname=".$flow;
     
@@ -1452,6 +1469,7 @@ sub AMAD_decrypt($) {
     <li>screenOrientation - Landscape/Portrait, screen orientation (horizontal,vertical)</li>
     <li>screenOrientationMode - auto/manual, mode for screen orientation</li>
     <li>state - current state of AMAD device</li>
+    <li>userFlowState - current state of a Flow, established under setUserFlowState Attribut</li>
     <li>volume - media volume setting</li>
     <li>volumeNotification - notification volume setting</li>
     <br>
@@ -1469,7 +1487,6 @@ sub AMAD_decrypt($) {
     <li>currentFlowsetUpdate - start flowset update on Android device</li>
     <li>installFlowSource - install a Automagic flow on device, <u>XML file must be stored in /tmp/ with extension xml</u>. <b>Example:</b> <i>set TabletWohnzimmer installFlowSource WlanUebwerwachen.xml</i></li>
     <li>doNotDisturb - sets the do not Disturb Mode, always Disturb, never Disturb, alarmClockOnly alarm Clock only, onlyImportant only important Disturbs</li>
-    <li>flowState - set Flow/s active or inactive,<b><i>set Nexus7Wohnzimmer inactive;Badezimmer vorheizen</i> or <i>set Nexus7Wohnzimmer inactive;Badezimmer vorheizen,Nachtlicht Steven</i></b></li>
     <li>mediaAmazonMusic - play/stop/next/back , controlling the amazon music media player</li>
     <li>mediaGoogleMusic - play/stop/next/back , controlling the google play music media player</li>
     <li>mediaSpotifyMusic - play/stop/next/back , controlling the spotify media player</li>
@@ -1481,6 +1498,7 @@ sub AMAD_decrypt($) {
     <li>statusRequest - Get a new status report of Android device. Not all readings can be updated using a statusRequest as some readings are only updated if the value of the reading changes.</li>
     <li>timer - set a countdown timer in the "Clock" stock app. Only seconds are allowed as parameter.</li>
     <li>ttsMsg - send a message which will be played as voice message</li>
+    <li>userFlowState - set Flow/s active or inactive,<b><i>set Nexus7Wohnzimmer inactive:Badezimmer vorheizen</i> or <i>set Nexus7Wohnzimmer inactive:Badezimmer vorheizen,Nachtlicht Steven</i></b></li>
     <li>vibrate - vibrate Android device</li>
     <li>volume - set media volume. Works on internal speaker or, if connected, bluetooth speaker or speaker connected via stereo jack</li>
     <li>volumeNotification - set notifications volume</li>
@@ -1613,6 +1631,7 @@ sub AMAD_decrypt($) {
     <li>screenOrientation - Landscape,Portrait, Bildschirmausrichtung (Horizontal,Vertikal)</li>
     <li>screenOrientationMode - auto/manual, Modus f&uuml;r die Ausrichtung (Automatisch, Manuell)</li>
     <li>state - aktueller Status</li>
+    <li>userFlowState - aktueller Status eines Flows, festgelegt unter dem setUserFlowState Attribut</li>
     <li>volume - Media Lautst&auml;rkewert</li>
     <li>volumeNotification - Benachrichtigungs Lautst&auml;rke</li>
     <br>
@@ -1629,7 +1648,6 @@ sub AMAD_decrypt($) {
     <li>clearNotificationBar - All,Automagic, l&ouml;scht alle Meldungen oder nur die Automagic Meldungen in der Statusleiste</li>
     <li>currentFlowsetUpdate - f&uuml;rt ein Flowsetupdate auf dem Device durch</li>
     <li>doNotDisturb - schaltet den nicht st&ouml;ren Modus, always immer st&ouml;ren, never niemals st&ouml;ren, alarmClockOnly nur Wecker darf st&ouml;ren, onlyImportant nur wichtige St&ouml;rungen</li>
-    <li>flowState - aktiviert oder deaktiviert einen oder mehrere Flows,<b><i>set Nexus7Wohnzimmer inactive;Badezimmer vorheizen</i> oder <i>set Nexus7Wohnzimmer inactive;Badezimmer vorheizen,Nachtlicht Steven</i></b></li>
     <li>installFlowSource - installiert einen Flow auf dem Device, <u>das XML File muss unter /tmp/ liegen und die Endung xml haben</u>. <b>Bsp:</b> <i>set TabletWohnzimmer installFlowSource WlanUebwerwachen.xml</i></li>
     <li>mediaAmazonMusic - play, stop, next, back  ,steuert den Amazon Musik Mediaplayer</li>
     <li>mediaGoogleMusic - play, stop, next, back  ,steuert den Google Play Musik Mediaplayer</li>
@@ -1641,6 +1659,7 @@ sub AMAD_decrypt($) {
     <li>statusRequest - Fordert einen neuen Statusreport beim Device an. Es k&ouml;nnen nicht von allen Readings per statusRequest die Daten geholt werden. Einige wenige geben nur bei Status&auml;nderung ihren Status wieder.</li>
     <li>timer - setzt einen Timer innerhalb der als Standard definierten ClockAPP auf dem Device. Es k&ouml;nnen nur Sekunden angegeben werden.</li>
     <li>ttsMsg - versendet eine Nachricht welche als Sprachnachricht ausgegeben wird</li>
+    <li>userFlowState - aktiviert oder deaktiviert einen oder mehrere Flows,<b><i>set Nexus7Wohnzimmer inactive:Badezimmer vorheizen</i> oder <i>set Nexus7Wohnzimmer inactive:Badezimmer vorheizen,Nachtlicht Steven</i></b></li>
     <li>vibrate - l&auml;sst das Androidger&auml;t vibrieren</li>
     <li>volume - setzt die Medialautst&auml;rke. Entweder die internen Lautsprecher oder sofern angeschlossen die Bluetoothlautsprecher und per Klinkenstecker angeschlossene Lautsprecher, + oder - vor dem Wert reduziert die aktuelle Lautst&auml;rke um den Wert</li>
     <li>volumeNotification - setzt die Benachrichtigungslautst&auml;rke.</li>
