@@ -259,7 +259,7 @@ sub AMAD_Attr(@) {
 
 sub AMAD_GetUpdate($) {
 
-my ( $hash ) = @_;
+    my ( $hash ) = @_;
     my $name = $hash->{NAME};
     my $bhash = $modules{AMAD}{defptr}{BRIDGE};
     my $bname = $bhash->{NAME};
