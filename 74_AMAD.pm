@@ -37,7 +37,7 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "2.6.3";
+my $modulversion = "2.6.4";
 my $flowsetversion = "2.6.4";
 
 
@@ -139,8 +139,8 @@ sub AMAD_Undef($$) {
 
     my ( $hash, $arg ) = @_;
     
-    if( $hash->{BRIDGE} ) {
-	delete $modules{AMAD}{defptr}{BRIDGE} if(defined($modules{AMAD}{defptr}{BRIDGE}));
+    if( $hash->{BRIDGE} or $hash->{TEMPORARY} == 1 ) {
+	delete $modules{AMAD}{defptr}{BRIDGE} if( defined($modules{AMAD}{defptr}{BRIDGE}) );
 	TcpServer_Close( $hash );
     } 
     
