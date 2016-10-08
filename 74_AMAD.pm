@@ -140,7 +140,7 @@ sub AMAD_Undef($$) {
     my ( $hash, $arg ) = @_;
     
     if( $hash->{BRIDGE} or $hash->{TEMPORARY} == 1 ) {
-	delete $modules{AMAD}{defptr}{BRIDGE} if( defined($modules{AMAD}{defptr}{BRIDGE}) );
+	delete $modules{AMAD}{defptr}{BRIDGE} if( defined($modules{AMAD}{defptr}{BRIDGE}) and $hash->{BRIDGE} );
 	TcpServer_Close( $hash );
     } 
     
