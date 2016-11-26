@@ -524,8 +524,8 @@ irname=getString("name")</extras>
   </condition>
   <condition type="expression">
     <useDefaultName>true</useDefaultName>
-    <name>Expression: global_fhemip != null or header_fhemip != null</name>
-    <expression>global_fhemip != null or header_fhemip != null</expression>
+    <name>Expression: global_fhemip != null or global_bridgeport != null</name>
+    <expression>global_fhemip != null or global_bridgeport != null</expression>
   </condition>
   <condition type="expression">
     <useDefaultName>true</useDefaultName>
@@ -2882,7 +2882,7 @@ if(param_mplayer == "mediaTuneinRadio")
     <actioncontainer id="t152" x="525.0" y="-3832.5">Script: nextAlarm = "nextAlarmTime@@" + {next_alarmtime} + "@@@@nextAlarmDay@@" + {next_alarmday}; fhemcmd = "setreading";</actioncontainer>
     <conditioncontainer id="t153" x="1015.0" y="682.5">Expression: trigger == "HTTP Request: /fhem-amad/deviceInfo/"</conditioncontainer>
     <actioncontainer id="t154" x="1015.00006" y="1417.5">Prüfe und setze globale Variablen</actioncontainer>
-    <conditioncontainer id="t155" x="1015.0" y="157.5">Expression: global_fhemip != null or header_fhemip != null</conditioncontainer>
+    <conditioncontainer id="t155" x="1015.0" y="157.5">Expression: global_fhemip != null or global_bridgeport != null</conditioncontainer>
     <connection from="t1" to="t29" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t2" to="t75" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t3" to="t75" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -3297,7 +3297,7 @@ if(param_mplayer == "mediaTuneinRadio")
       <trigger>Sprachbefehl angefordert</trigger>
       <trigger>HTTP Request: /fhem-amad/setCommands/*</trigger>
     </triggercontainer>
-    <conditioncontainer id="t155" x="-805.0" y="-2782.5">Expression: global_fhemip != null or header_fhemip != null</conditioncontainer>
+    <conditioncontainer id="t155" x="-805.0" y="-2782.5">Expression: global_fhemip != null or global_bridgeport != null</conditioncontainer>
     <connection from="t1" to="t33" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t2" to="t64" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t2" to="t13" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
