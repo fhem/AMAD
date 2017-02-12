@@ -37,8 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "2.6.8";
-my $flowsetversion = "2.6.8";
+my $modulversion = "2.6.9";
+my $flowsetversion = "2.6.9";
 
 
 
@@ -1475,6 +1475,10 @@ sub AMAD_decrypt($) {
     <li>flow_SetCommands - active/inactive, state of SetCommands flow</li>
     <li>flow_informations - active/inactive, state of Informations flow</li>
     <li>flowsetVersionAtDevice - currently installed version of the flowsets on the Android device</li>
+    <li>incomingCallerName - Callername from last Call</li>
+    <li>incomingCallerNumber - Callernumber from last Call</li>
+    <li>incommingWhatsAppMessageFrom - last WhatsApp message</li>
+    <li>incommingWhatsTelegramMessageFrom - last telegram message</li>
     <li>intentRadioName - name of the most-recent streamed intent radio</li>
     <li>intentRadioState - state of intent radio player</li>
     <li>keyguardSet - 0/1 keyguard set, 0=no 1=yes, does not indicate whether it is currently active</li>
@@ -1640,6 +1644,10 @@ sub AMAD_decrypt($) {
     <li>flow_SetCommands - active/inactive, Status des SetCommands Flow</li>
     <li>flow_informations - active/inactive, Status des Informations Flow</li>
     <li>flowsetVersionAtDevice - aktuell installierte Flowsetversion auf dem Device</li>
+    <li>incomingCallerName - Anrufername des eingehenden Anrufes</li>
+    <li>incomingCallerNumber - Anrufernummer des eingehenden Anrufes</li>
+    <li>incommingWhatsAppMessageFrom - letzte WhatsApp Nachricht</li>
+    <li>incommingWhatsTelegramMessageFrom - letzte Telegram Nachricht</li>
     <li>intentRadioName - zuletzt gesrreamter Intent Radio Name</li>
     <li>intentRadioState - Status des IntentRadio Players</li>
     <li>keyguardSet - 0/1 Displaysperre gesetzt 0=nein 1=ja, bedeutet nicht das sie gerade aktiv ist</li>
