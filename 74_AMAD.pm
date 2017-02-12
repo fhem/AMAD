@@ -1235,101 +1235,104 @@ sub AMAD_CommBridge_Read($) {
     }
 
 
-
-    elsif ( $fhemcmd =~ /setreading\b/ ) {
-	my $tv = $data[1];
-
-        Log3 $bname, 4, "AMAD ($bname) - AMAD_CommBridge: processing receive reading values - Device: $device Data: $tv";
     
-        AMAD_ResponseProcessing($dhash,$tv);
-        
-        $response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM was processes\r\n";
-        $c = $hash->{CD};
-        print $c "HTTP/1.1 200 OK\r\n",
-            "Content-Type: text/plain\r\n",
-            "Connection: close\r\n",
-            "Content-Length: ".length($response)."\r\n\r\n",
-            $response;
+    if( defined($fhemcmd) and ($fhemcmd) ) {
+        if ( $fhemcmd =~ /setreading\b/ ) {
+            my $tv = $data[1];
 
-        return;
-    }
-
-    elsif ( $fhemcmd =~ /set\b/ ) {
-        my $fhemCmd = $data[1];
-        
-        fhem ("set $fhemCmd") if( ReadingsVal( $bname, "expertMode", 0 ) eq "1" );
-	readingsSingleUpdate( $bhash, "receiveFhemCommand", "set ".$fhemCmd, 0 );
-	Log3 $bname, 4, "AMAD ($bname) - AMAD_CommBridge: set reading receive fhem command";
-	
-	$response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM execute set command now\r\n";
-        $c = $hash->{CD};
-        print $c "HTTP/1.1 200 OK\r\n",
-            "Content-Type: text/plain\r\n",
-            "Connection: close\r\n",
-            "Content-Length: ".length($response)."\r\n\r\n",
-            $response;
-	
-	return;
-    }
+            Log3 $bname, 4, "AMAD ($bname) - AMAD_CommBridge: processing receive reading values - Device: $device Data: $tv";
     
-    elsif ( $fhemcmd =~ /voiceinputvalue\b/ ) {
-        my $fhemCmd = lc $data[1];
+            AMAD_ResponseProcessing($dhash,$tv);
         
-        readingsBeginUpdate( $bhash);
-	readingsBulkUpdate( $bhash, "receiveVoiceCommand", $fhemCmd );
-	readingsBulkUpdate( $bhash, "receiveVoiceDevice", $device );
-	readingsEndUpdate( $bhash, 1 );
-	Log3 $bname, 4, "AMAD ($bname) - AMAD_CommBridge: set reading receive voice command: $fhemCmd from Device $device";
+            $response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM was processes\r\n";
+            $c = $hash->{CD};
+            print $c "HTTP/1.1 200 OK\r\n",
+                "Content-Type: text/plain\r\n",
+                "Connection: close\r\n",
+                "Content-Length: ".length($response)."\r\n\r\n",
+                $response;
+
+            return;
+        }
+
+        elsif ( $fhemcmd =~ /set\b/ ) {
+            my $fhemCmd = $data[1];
+        
+            fhem ("set $fhemCmd") if( ReadingsVal( $bname, "expertMode", 0 ) eq "1" );
+            readingsSingleUpdate( $bhash, "receiveFhemCommand", "set ".$fhemCmd, 0 );
+            Log3 $bname, 4, "AMAD ($bname) - AMAD_CommBridge: set reading receive fhem command";
 	
-	$response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM was processes\r\n";
-        $c = $hash->{CD};
-        print $c "HTTP/1.1 200 OK\r\n",
-            "Content-Type: text/plain\r\n",
-            "Connection: close\r\n",
-            "Content-Length: ".length($response)."\r\n\r\n",
-            $response;
+            $response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM execute set command now\r\n";
+            $c = $hash->{CD};
+            print $c "HTTP/1.1 200 OK\r\n",
+                "Content-Type: text/plain\r\n",
+                "Connection: close\r\n",
+                "Content-Length: ".length($response)."\r\n\r\n",
+                $response;
+	
+            return;
+        }
+    
+        elsif ( $fhemcmd =~ /voiceinputvalue\b/ ) {
+            my $fhemCmd = lc $data[1];
+        
+            readingsBeginUpdate( $bhash);
+            readingsBulkUpdate( $bhash, "receiveVoiceCommand", $fhemCmd );
+            readingsBulkUpdate( $bhash, "receiveVoiceDevice", $device );
+            readingsEndUpdate( $bhash, 1 );
+            Log3 $bname, 4, "AMAD ($bname) - AMAD_CommBridge: set reading receive voice command: $fhemCmd from Device $device";
+
+            $response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM was processes\r\n";
+            $c = $hash->{CD};
+            print $c "HTTP/1.1 200 OK\r\n",
+                "Content-Type: text/plain\r\n",
+                "Connection: close\r\n",
+                "Content-Length: ".length($response)."\r\n\r\n",
+                $response;
             
-	return;
-    }
+            return;
+        }
     
-    elsif ( $fhemcmd =~ /readingsval\b/ ) {
-        my $fhemCmd = $data[1];
-        my @datavalue = split( ' ', $fhemCmd );
+        elsif ( $fhemcmd =~ /readingsval\b/ ) {
+            my $fhemCmd = $data[1];
+            my @datavalue = split( ' ', $fhemCmd );
 
-        $response = ReadingsVal( $datavalue[0], $datavalue[1], $datavalue[2] );
-        $c = $hash->{CD};
-        print $c "HTTP/1.1 200 OK\r\n",
-            "Content-Type: text/plain\r\n",
-            "Connection: close\r\n",
-            "Content-Length: ".length($response)."\r\n\r\n",
-            $response;
+            $response = ReadingsVal( $datavalue[0], $datavalue[1], $datavalue[2] );
+            $c = $hash->{CD};
+            print $c "HTTP/1.1 200 OK\r\n",
+                "Content-Type: text/plain\r\n",
+                "Connection: close\r\n",
+                "Content-Length: ".length($response)."\r\n\r\n",
+                $response;
         
-	Log3 $bname, 4, "AMAD ($bname) - AMAD_CommBridge: response ReadingsVal Value to Automagic Device";
-	return;
-    }
+            Log3 $bname, 4, "AMAD ($bname) - AMAD_CommBridge: response ReadingsVal Value to Automagic Device";
+            return;
+        }
     
-    elsif ( $fhemcmd =~ /fhemfunc\b/ ) {
-        my $fhemCmd = $data[1];
+        elsif ( $fhemcmd =~ /fhemfunc\b/ ) {
+            my $fhemCmd = $data[1];
 	
-	Log3 $bname, 4, "AMAD ($bname) - AMAD_CommBridge: receive fhem-function command";
+            Log3 $bname, 4, "AMAD ($bname) - AMAD_CommBridge: receive fhem-function command";
 	
-        if( $fhemCmd =~ /^{.*}$/ ) {
+            if( $fhemCmd =~ /^{.*}$/ ) {
         
-            $response = $fhemCmd if( ReadingsVal( $bname, "expertMode", 0 ) eq "1" );
+                $response = $fhemCmd if( ReadingsVal( $bname, "expertMode", 0 ) eq "1" );
             
-	} else {
+            } else {
 	
-            $response = "header lines: \r\n AMADCommBridge receive no typical FHEM function\r\n FHEM to do nothing\r\n";
-	}
+                $response = "header lines: \r\n AMADCommBridge receive no typical FHEM function\r\n FHEM to do nothing\r\n";
+            }
 	
-        $c = $hash->{CD};
-        print $c "HTTP/1.1 200 OK\r\n",
-            "Content-Type: text/plain\r\n",
-            "Connection: close\r\n",
-            "Content-Length: ".length($response)."\r\n\r\n",
-            $response;
+            $c = $hash->{CD};
+            print $c "HTTP/1.1 200 OK\r\n",
+                "Content-Type: text/plain\r\n",
+                "Connection: close\r\n",
+                "Content-Length: ".length($response)."\r\n\r\n",
+                $response;
 	
-	return;
+            return;
+        }
+    
     }
 
 
