@@ -37,8 +37,8 @@ use TcpServerUtils;
 use Encode qw(encode);
 
 
-my $modulversion = "2.6.9";
-my $flowsetversion = "2.6.9";
+my $modulversion = "2.6.10";
+my $flowsetversion = "2.6.10";
 
 
 
@@ -520,108 +520,109 @@ sub AMAD_Set($$@) {
     my $bname = $bhash->{NAME};
     
     if( $name ne "$bname" ) {
-	my $apps = AttrVal( $name, "setOpenApp", "none" );
-	my $btdev = AttrVal( $name, "setBluetoothDevice", "none" );
-	my $activetask = AttrVal( $name, "setActiveTask", "none" );
+        my $apps = AttrVal( $name, "setOpenApp", "none" );
+        my $btdev = AttrVal( $name, "setBluetoothDevice", "none" );
+        my $activetask = AttrVal( $name, "setActiveTask", "none" );
   
-	my $list = "";
-	$list .= "screenMsg ";
-	$list .= "ttsMsg ";
-	$list .= "volume:slider,0,1,15 ";
-	$list .= "mediaGoogleMusic:play,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
-	$list .= "mediaAmazonMusic:play,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
-	$list .= "mediaSpotifyMusic:play,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
-	$list .= "mediaTuneinRadio:play,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
-	$list .= "screenBrightness:slider,0,1,255 ";
-	$list .= "screen:on,off,lock,unlock ";
-	$list .= "screenOrientation:auto,landscape,portrait " if( AttrVal( $name, "setScreenOrientation", "0" ) eq "1" );
-	$list .= "screenFullscreen:on,off " if( AttrVal( $name, "setFullscreen", "0" ) eq "1" );
-	$list .= "openURL ";
-	$list .= "openApp:$apps " if( AttrVal( $name, "setOpenApp", "none" ) ne "none" );
-	$list .= "nextAlarmTime:time ";
-	$list .= "timer:slider,1,1,60 ";
-	$list .= "statusRequest:noArg ";
-	$list .= "system:reboot,shutdown,airplanemodeON " if( AttrVal( $name, "root", "0" ) eq "1" );
-	$list .= "bluetooth:on,off ";
-	$list .= "notifySndFile ";
-	$list .= "clearNotificationBar:All,Automagic ";
-	$list .= "changetoBTDevice:$btdev " if( AttrVal( $name, "setBluetoothDevice", "none" ) ne "none" );
-	$list .= "activateVoiceInput:noArg ";
-	$list .= "volumeNotification:slider,0,1,7 ";
-	$list .= "vibrate:noArg ";
-	$list .= "sendIntent ";
-	$list .= "openCall ";
-	$list .= "currentFlowsetUpdate:noArg ";
-	$list .= "installFlowSource ";
-	$list .= "doNotDisturb:never,always,alarmClockOnly,onlyImportant ";
-	$list .= "userFlowState ";
-	$list .= "sendSMS ";
+        my $list = "";
+        $list .= "screenMsg ";
+        $list .= "ttsMsg ";
+        $list .= "volume:slider,0,1,15 ";
+        $list .= "mediaGoogleMusic:play,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
+        $list .= "mediaAmazonMusic:play,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
+        $list .= "mediaSpotifyMusic:play,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
+        $list .= "mediaTuneinRadio:play,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
+        $list .= "screenBrightness:slider,0,1,255 ";
+        $list .= "screen:on,off,lock,unlock ";
+        $list .= "screenOrientation:auto,landscape,portrait " if( AttrVal( $name, "setScreenOrientation", "0" ) eq "1" );
+        $list .= "screenFullscreen:on,off " if( AttrVal( $name, "setFullscreen", "0" ) eq "1" );
+        $list .= "openURL ";
+        $list .= "openApp:$apps " if( AttrVal( $name, "setOpenApp", "none" ) ne "none" );
+        $list .= "nextAlarmTime:time ";
+        $list .= "timer:slider,1,1,60 ";
+        $list .= "statusRequest:noArg ";
+        $list .= "system:reboot,shutdown,airplanemodeON " if( AttrVal( $name, "root", "0" ) eq "1" );
+        $list .= "bluetooth:on,off ";
+        $list .= "notifySndFile ";
+        $list .= "clearNotificationBar:All,Automagic ";
+        $list .= "changetoBTDevice:$btdev " if( AttrVal( $name, "setBluetoothDevice", "none" ) ne "none" );
+        $list .= "activateVoiceInput:noArg ";
+        $list .= "volumeNotification:slider,0,1,7 ";
+        $list .= "vibrate:noArg ";
+        $list .= "sendIntent ";
+        $list .= "openCall ";
+        $list .= "closeCall:noArg ";
+        $list .= "currentFlowsetUpdate:noArg ";
+        $list .= "installFlowSource ";
+        $list .= "doNotDisturb:never,always,alarmClockOnly,onlyImportant ";
+        $list .= "userFlowState ";
+        $list .= "sendSMS ";
 
-	if( lc $cmd eq 'screenmsg'
-	    || lc $cmd eq 'ttsmsg'
-	    || lc $cmd eq 'volume'
-	    || lc $cmd eq 'mediagooglemusic'
-	    || lc $cmd eq 'mediaamazonmusic'
-	    || lc $cmd eq 'mediaspotifymusic'
-	    || lc $cmd eq 'mediatuneinradio'
-	    || lc $cmd eq 'screenbrightness'
-	    || lc $cmd eq 'screenorientation'
-	    || lc $cmd eq 'screenfullscreen'
-	    || lc $cmd eq 'screen'
-	    || lc $cmd eq 'openurl'
-	    || lc $cmd eq 'openapp'
-	    || lc $cmd eq 'nextalarmtime'
-	    || lc $cmd eq 'timer'
-	    || lc $cmd eq 'bluetooth'
-	    || lc $cmd eq 'system'
-	    || lc $cmd eq 'notifysndfile'
-	    || lc $cmd eq 'changetobtdevice'
-	    || lc $cmd eq 'clearnotificationbar'
-	    || lc $cmd eq 'activatevoiceinput'
-	    || lc $cmd eq 'volumenotification'
-	    || lc $cmd eq 'screenlock'
-	    || lc $cmd eq 'statusrequest'
-	    || lc $cmd eq 'sendsms'
-	    || lc $cmd eq 'sendintent'
-	    || lc $cmd eq 'currentflowsetupdate'
-	    || lc $cmd eq 'installflowsource'
-	    || lc $cmd eq 'opencall'
-	    || lc $cmd eq 'donotdisturb'
-	    || lc $cmd eq 'userflowstate'
-	    || lc $cmd eq 'vibrate') {
+        if( lc $cmd eq 'screenmsg'
+            || lc $cmd eq 'ttsmsg'
+            || lc $cmd eq 'volume'
+            || lc $cmd eq 'mediagooglemusic'
+            || lc $cmd eq 'mediaamazonmusic'
+            || lc $cmd eq 'mediaspotifymusic'
+            || lc $cmd eq 'mediatuneinradio'
+            || lc $cmd eq 'screenbrightness'
+            || lc $cmd eq 'screenorientation'
+            || lc $cmd eq 'screenfullscreen'
+            || lc $cmd eq 'screen'
+            || lc $cmd eq 'openurl'
+            || lc $cmd eq 'openapp'
+            || lc $cmd eq 'nextalarmtime'
+            || lc $cmd eq 'timer'
+            || lc $cmd eq 'bluetooth'
+            || lc $cmd eq 'system'
+            || lc $cmd eq 'notifysndfile'
+            || lc $cmd eq 'changetobtdevice'
+            || lc $cmd eq 'clearnotificationbar'
+            || lc $cmd eq 'activatevoiceinput'
+            || lc $cmd eq 'volumenotification'
+            || lc $cmd eq 'screenlock'
+            || lc $cmd eq 'statusrequest'
+            || lc $cmd eq 'sendsms'
+            || lc $cmd eq 'sendintent'
+            || lc $cmd eq 'currentflowsetupdate'
+            || lc $cmd eq 'installflowsource'
+            || lc $cmd eq 'opencall'
+            || lc $cmd eq 'closecall'
+            || lc $cmd eq 'donotdisturb'
+            || lc $cmd eq 'userflowstate'
+            || lc $cmd eq 'vibrate') {
 
-	    Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
-            
+            Log3 $name, 5, "AMAD ($name) - set $name $cmd ".join(" ", @val);
+                
             return AMAD_SelectSetCmd( $hash, $cmd, @val ) if( lc $cmd eq 'statusrequest' );
-	    return "set command only works if state not equal initialized" if( ReadingsVal( $hash->{NAME}, "state", 0 ) eq "initialized");
-	    return "Cannot set command, FHEM Device is disabled" if( AttrVal( $name, "disable", "0" ) eq "1" );
-	    
-	    return "Cannot set command, FHEM Device is unknown" if( ReadingsVal( $name, "deviceState", "online" ) eq "unknown" );
-	    return "Cannot set command, FHEM Device is offline" if( ReadingsVal( $name, "deviceState", "online" ) eq "offline" );
-	  
-	    return AMAD_SelectSetCmd( $hash, $cmd, @val ) if( @val ) || ( lc $cmd eq 'activatevoiceinput' ) || ( lc $cmd eq 'vibrate' ) || ( lc $cmd eq 'currentflowsetupdate' );
-	}
+            return "set command only works if state not equal initialized" if( ReadingsVal( $hash->{NAME}, "state", 0 ) eq "initialized");
+            return "Cannot set command, FHEM Device is disabled" if( AttrVal( $name, "disable", "0" ) eq "1" );
+            
+            return "Cannot set command, FHEM Device is unknown" if( ReadingsVal( $name, "deviceState", "online" ) eq "unknown" );
+            return "Cannot set command, FHEM Device is offline" if( ReadingsVal( $name, "deviceState", "online" ) eq "offline" );
+        
+            return AMAD_SelectSetCmd( $hash, $cmd, @val ) if( @val ) || ( lc $cmd eq 'activatevoiceinput' ) || ( lc $cmd eq 'vibrate' ) || ( lc $cmd eq 'currentflowsetupdate' ) || ( lc $cmd eq 'closecall' );
+        }
 
-	return "Unknown argument $cmd, bearword as argument or wrong parameter(s), choose one of $list";
-    }
-
-    elsif( $modules{AMAD}{defptr}{BRIDGE} ) {
+        return "Unknown argument $cmd, bearword as argument or wrong parameter(s), choose one of $list";
     
-	my $list = "";
+    } elsif( $modules{AMAD}{defptr}{BRIDGE} ) {
     
-	## set Befehle für die AMAD_CommBridge
-	$list .= "expertMode:0,1 " if( $modules{AMAD}{defptr}{BRIDGE} );
-	$list .= "fhemServerIP " if( $modules{AMAD}{defptr}{BRIDGE} );
-	
-	if( lc $cmd eq 'expertmode'
-	    || lc $cmd eq 'fhemserverip' ) {
-	    
-	    readingsSingleUpdate( $hash, $cmd, $val[0], 0 );
-	    
-	    return;
-	}
-	
-	return "Unknown argument $cmd, bearword as argument or wrong parameter(s), choose one of $list";
+        my $list = "";
+    
+        ## set Befehle für die AMAD_CommBridge
+        $list .= "expertMode:0,1 " if( $modules{AMAD}{defptr}{BRIDGE} );
+        $list .= "fhemServerIP " if( $modules{AMAD}{defptr}{BRIDGE} );
+        
+        if( lc $cmd eq 'expertmode'
+            || lc $cmd eq 'fhemserverip' ) {
+            
+            readingsSingleUpdate( $hash, $cmd, $val[0], 0 );
+            
+            return;
+        }
+        
+        return "Unknown argument $cmd, bearword as argument or wrong parameter(s), choose one of $list";
     }
 }
 
@@ -919,6 +920,13 @@ sub AMAD_SelectSetCmd($$@) {
         $time = "none" if( !$time );
 
         my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/openCall?callnumber=".$callnumber."&hanguptime=".$time;
+	
+        return AMAD_HTTP_POST( $hash,$url );
+    }
+    
+    elsif( lc $cmd eq 'closecall' ) {
+
+        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/closeCall";
 	
         return AMAD_HTTP_POST( $hash,$url );
     }
