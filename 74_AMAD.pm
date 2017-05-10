@@ -24,6 +24,21 @@
 # $Id$
 #
 ###############################################################################
+##
+##
+## Das JSON Modul immer in einem eval aufrufen
+# $data = eval{decode_json($data)};
+#
+# if($@){
+#   Log3($SELF, 2, "$TYPE ($SELF) - error while request: $@");
+#  
+#   readingsSingleUpdate($hash, "state", "error", 1);
+#
+#   return;
+# }
+##
+##
+
 
 
 package main;
