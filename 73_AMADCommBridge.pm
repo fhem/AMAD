@@ -36,6 +36,13 @@
 #
 #   return;
 # }
+#
+#
+###### Möglicher Aufbau eines JSON Strings für die AMADCommBridge
+#
+#  {"amad": {"AMADDEVICE": "nexus7-Wohnzimmer","FHEMCMD": "setreading"},"payload": {"reading0": "value0","reading1": "value1","readingX": "valueX"}}
+#
+#
 ##
 ##
 
@@ -43,16 +50,18 @@
 
 package main;
 
+
+my $missingModul = "";
+
 use strict;
 use warnings;
-use Time::HiRes qw(gettimeofday);
 
 use HttpUtils;
 use TcpServerUtils;
-use Encode qw(encode);
+eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3alpha5";
+my $modulversion = "3alpha9";
 my $flowsetversion = "2.6.12";
 
 
@@ -95,7 +104,7 @@ sub AMADCommBridge_Initialize($) {
     $hash->{UndefFn}    = "AMADCommBridge_Undef";
     
     $hash->{AttrFn}     = "AMADCommBridge_Attr";
-    $hash->{AttrList}   = "expertMode:0,1 ".
+    $hash->{AttrList}   = "expertMode:1 ".
                           "port ".
                           "disable:1 ".
                           $readingFnAttributes;
@@ -115,8 +124,9 @@ sub AMADCommBridge_Define($$) {
     my @a = split( "[ \t][ \t]*", $def );
 
     
-    return "too few parameters: define <name> AMADCommBridge <HOST-IP> '<HOST-PORT>'" if( @a < 2 and @a > 3 );
-
+    return "too few parameters: define <name> AMADCommBridge'" if( @a != 2);
+    return "Cannot define a HEOS device. Perl modul $missingModul is missing." if ( $missingModul );
+    
     my $name                = $a[0];
     my $host                = $a[2];
     
@@ -125,7 +135,6 @@ sub AMADCommBridge_Define($$) {
     $port                   = 8090 if( not defined($port) and (!$port) );
     
     $hash->{BRIDGE}         = 1;
-    $hash->{HOST}           = $host;
     $hash->{PORT}           = $port;
     $hash->{VERSIONMODUL}   = $modulversion;
     $hash->{VERSIONFLOWSET} = $flowsetversion;
@@ -137,7 +146,7 @@ sub AMADCommBridge_Define($$) {
 
     $attr{$name}{room} = "AMAD" if( !defined( $attr{$name}{room} ) );
     
-    Log3 $name, 3, "AMADCommBridge ($name) - defined AMADCommBridge at $host with Socketport $port";
+    Log3 $name, 3, "AMADCommBridge ($name) - defined AMADCommBridge with Socketport $port";
 
     AMADCommBridge_Open( $hash );
     
@@ -398,9 +407,13 @@ sub AMADCommBridge_Set($@) {
     } elsif( $cmd eq 'close' ) {
     
         AMADCommBridge_Close($hash);
+        
+    } elsif( $cmd eq 'fhemServerIP' ) {
+    
+        readingsSingleUpdate($hash,$cmd,$arg,1);
     
     } else {
-        my $list = "open:noArg close:noArg";
+        my $list = "open:noArg close:noArg fhemServerIP";
         return "Unknown argument $cmd, choose one of $list";
     }
 }
@@ -638,22 +651,30 @@ sub AMADCommBridge_ResponseProcessing($$) {
     my $bhash       = $modules{AMADCommBridge}{defptr}{BRIDGE};
     my $bname       = $bhash->{NAME};
     
+    my @data        = split( '\R\R', $buf );
+    
+    
+    
     
     #### Verarbeitung der Daten welche über die AMADCommBridge kommen ####
     
     Log3 $bname, 5, "AMADCommBridge ($name) - Receive RAW Message in Debugging Mode: $buf";
 
-    ###
-    ## Consume Content
-    ###
 
-    my @data = split( '\R\R', $buf );
-    
-    my $header = AMADCommBridge_Header2Hash( $data[0] );
     my $response;
     my $c;
-    my $device = $header->{FHEMDEVICE} if(defined($header->{FHEMDEVICE}));
-    my $fhemcmd = $header->{FHEMCMD} if(defined($header->{FHEMCMD}));
+    my $json        = $data[1];
+    my $decode_json;
+
+    $decode_json    = eval{decode_json($json)};
+    if($@){
+        Log3 $bname, 3, "AMADCommBridge ($name) - error while request: $@";
+        readingsSingleUpdate($bhash, "state", "error", 1);
+        return;
+    }
+
+    my $amadDevice  = $decode_json->{amad}{AMADDEVICE};
+    my $fhemcmd     = $decode_json->{amad}{FHEMCMD};
 
 
 
@@ -689,7 +710,7 @@ sub AMADCommBridge_ResponseProcessing($$) {
 
 
 
-    elsif( !defined($device) ) {
+    elsif( !defined($amadDevice) ) {
         readingsSingleUpdate( $bhash, "transmitterERROR", $hash->{NAME}." has no device name sends", 1 ) if( AttrVal( $bname, "expertMode", 0 ) eq "1" );
         Log3 $bname, 4, "AMADCommBridge ($name) - ERROR - no device name given. please check your global variable in automagic";
         
@@ -709,13 +730,14 @@ sub AMADCommBridge_ResponseProcessing($$) {
     if( defined($fhemcmd) and ($fhemcmd) ) {
         if ( $fhemcmd =~ /setreading\b/ ) {
             my $tv = $data[1];
-            return Log3 $bname, 3, "AMADCommBridge ($name) - AMADCommBridge: processing receive no reading values from Device: $device"
+            return Log3 $bname, 3, "AMADCommBridge ($name) - AMADCommBridge: processing receive no reading values from Device: $amadDevice"
             unless( defined($tv) and ($tv) );
             
-            Log3 $bname, 4, "AMADCommBridge ($name) - AMADCommBridge: processing receive reading values - Device: $device Data: $tv";
-    
-            # Hier muß dann der Dispatcher aufgerufen werden
-            #AMADCommBridge_ResponseProcessing($dhash,$tv);
+            Log3 $bname, 4, "AMADCommBridge ($name) - AMADCommBridge: processing receive reading values - Device: $amadDevice Data: $tv";
+
+            Dispatch($bhash,$json,undef);
+            Log3 $name, 4, "AMADCommBridge ($name) - call Dispatcher";
+            readingsSingleUpdate($bhash,'fhemServerIP',$decode_json->{payload}{'DEVICE-IP'},1) if( defined($decode_json->{payload}{'DEVICE-IP'}));
         
             $response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM was processes\r\n";
             $c = $hash->{CD};
@@ -751,9 +773,9 @@ sub AMADCommBridge_ResponseProcessing($$) {
         
             readingsBeginUpdate( $bhash);
             readingsBulkUpdate( $bhash, "receiveVoiceCommand", $fhemCmd );
-            readingsBulkUpdate( $bhash, "receiveVoiceDevice", $device );
+            readingsBulkUpdate( $bhash, "receiveVoiceDevice", $amadDevice );
             readingsEndUpdate( $bhash, 1 );
-            Log3 $bname, 4, "AMADCommBridge ($name) - AMADCommBridge_CommBridge: set reading receive voice command: $fhemCmd from Device $device";
+            Log3 $bname, 4, "AMADCommBridge ($name) - AMADCommBridge_CommBridge: set reading receive voice command: $fhemCmd from Device $amadDevice";
 
             $response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM was processes\r\n";
             $c = $hash->{CD};
@@ -818,21 +840,29 @@ sub AMADCommBridge_ResponseProcessing($$) {
         $response;
 }
 
-sub AMADCommBridge_Header2Hash($) {
+##################
+### my little helper
+##################
 
-    my $string  = shift;
-    my %hash    = ();
+##### bleibt zu Anschauungszwecken erhalten
+#sub AMADCommBridge_Header2Hash($) {
+#
+#    my $string  = shift;
+#    my %hash    = ();
+#
+#    foreach my $line (split("\r\n", $string)) {
+#        my ($key,$value) = split( ": ", $line );
+#        next if( !$value );
+#
+#        $value =~ s/^ //;
+#        $hash{$key} = $value;
+#    }     
+#        
+#    return \%hash;
+#}
 
-    foreach my $line (split("\r\n", $string)) {
-        my ($key,$value) = split( ": ", $line );
-        next if( !$value );
 
-        $value =~ s/^ //;
-        $hash{$key} = $value;
-    }     
-        
-    return \%hash;
-}
+
 
 
 
