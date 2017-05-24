@@ -38,15 +38,7 @@
 # }
 #
 #
-###### Möglicher Aufbau eines JSON Strings für die AMADCommBridge
-#
-#  {"amad": {"AMADDEVICE": "nexus7-Wohnzimmer","FHEMCMD": "setreading"},"payload": {"reading0": "value0","reading1": "value1","readingX": "valueX"}}
-#
-#
-##
-##
-##
-##
+
 
 
 
@@ -62,7 +54,7 @@ use Encode qw(encode);
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3alpha9";
+my $modulversion = "3alpha27";
 my $flowsetversion = "2.6.12";
 
 
@@ -144,19 +136,22 @@ sub AMADDevice_Define($$) {
         $i++;
     }
     
-    return "too few parameters: define <name> AMADDevice <HOST-IP>" if( @a < 2 );
-    return "Cannot define a HEOS device. Perl modul $missingModul is missing." if ( $missingModul );
+    return "too few parameters: define <name> AMADDevice <HOST-IP> <amad_id>" if( @a != 3 );
+    return "Cannot define a AMAD device. Perl modul $missingModul is missing." if ( $missingModul );
     
     
-    my ($name,$host)                            = @a;
+    my ($name,$host,$amad_id)                        = @a;
 
     $hash->{HOST}                               = $host;
+    $hash->{AMAD_ID}                            = $amad_id;
     $hash->{PORT}                               = 8090;
     $hash->{VERSIONMODUL}                       = $modulversion;
     $hash->{VERSIONFLOWSET}                     = $flowsetversion;
-    $hash->{helper}{infoErrorCounter}           = 0 if( $hash->{HOST} );
-    $hash->{helper}{setCmdErrorCounter}         = 0 if( $hash->{HOST} );
-    $hash->{helper}{deviceStateErrorCounter}    = 0 if( $hash->{HOST} );
+    $hash->{helper}{infoErrorCounter}           = 0;
+    $hash->{helper}{setCmdErrorCounter}         = 0;
+    $hash->{helper}{deviceStateErrorCounter}    = 0;
+
+    
 
 
     AssignIoPort($hash,$iodev) if( !$hash->{IODev} );
@@ -173,13 +168,12 @@ sub AMADDevice_Define($$) {
     
     $iodev = $hash->{IODev}->{NAME};
     
-    my $code = $iodev ."-". $name if( defined($iodev) );
-    my $d = $modules{AMADDevice}{defptr}{$code};
+    my $d = $modules{AMADDevice}{defptr}{$amad_id};
     
     return "AMADDevice device $name on AMADCommBridge $iodev already defined."
     if( defined($d) && $d->{IODev} == $hash->{IODev} && $d->{NAME} ne $name );
 
-    Log3 $name, 3, "AMADDevice ($name) - defined with Code: $code on port $hash->{PORT}";
+    Log3 $name, 3, "AMADDevice ($name) - defined with AMAD_ID: $amad_id on port $hash->{PORT}";
 
     $attr{$name}{room} = "AMAD" if( !defined( $attr{$name}{room} ) );
         
@@ -198,7 +192,7 @@ sub AMADDevice_Define($$) {
         #InternalTimer( gettimeofday()+30, "AMADDevice_GetUpdate", $hash, 0 ) if( ($hash->{HOST}) );
     }
 
-    $modules{AMADDevice}{defptr}{$code} = $hash;
+    $modules{AMADDevice}{defptr}{$amad_id} = $hash;
 
     return undef;
 }
@@ -207,11 +201,11 @@ sub AMADDevice_Undef($$) {
 
     my ( $hash, $arg )  = @_;
     my $name            = $hash->{NAME};
+    my $amad_id         = $hash->{AMAD_ID};
     
-    my $code = $hash->{IODev}->{NAME} ."-". $name if( defined($hash->{IODev}->{NAME}) );
     
     RemoveInternalTimer( $hash );
-    delete $modules{AMADDevice}{defptr}{$code};
+    delete $modules{AMADDevice}{defptr}{$amad_id};
 
     return undef;
 }
@@ -348,12 +342,10 @@ sub AMADDevice_WriteReadings($$) {
     my ( $hash, $decode_json ) = @_;
     
     my $name = $hash->{NAME};
-    my $host = $hash->{HOST};
 
 
     ############################
     #### schreiben der Readings
-    readingsBeginUpdate($hash);
 
     Log3 $name, 5, "AMADDevice ($name) - Processing data: $decode_json";
     readingsSingleUpdate( $hash, "state", "active", 1) if( ReadingsVal( $name, "state", 0 ) ne "initialized" or ReadingsVal( $name, "state", 0 ) ne "active" );
@@ -362,6 +354,8 @@ sub AMADDevice_WriteReadings($$) {
     my $t;
     my $v;
     
+    
+    readingsBeginUpdate($hash);
     
     while( ( $t, $v ) = each %{$decode_json->{payload}} ) {
         readingsBulkUpdate( $hash, $t, $v ) if( defined( $v ) );
@@ -386,179 +380,55 @@ sub AMADDevice_WriteReadings($$) {
 }
 
 sub AMADDevice_Set($$@) {
-    
-    my ( $hash, $name, $cmd, @val ) = @_;
-    
-    my $bhash = $modules{AMADDevice}{defptr}{BRIDGE};
-    my $bname = $bhash->{NAME};
-    
-    if( $name ne "$bname" ) {
-        my $apps = AttrVal( $name, "setOpenApp", "none" );
-        my $btdev = AttrVal( $name, "setBluetoothDevice", "none" );
-        my $activetask = AttrVal( $name, "setActiveTask", "none" );
-  
-        my $list = "";
-        $list .= "screenMsg ";
-        $list .= "ttsMsg ";
-        $list .= "volume:slider,0,1,15 ";
-        $list .= "mediaGoogleMusic:play/pause,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
-        $list .= "mediaAmazonMusic:play/pause,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
-        $list .= "mediaSpotifyMusic:play/pause,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
-        $list .= "mediaTuneinRadio:play/pause,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
-        $list .= "mediaAldiMusic:play/pause,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
-        $list .= "mediaYouTube:play/pause,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
-        $list .= "mediaVlcPlayer:play/pause,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
-        $list .= "mediaAudible:play/pause,stop,next,back " if( ReadingsVal( $bname, "fhemServerIP", "none" ) ne "none");
-        $list .= "screenBrightness:slider,0,1,255 ";
-        $list .= "screen:on,off,lock,unlock ";
-        $list .= "screenOrientation:auto,landscape,portrait " if( AttrVal( $name, "setScreenOrientation", "0" ) eq "1" );
-        $list .= "screenFullscreen:on,off " if( AttrVal( $name, "setFullscreen", "0" ) eq "1" );
-        $list .= "openURL ";
-        $list .= "openApp:$apps " if( AttrVal( $name, "setOpenApp", "none" ) ne "none" );
-        $list .= "nextAlarmTime:time ";
-        $list .= "timer:slider,1,1,60 ";
-        $list .= "statusRequest:noArg ";
-        $list .= "system:reboot,shutdown,airplanemodeON " if( AttrVal( $name, "root", "0" ) eq "1" );
-        $list .= "bluetooth:on,off ";
-        $list .= "notifySndFile ";
-        $list .= "clearNotificationBar:All,Automagic ";
-        $list .= "changetoBTDevice:$btdev " if( AttrVal( $name, "setBluetoothDevice", "none" ) ne "none" );
-        $list .= "activateVoiceInput:noArg ";
-        $list .= "volumeNotification:slider,0,1,7 ";
-        $list .= "volumeRingSound:slider,0,1,7 ";
-        $list .= "vibrate:noArg ";
-        $list .= "sendIntent ";
-        $list .= "openCall ";
-        $list .= "closeCall:noArg ";
-        $list .= "currentFlowsetUpdate:noArg ";
-        $list .= "installFlowSource ";
-        $list .= "doNotDisturb:never,always,alarmClockOnly,onlyImportant ";
-        $list .= "userFlowState ";
-        $list .= "sendSMS ";
-        $list .= "startDaydream:noArg ";
 
-        if( lc $cmd eq 'screenmsg'
-            || lc $cmd eq 'ttsmsg'
-            || lc $cmd eq 'volume'
-            || lc $cmd eq 'mediagooglemusic'
-            || lc $cmd eq 'mediaamazonmusic'
-            || lc $cmd eq 'mediaspotifymusic'
-            || lc $cmd eq 'mediatuneinradio'
-            || lc $cmd eq 'mediaaldimusic'
-            || lc $cmd eq 'mediayoutube'
-            || lc $cmd eq 'mediavlcplayer'
-            || lc $cmd eq 'mediaaudible'
-            || lc $cmd eq 'screenbrightness'
-            || lc $cmd eq 'screenorientation'
-            || lc $cmd eq 'screenfullscreen'
-            || lc $cmd eq 'screen'
-            || lc $cmd eq 'openurl'
-            || lc $cmd eq 'openapp'
-            || lc $cmd eq 'nextalarmtime'
-            || lc $cmd eq 'timer'
-            || lc $cmd eq 'bluetooth'
-            || lc $cmd eq 'system'
-            || lc $cmd eq 'notifysndfile'
-            || lc $cmd eq 'changetobtdevice'
-            || lc $cmd eq 'clearnotificationbar'
-            || lc $cmd eq 'activatevoiceinput'
-            || lc $cmd eq 'volumenotification'
-            || lc $cmd eq 'volumeringsound'
-            || lc $cmd eq 'screenlock'
-            || lc $cmd eq 'statusrequest'
-            || lc $cmd eq 'sendsms'
-            || lc $cmd eq 'sendintent'
-            || lc $cmd eq 'currentflowsetupdate'
-            || lc $cmd eq 'installflowsource'
-            || lc $cmd eq 'opencall'
-            || lc $cmd eq 'closecall'
-            || lc $cmd eq 'donotdisturb'
-            || lc $cmd eq 'userflowstate'
-            || lc $cmd eq 'startdaydream'
-            || lc $cmd eq 'vibrate') {
+    my ($hash, $name, @aa)  = @_;
+    my ($cmd, @args)        = @aa;
 
-            Log3 $name, 5, "AMADDevice ($name) - set $name $cmd ".join(" ", @val);
-                
-            return AMADDevice_SelectSetCmd( $hash, $cmd, @val ) if( lc $cmd eq 'statusrequest' );
-            return "set command only works if state not equal initialized" if( ReadingsVal( $hash->{NAME}, "state", 0 ) eq "initialized");
-            return "Cannot set command, FHEM Device is disabled" if( AttrVal( $name, "disable", "0" ) eq "1" );
-            
-            return "Cannot set command, FHEM Device is unknown" if( ReadingsVal( $name, "deviceState", "online" ) eq "unknown" );
-            return "Cannot set command, FHEM Device is offline" if( ReadingsVal( $name, "deviceState", "online" ) eq "offline" );
-        
-            return AMADDevice_SelectSetCmd( $hash, $cmd, @val ) if( (@val) or (lc $cmd eq 'activatevoiceinput') or (lc $cmd eq 'vibrate') or (lc $cmd eq 'currentflowsetupdate') or (lc $cmd eq 'closecall') or (lc $cmd eq 'startdaydream') );
-        }
+    my $host                = $hash->{HOST};
+    my $port                = $hash->{PORT};
+    my $amad_id             = $hash->{AMAD_ID};
+    my $uri;
+    my $header;
+    my $method;
 
-        return "Unknown argument $cmd, bearword as argument or wrong parameter(s), choose one of $list";
-    
-    } elsif( $modules{AMADDevice}{defptr}{BRIDGE} ) {
-    
-        my $list = "";
-    
-        ## set Befehle für die AMADDevice_CommBridge
-        $list .= "expertMode:0,1 " if( $modules{AMADDevice}{defptr}{BRIDGE} );
-        $list .= "fhemServerIP " if( $modules{AMADDevice}{defptr}{BRIDGE} );
-        
-        if( lc $cmd eq 'expertmode'
-            || lc $cmd eq 'fhemserverip' ) {
-            
-            readingsSingleUpdate( $hash, $cmd, $val[0], 0 );
-            
-            return;
-        }
-        
-        return "Unknown argument $cmd, bearword as argument or wrong parameter(s), choose one of $list";
-    }
-}
-
-sub AMADDevice_SelectSetCmd($$@) {
-
-    my ( $hash, $cmd, @data ) = @_;
-    my $name = $hash->{NAME};
-    my $host = $hash->{HOST};
-    my $port = $hash->{PORT};
 
     if( lc $cmd eq 'screenmsg' ) {
-        my $msg = join( " ", @data );
+        my $msg = join( " ", @args );
 
-        $msg =~ s/%/%25/g;
-        $msg =~ s/\s/%20/g;
+        $msg    =~ s/%/%25/g;
+        $msg    =~ s/\s/%20/g;
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/screenMsg?message=$msg";
-        Log3 $name, 4, "AMADDevice ($name) - Sub AMADDevice_SetScreenMsg";
-    
-        return AMADDevice_HTTP_POST( $hash,$url );
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/screenMsg?message=$msg";
+        $method = "POST";
     }
     
     elsif( lc $cmd eq 'ttsmsg' ) {
 
-        my $msg     = join( " ", @data );
+        my $msg     = join( " ", @args );
         my $speed   = AttrVal( $name, "setTtsMsgSpeed", "1.0" );
         my $lang    = AttrVal( $name, "setTtsMsgLang","de" );
 
-        $msg =~ s/%/%25/g;
-        $msg =~ s/\s/%20/g;    
+        $msg        =~ s/%/%25/g;
+        $msg        =~ s/\s/%20/g;    
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/ttsMsg?message=".$msg."&msgspeed=".$speed."&msglang=".$lang;
-    
-        return AMADDevice_HTTP_POST( $hash,$url );
+        $uri        = $host . ":" . $port . "/fhem-amad/setCommands/ttsMsg?message=".$msg."&msgspeed=".$speed."&msglang=".$lang;
+        $method     = "POST";
     }
     
     elsif( lc $cmd eq 'userflowstate' ) {
 
-        my $datas = join( " ", @data );
-        my ($flow,$state) = split( ":", $datas);
+        my $datas           = join( " ", @args );
+        my ($flow,$state)   = split( ":", $datas);
         
-        $flow          =~ s/\s/%20/g;    
+        $flow               =~ s/\s/%20/g;    
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/flowState?flowstate=".$state."&flowname=".$flow;
-    
-        return AMADDevice_HTTP_POST( $hash,$url );
+        $uri                = $host . ":" . $port . "/fhem-amad/setCommands/flowState?flowstate=".$state."&flowname=".$flow;
+        $method     = "POST";
     }
     
     elsif( lc $cmd eq 'volume' ) {
     
-        my $vol = join( " ", @data );
+        my $vol = join( " ", @args );
 
         if( $vol =~ /^\+(.*)/ or $vol =~ /^-(.*)/ ) {
 
@@ -576,58 +446,52 @@ sub AMADDevice_SelectSetCmd($$@) {
             }
         }
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setVolume?volume=$vol";
-
-        return AMADDevice_HTTP_POST( $hash, $url );
+        $uri        = $host . ":" . $port . "/fhem-amad/setCommands/setVolume?volume=$vol";
+        $method     = "POST";
     }
     
     elsif( lc $cmd eq 'volumenotification' ) {
     
-        my $vol = join( " ", @data );
+        my $vol = join( " ", @args );
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setNotifiVolume?notifivolume=$vol";
-
-        return AMADDevice_HTTP_POST( $hash, $url );
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/setNotifiVolume?notifivolume=$vol";
+        $method = "POST";
     }
     
     elsif( lc $cmd eq 'volumeringsound' ) {
     
-        my $vol = join( " ", @data );
+        my $vol = join( " ", @args );
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setRingSoundVolume?ringsoundvolume=$vol";
-
-        return AMADDevice_HTTP_POST( $hash, $url );
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/setRingSoundVolume?ringsoundvolume=$vol";
+        $method = "POST";
     }
     
     elsif( lc $cmd =~ /^media/ ) {
     
-        my $btn = join( " ", @data );
+        my $btn = join( " ", @args );
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/multimediaControl?mplayer=".$cmd."&button=".$btn;
-    
-        return AMADDevice_HTTP_POST( $hash,$url );
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/multimediaControl?mplayer=".$cmd."&button=".$btn;
+        $method = "POST";
     }
     
     elsif( lc $cmd eq 'screenbrightness' ) {
     
-        my $bri = join( " ", @data );
+        my $bri = join( " ", @args );
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setBrightness?brightness=$bri";
-
-        return AMADDevice_HTTP_POST( $hash,$url );
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/setBrightness?brightness=$bri";
+        $method = "POST";
     }
     
     elsif( lc $cmd eq 'screen' ) {
     
-        my $mod = join( " ", @data );
+        my $mod = join( " ", @args );
         my $scot = AttrVal( $name, "setScreenOnForTimer", undef );
         $scot = 60 if( !$scot );
 
         if ($mod eq "on" || $mod eq "off") {
 
-            my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setScreenOnOff?screen=".$mod."&screenontime=".$scot if ($mod eq "on" || $mod eq "off");
-            
-            return AMADDevice_HTTP_POST( $hash,$url );
+            $uri    = $host . ":" . $port . "/fhem-amad/setCommands/setScreenOnOff?screen=".$mod."&screenontime=".$scot if ($mod eq "on" || $mod eq "off");
+            $method = "POST";
         }
 
         elsif ($mod eq "lock" || $mod eq "unlock") {
@@ -636,220 +500,225 @@ sub AMADDevice_SelectSetCmd($$@) {
             my $PIN = AttrVal( $name, "setScreenlockPIN", undef );
             $PIN = AMADDevice_decrypt($PIN);
 
-            my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/screenlock?lockmod=".$mod."&lockPIN=".$PIN;
-
-            return AMADDevice_HTTP_POST( $hash,$url );
+            $uri    = $host . ":" . $port . "/fhem-amad/setCommands/screenlock?lockmod=".$mod."&lockPIN=".$PIN;
+            $method = "POST";
         }
     }
     
     elsif( lc $cmd eq 'screenorientation' ) {
     
-        my $mod = join( " ", @data );
+        my $mod = join( " ", @args );
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setScreenOrientation?orientation=$mod";
-
-        return AMADDevice_HTTP_POST( $hash,$url );
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/setScreenOrientation?orientation=$mod";
+        $method = "POST";
     }
     
     elsif( lc $cmd eq 'activatevoiceinput' ) {
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setvoicecmd";
-
-        return AMADDevice_HTTP_POST( $hash,$url );
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/setvoicecmd";
+        $method = "POST";
     }
     
     elsif( lc $cmd eq 'screenfullscreen' ) {
     
-        my $mod = join( " ", @data );
+        my $mod = join( " ", @args );
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setScreenFullscreen?fullscreen=$mod";
-
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/setScreenFullscreen?fullscreen=$mod";
+        $method = "POST";
         readingsSingleUpdate( $hash, $cmd, $mod, 1 );
-
-        return AMADDevice_HTTP_POST( $hash, $url );
     }
     
     elsif( lc $cmd eq 'openurl' ) {
     
-        my $openurl = join( " ", @data );
+        my $openurl = join( " ", @args );
         my $browser = AttrVal( $name, "setOpenUrlBrowser", "com.android.chrome|com.google.android.apps.chrome.Main" );
         my @browserapp = split( /\|/, $browser );
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/openURL?url=".$openurl."&browserapp=".$browserapp[0]."&browserappclass=".$browserapp[1];
-    
-        return AMADDevice_HTTP_POST( $hash, $url );
+        my $uri     = $host . ":" . $port . "/fhem-amad/setCommands/openURL?url=".$openurl."&browserapp=".$browserapp[0]."&browserappclass=".$browserapp[1];
+        $method     = "POST";
     }
     
     elsif (lc $cmd eq 'nextalarmtime') {
     
-        my $value = join( " ", @data );
-        my @alarm = split( ":", $value );
+        my $value   = join( " ", @args );
+        my @alarm   = split( ":", $value );
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setAlarm?hour=".$alarm[0]."&minute=".$alarm[1];
-
-        return AMADDevice_HTTP_POST( $hash, $url );
+        $uri        = $host . ":" . $port . "/fhem-amad/setCommands/setAlarm?hour=".$alarm[0]."&minute=".$alarm[1];
+        $method     = "POST";
     }
     
     elsif (lc $cmd eq 'timer') {
     
-        my $timer = join( " ", @data );
+        my $timer   = join( " ", @args );
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setTimer?minute=$timer";
-
-        return AMADDevice_HTTP_POST( $hash, $url );
+        $uri        = $host . ":" . $port . "/fhem-amad/setCommands/setTimer?minute=$timer";
+        $method     = "POST";
     }
-    
+
     elsif( lc $cmd eq 'statusrequest' ) {
-    
-        AMADDevice_statusRequest( $hash );
-        return undef;
+
+        my $activetask = AttrVal( $name, "checkActiveTask", "none" );
+        my $userFlowState = AttrVal( $name, "setUserFlowState", "none" );
+        my $apssid = AttrVal( $name, "setAPSSID", "none" );
+        my $fhemip  = ReadingsVal($hash->{IODev}->{NAME}, "fhemServerIP", "none");
+        my $bport   = $hash->{IODev}->{PORT};
+        
+
+        $uri     = $host . ":" . $port . "/fhem-amad/deviceInfo/";       # Pfad muß so im Automagic als http request Trigger drin stehen
+        $header  = "fhemip: $fhemip\r\nfhemdevice: $name\r\nactivetask: $activetask\r\napssid: $apssid\r\nbport: $bport\r\nuserflowstate: $userFlowState";
+        $method  = "GET";
     }
-    
+
     elsif( lc $cmd eq 'openapp' ) {
     
-        my $app = join( " ", @data );
+        my $app = join( " ", @args );
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/openApp?app=$app";
-    
-        return AMADDevice_HTTP_POST( $hash,$url );
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/openApp?app=$app";
+        $method = "POST";
     }
     
     elsif( lc $cmd eq 'system' ) {
     
-        my $systemcmd = join( " ", @data );
+        my $systemcmd   = join( " ", @args );
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/systemcommand?syscmd=$systemcmd";
-
+        $uri            = $host . ":" . $port . "/fhem-amad/setCommands/systemcommand?syscmd=$systemcmd";
+        $method         = "POST";
         readingsSingleUpdate( $hash, "airplanemode", "on", 1 ) if( $systemcmd eq "airplanemodeON" );
         readingsSingleUpdate( $hash, "deviceState", "offline", 1 ) if( $systemcmd eq "airplanemodeON" || $systemcmd eq "shutdown" );
-    
-        return AMADDevice_HTTP_POST( $hash,$url );
     }
     
     elsif( lc $cmd eq 'donotdisturb' ) {
     
-        my $disturbmod = join( " ", @data );
+        my $disturbmod  = join( " ", @args );
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/donotdisturb?disturbmod=$disturbmod";
-    
-        return AMADDevice_HTTP_POST( $hash,$url );
+        $uri            = $host . ":" . $port . "/fhem-amad/setCommands/donotdisturb?disturbmod=$disturbmod";
+        $method         = "POST";
     }
     
     elsif( lc $cmd eq 'bluetooth' ) {
     
-        my $mod = join( " ", @data );
+        my $mod = join( " ", @args );
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setbluetooth?bluetooth=$mod";
-    
-        return AMADDevice_HTTP_POST( $hash,$url );
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/setbluetooth?bluetooth=$mod";
+        $method = "POST";
     }
     
     elsif( lc $cmd eq 'notifysndfile' ) {
     
-        my $notify = join( " ", @data );
-        my $filepath = AttrVal( $name, "setNotifySndFilePath", "/storage/emulated/0/Notifications/" );
+        my $notify      = join( " ", @args );
+        my $filepath    = AttrVal( $name, "setNotifySndFilePath", "/storage/emulated/0/Notifications/" );
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/playnotifysnd?notifyfile=".$notify."&notifypath=".$filepath;
-    
-        return AMADDevice_HTTP_POST( $hash,$url );
+        $uri            = $host . ":" . $port . "/fhem-amad/setCommands/playnotifysnd?notifyfile=".$notify."&notifypath=".$filepath;
+        $method         = "POST";
     }
     
     elsif( lc $cmd eq 'changetobtdevice' ) {
     
-        my $swToBtDevice = join( " ", @data );    
+        my $swToBtDevice = join( " ", @args );    
         my @swToBtMac = split( /\|/, $swToBtDevice );
         my $btDevices = AttrVal( $name, "setBluetoothDevice", "none" ) if( AttrVal( $name, "setBluetoothDevice", "none" ) ne "none" );
         my @btDevice = split( ',', $btDevices );
         my @btDeviceOne = split( /\|/, $btDevice[0] );
         my @btDeviceTwo = split( /\|/, $btDevice[1] );
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setbtdevice?swToBtDeviceMac=".$swToBtMac[1]."&btDeviceOne=".$btDeviceOne[1]."&btDeviceTwo=".$btDeviceTwo[1];
-
-        return AMADDevice_HTTP_POST( $hash,$url );
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/setbtdevice?swToBtDeviceMac=".$swToBtMac[1]."&btDeviceOne=".$btDeviceOne[1]."&btDeviceTwo=".$btDeviceTwo[1];
+        $method = "POST";
     }
     
     elsif( lc $cmd eq 'clearnotificationbar' ) {
     
-        my $appname = join( " ", @data );
+        my $appname = join( " ", @args );
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/clearnotificationbar?app=$appname";
-    
-        return AMADDevice_HTTP_POST( $hash,$url );
+        $uri        = $host . ":" . $port . "/fhem-amad/setCommands/clearnotificationbar?app=$appname";
+        $method     = "POST";
     }
     
     elsif( lc $cmd eq 'vibrate' ) {
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/setvibrate";
-
-        return AMADDevice_HTTP_POST( $hash,$url );
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/setvibrate";
+        $method = "POST";
     }
     
     elsif( lc $cmd eq 'sendintent' ) {
     
-        my $intentstring = join( " ", @data );
+        my $intentstring = join( " ", @args );
         my ( $action, $exkey1, $exval1, $exkey2, $exval2 ) = split( "[ \t][ \t]*", $intentstring );
         $exkey1 = "" if( !$exkey1 );
         $exval1 = "" if( !$exval1 );
         $exkey2 = "" if( !$exkey2 );
         $exval2 = "" if( !$exval2 );
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/sendIntent?action=".$action."&exkey1=".$exkey1."&exval1=".$exval1."&exkey2=".$exkey2."&exval2=".$exval2;
-
-        return AMADDevice_HTTP_POST( $hash,$url );
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/sendIntent?action=".$action."&exkey1=".$exkey1."&exval1=".$exval1."&exkey2=".$exkey2."&exval2=".$exval2;
+        $method = "POST";
     }
     
     elsif( lc $cmd eq 'installflowsource' ) {
     
-        my $flowname = join( " ", @data );
+        my $flowname    = join( " ", @args );
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/installFlow?flowname=$flowname";
-
-        return AMADDevice_HTTP_POST( $hash,$url );
+        $uri            = $host . ":" . $port . "/fhem-amad/setCommands/installFlow?flowname=$flowname";
+        $method         = "POST";
     }
     
     elsif( lc $cmd eq 'opencall' ) {
     
-        my $string = join( " ", @data );
+        my $string = join( " ", @args );
         my ($callnumber, $time) = split( "[ \t][ \t]*", $string );
-        $time = "none" if( !$time );
+        $time   = "none" if( !$time );
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/openCall?callnumber=".$callnumber."&hanguptime=".$time;
-
-        return AMADDevice_HTTP_POST( $hash,$url );
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/openCall?callnumber=".$callnumber."&hanguptime=".$time;
+        $method = "POST";
     }
     
     elsif( lc $cmd eq 'closecall' ) {
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/closeCall";
-
-        return AMADDevice_HTTP_POST( $hash,$url );
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/closeCall";
+        $method = "POST";
     }
     
     elsif( lc $cmd eq 'startdaydream' ) {
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/startDaydream";
-
-        return AMADDevice_HTTP_POST( $hash,$url );
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/startDaydream";
+        $method = "POST";
     }
     
     elsif( lc $cmd eq 'currentflowsetupdate' ) {
 
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/currentFlowsetUpdate";
-
-        return AMADDevice_HTTP_POST( $hash,$url );
+        $uri    = $host . ":" . $port . "/fhem-amad/currentFlowsetUpdate";
+        $method = "POST";
     }
     
     elsif( lc $cmd eq 'sendsms' ) {
-        my $string = join( " ", @data );
+        my $string = join( " ", @args );
         my ($smsmessage, $smsnumber) = split( "\\|", $string );
         
         $smsmessage =~ s/%/%25/g;
         $smsmessage =~ s/\s/%20/g;
     
-        my $url = "http://" . $host . ":" . $port . "/fhem-amad/setCommands/sendSms?smsmessage=".$smsmessage."&smsnumber=".$smsnumber;
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/sendSms?smsmessage=".$smsmessage."&smsnumber=".$smsnumber;
+        $method = "POST";
+        
+    } else {
+    
+        my $apps = AttrVal( $name, "setOpenApp", "none" );
+        my $btdev = AttrVal( $name, "setBluetoothDevice", "none" );
+        
+        
+        my $list = "screenMsg ttsMsg volume:slider,0,1,15 mediaGoogleMusic:play/pause,stop,next,back mediaAmazonMusic:play/pause,stop,next,back mediaSpotifyMusic:play/pause,stop,next,back mediaTuneinRadio:play/pause,stop,next,back mediaAldiMusic:play/pause,stop,next,back mediaYouTube:play/pause,stop,next,back mediaVlcPlayer:play/pause,stop,next,back mediaAudible:play/pause,stop,next,back screenBrightness:slider,0,1,255 screen:on,off,lock,unlock openURL nextAlarmTime:time timer:slider,1,1,60 statusRequest:noArg bluetooth:on,off notifySndFile clearNotificationBar:All,Automagic activateVoiceInput:noArg volumeNotification:slider,0,1,7 volumeRingSound:slider,0,1,7 vibrate:noArg sendIntent openCall closeCall:noArg currentFlowsetUpdate:noArg installFlowSource doNotDisturb:never,always,alarmClockOnly,onlyImportant userFlowState sendSMS startDaydream:noArg";
 
-        return AMADDevice_HTTP_POST( $hash,$url );
+        $list .= " screenOrientation:auto,landscape,portrait"   if( AttrVal( $name, "setScreenOrientation", "0" ) eq "1" );
+        $list .= " screenFullscreen:on,off"                     if( AttrVal( $name, "setFullscreen", "0" ) eq "1" );
+        $list .= " openApp:$apps"                               if( AttrVal( $name, "setOpenApp", "none" ) ne "none" );
+        $list .= " system:reboot,shutdown,airplanemodeON"       if( AttrVal( $name, "root", "0" ) eq "1" );
+        $list .= " changetoBTDevice:$btdev"                     if( AttrVal( $name, "setBluetoothDevice", "none" ) ne "none" );
+
+
+        return "Unknown argument $cmd, choose one of $list";
     }
+    
+    $header = undef unless( defined($header) and ($header) );
+    IOWrite($hash,$amad_id,$uri,$method,$header);
+    Log3 $name, 5, "AMADDevice ($name) - IOWrite: $uri $method IODevHash=$hash->{IODev}";
 
     return undef;
 }
@@ -858,11 +727,9 @@ sub AMADDevice_Parse($$) {
 
     my ($io_hash,$json) = @_;
     my $name            = $io_hash->{NAME};
-    my $amadDevice;
-    my $decode_json;
 
 
-    $decode_json        = eval{decode_json($json)};
+    my $decode_json        = eval{decode_json($json)};
     if($@){
         Log3 $name, 3, "AMADDevice ($name) - error while request: $@";
         #readingsSingleUpdate($hash, "state", "error", 1);
@@ -871,13 +738,13 @@ sub AMADDevice_Parse($$) {
     
     Log3 $name, 3, "AMADDevice ($name) - ParseFn was called";
     Log3 $name, 3, "AMADDevice ($name) - ParseFn was called, !!! JSON: $json";
-    Log3 $name, 3, "AMADDevice ($name) - ParseFn was called, !!! AMAD: $decode_json->{amad}{AMADDEVICE}";
+    Log3 $name, 3, "AMADDevice ($name) - ParseFn was called, !!! AMAD_ID: $decode_json->{amad}{amad_id}";
 
 
-    $amadDevice         = $decode_json->{amad}{AMADDEVICE};
-    my $code               = $io_hash->{NAME} ."-". $amadDevice;
+    my $fhemDevice  = $decode_json->{payload}{fhemdevice} if( defined($decode_json->{payload}{fhemdevice}) );
+    my $amad_id     = $decode_json->{amad}{amad_id};
         
-    if( my $hash        = $modules{AMADDevice}{defptr}{$code} ) {        
+    if( my $hash        = $modules{AMADDevice}{defptr}{$amad_id} ) {        
         my $name        = $hash->{NAME};
                         
         AMADDevice_WriteReadings($hash,$decode_json);
@@ -887,10 +754,9 @@ sub AMADDevice_Parse($$) {
             
     } else {
 
-        return "UNDEFINED $amadDevice AMADDevice $decode_json->{payload}{'DEVICE-IP'} IODev=$name";
+        return "UNDEFINED $fhemDevice AMADDevice $decode_json->{payload}{'amaddevice_ip'} $decode_json->{amad}{'amad_id'} IODev=$name";
     }
 }
-
 
 ##################################
 ##################################
