@@ -41,7 +41,8 @@
 ###### Möglicher Aufbau eines JSON Strings für die AMADCommBridge
 #
 #  first initial String
-#   {"amad": {"amad_id": "37836534","fhemcmd": "setreading"},"payload": {"fhemdevice": "TabletWohnzimmer","fhemserverip": "192.168.1.25","amaddevice_ip": "192.168.1.123"}}
+#   {"amad": {"amad_id": "1495827100156","fhemcmd": "setreading"},"payload": {},"firstrun": {"fhemdevice": "TabletWohnzimmer","fhemserverip": "fhem02.tuxnet.local","amaddevice_ip": "10.6.9.35"}}
+#   {"amad": {"amad_id": "1495827100156","fhemcmd": "setreading"},"payload": {},"firstrun": {"fhemdevice": "TabletWohnzimmer","fhemserverip": "fhem02.tuxnet.local","amaddevice_ip": "10.6.9.35"}}
 #
 #  default String
 #   {"amad": {"amad_id": "37836534","fhemcmd": "setreading"},"payload": {"reading0": "value0","reading1": "value1","readingX": "valueX"}}
@@ -67,8 +68,8 @@ use TcpServerUtils;
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3alpha27";
-my $flowsetversion = "2.6.12";
+my $modulversion = "3.9.48";
+my $flowsetversion = "3.9.48";
 
 
 
@@ -78,7 +79,6 @@ sub AMADCommBridge_Attr(@);
 sub AMADCommBridge_Open($);
 sub AMADCommBridge_Read($);
 sub AMADCommBridge_Define($$);
-sub AMADCommBridge_WriteRequest($$$);
 sub AMADCommBridge_Initialize($);
 sub AMADCommBridge_Set($@);
 sub AMADCommBridge_Write($@);
@@ -86,6 +86,8 @@ sub AMADCommBridge_Undef($$);
 sub AMADCommBridge_ResponseProcessing($$);
 sub AMADCommBridge_Close($);
 sub AMADCommBridge_ErrorHandling($$$);
+sub AMADCommBridge_ProcessRead($$);
+sub AMADCommBridge_ParseMsg($$);
 
 
 
@@ -99,7 +101,7 @@ sub AMADCommBridge_Initialize($) {
     $hash->{ReadFn}     = "AMADCommBridge_Read";
     $hash->{WriteFn}    = "AMADCommBridge_Write";
     $hash->{Clients}    = ":AMADDevice:";
-    $hash->{MatchList}  = { "1:AMADDevice"      => '.*' };
+    $hash->{MatchList}  = { "1:AMADDevice"      => '{"amad": {"amad_id":.+}}' };
     
     
     # Consumer
@@ -246,10 +248,8 @@ sub AMADCommBridge_Set($@) {
 
 sub AMADCommBridge_Write($@) {
 
-    my ($hash,$amad_id,$uri,$method)    = @_;
-    my $header                          = "Connection: close\r\n";
-    $header                             .=  shift;
-    my $name                            = $hash->{NAME};
+    my ($hash,$amad_id,$uri,$header,$method)    = @_;
+    my $name                                    = $hash->{NAME};
 
 
     HttpUtils_NonblockingGet(
@@ -589,6 +589,7 @@ sub AMADCommBridge_Close($) {
 sub AMADCommBridge_Read($) {
 
     my $hash    = shift;
+    my $name    = $hash->{NAME};
 
 
     if( $hash->{SERVERSOCKET} ) {               # Accept and create a child
@@ -598,62 +599,39 @@ sub AMADCommBridge_Read($) {
 
     # Read 1024 byte of data
     my $buf;
-    my $ret = sysread($hash->{CD}, $buf, 1024);
+    my $ret = sysread($hash->{CD}, $buf, 2048);
 
-    
+
     # When there is an error in connection return
     if( !defined($ret ) || $ret <= 0 ) {
-        CommandDelete( undef, $hash->{NAME} );
+        CommandDelete( undef, $name );
+        Log3 $name, 5, "AMADCommBridge ($name) - Error in connection";
         return;
     }
     
-    AMADCommBridge_ResponseProcessing($hash,$buf);
+    AMADCommBridge_ProcessRead($hash,$buf);
 }
 
-sub AMADCommBridge_ResponseProcessing($$) {
+sub AMADCommBridge_ProcessRead($$) {
 
-    my ($hash,$buf)     = @_;
+    my ($hash, $buf)    = @_;
+    my $name            = $hash->{NAME};
     
-    my $name        = $hash->{NAME};
-    my $bhash       = $modules{AMADCommBridge}{defptr}{BRIDGE};
-    my $bname       = $bhash->{NAME};
-    
-    my @data        = split( '\R\R', $buf );
-    
-    
+    my @data            = split( '\R\R', $buf );
+    my $data            = $data[0];
+    my $json            = $data[1];
+    my $buffer          = '';
     
     
-    #### Verarbeitung der Daten welche über die AMADCommBridge kommen ####
     
-    Log3 $bname, 5, "AMADCommBridge ($name) - Receive RAW Message in Debugging Mode: $buf";
-
-
+    
+    Log3 $name, 4, "AMADCommBridge ($name) - process read";
+    
+    
     my $response;
     my $c;
-    my $json        = $data[1];
-    my $decode_json;
-
-    $decode_json    = eval{decode_json($json)};
-    if($@){
-        Log3 $bname, 3, "AMADCommBridge ($name) - error while request: $@";
-        readingsSingleUpdate($bhash, "state", "error", 1);
-        return;
-    }
-
-    my $amad_id     = $decode_json->{amad}{amad_id};
-    my $fhemcmd     = $decode_json->{amad}{fhemcmd};
-    my $fhemDevice;
     
-    if( defined($decode_json->{payload}{fhemdevice}) and ($decode_json->{payload}{fhemdevice}) ) {
-        $fhemDevice  = $decode_json->{payload}{fhemdevice} if( defined($decode_json->{payload}{fhemdevice}) );
-    } else {
-        $fhemDevice  = $modules{AMADDevice}{defptr}{$amad_id}->{NAME};
-    }
-
-
-
-
-    if ( $data[0] =~ /currentFlowsetUpdate.xml/ ) {
+    if ( $data =~ /currentFlowsetUpdate.xml/ ) {
 
         my $fhempath = $attr{global}{modpath};
         $response = qx(cat $fhempath/FHEM/lib/74_AMADautomagicFlowset_$flowsetversion.xml);
@@ -667,7 +645,7 @@ sub AMADCommBridge_ResponseProcessing($$) {
         return;
     }
     
-    elsif ( $data[0] =~ /installFlow_([^.]*.xml)/ ) {
+    elsif ( $data =~ /installFlow_([^.]*.xml)/ ) {
 
         if( defined($1) ){
             $response = qx(cat /tmp/$1);
@@ -683,8 +661,98 @@ sub AMADCommBridge_ResponseProcessing($$) {
     }
 
 
+    if(defined($hash->{PARTIAL}) and $hash->{PARTIAL}) {
+    
+        Log3 $name, 5, "AMADCommBridge ($name) - PARTIAL: " . $hash->{PARTIAL};
+        $buffer = $hash->{PARTIAL};
+        
+    } else {
+    
+        Log3 $name, 4, "AMADCommBridge ($name) - No PARTIAL buffer";
+    }
 
-    elsif( !defined($amad_id) ) {
+    Log3 $name, 5, "AMADCommBridge ($name) - Incoming data: " . $json;
+
+    $buffer = $buffer . $json;
+    Log3 $name, 5, "AMADCommBridge ($name) - Current processing buffer (PARTIAL + incoming data): " . $buffer;
+
+    my ($correct_json,$tail) = AMADCommBridge_ParseMsg($hash, $buffer);
+
+
+    while($correct_json) {
+    
+        $hash->{LAST_RECV} = time();
+        
+        Log3 $name, 5, "AMADCommBridge ($name) - Decoding JSON message. Length: " . length($correct_json) . " Content: " . $correct_json;
+        Log3 $name, 5, "AMADCommBridge ($name) - Vor Sub: Laenge JSON: " . length($correct_json) . " Content: " . $correct_json . " Tail: " . $tail;
+        
+        AMADCommBridge_ResponseProcessing($hash,$correct_json)
+        unless(not defined($tail) and not ($tail));
+        
+        ($correct_json,$tail) = AMADCommBridge_ParseMsg($hash, $tail);
+        
+        Log3 $name, 5, "AMADCommBridge ($name) - Nach Sub: Laenge JSON: " . length($correct_json) . " Content: " . $correct_json . " Tail: " . $tail;
+    }
+
+
+    $hash->{PARTIAL} = $tail;
+    Log3 $name, 4, "AMADCommBridge ($name) - PARTIAL lenght: " . length($tail);
+    
+    
+    Log3 $name, 5, "AMADCommBridge ($name) - Tail: " . $tail;
+    Log3 $name, 5, "AMADCommBridge ($name) - PARTIAL: " . $hash->{PARTIAL};
+    
+}
+
+sub AMADCommBridge_ResponseProcessing($$) {
+
+    my ($hash,$json)     = @_;
+    
+    my $name        = $hash->{NAME};
+    my $bhash       = $modules{AMADCommBridge}{defptr}{BRIDGE};
+    my $bname       = $bhash->{NAME};
+    
+    
+    
+    
+    #### Verarbeitung der Daten welche über die AMADCommBridge kommen ####
+    
+    Log3 $bname, 4, "AMADCommBridge ($name) - Receive RAW Message in Debugging Mode: $json";
+
+
+    my $response;
+    my $c;
+    #my $json        = $data[1];
+    my $decode_json;
+
+    $decode_json    = eval{decode_json($json)};
+    if($@){
+        Log3 $bname, 3, "AMADCommBridge ($name) - ERROR while request: $@";
+        readingsSingleUpdate($bhash, "JSON info", "JSON ERROR", 1);
+        $response = "header lines: \r\n AMADCommBridge receive a JSON error\r\n AMADCommBridge to do nothing\r\n";
+        $c = $hash->{CD};
+        print $c "HTTP/1.1 200 OK\r\n",
+            "Content-Type: text/plain\r\n",
+            "Connection: close\r\n",
+            "Content-Length: ".length($response)."\r\n\r\n",
+            $response;
+        return;
+    }
+
+    my $amad_id     = $decode_json->{amad}{amad_id};
+    my $fhemcmd     = $decode_json->{amad}{fhemcmd};
+    my $fhemDevice;
+    
+    if( defined($decode_json->{firstrun}) and ($decode_json->{firstrun}) ) {
+        $fhemDevice  = $decode_json->{payload}{fhemdevice} if( defined($decode_json->{firstrun}{fhemdevice}) );
+    } else {
+        $fhemDevice  = $modules{AMADDevice}{defptr}{$amad_id}->{NAME};
+    }
+
+
+
+
+    if( !defined($amad_id) ) {
         readingsSingleUpdate( $bhash, "transmitterERROR", $hash->{NAME}." has no device name sends", 1 ) if( AttrVal( $bname, "expertMode", 0 ) eq "1" );
         Log3 $bname, 4, "AMADCommBridge ($name) - ERROR - no device name given. please check your global variable in automagic";
         
@@ -699,7 +767,6 @@ sub AMADCommBridge_ResponseProcessing($$) {
         return;
     }
 
-
     
     if( defined($fhemcmd) and ($fhemcmd) ) {
         if ( $fhemcmd eq 'setreading' ) {
@@ -710,7 +777,7 @@ sub AMADCommBridge_ResponseProcessing($$) {
 
             Dispatch($bhash,$json,undef);
             Log3 $bname, 4, "AMADCommBridge ($bname) - call Dispatcher";
-            readingsSingleUpdate($bhash,'fhemServerIP',$decode_json->{payload}{'fhemserverip'},1) if( defined($decode_json->{payload}{'fhemserverip'}));
+            readingsSingleUpdate($bhash,'fhemServerIP',$decode_json->{firstrun}{'fhemserverip'},1) if( defined($decode_json->{firstrun}{'fhemserverip'}));
         
             $response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM was processes\r\n";
             $c = $hash->{CD};
@@ -723,13 +790,13 @@ sub AMADCommBridge_ResponseProcessing($$) {
             return;
         }
 
-        elsif ( $fhemcmd =~ /set\b/ ) {
-            my $fhemCmd = $data[1];
+        elsif ( $fhemcmd eq 'set' ) {
+            my $fhemCmd = $decode_json->{payload}{setcmd};
         
             fhem ("set $fhemCmd") if( ReadingsVal( $bname, "expertMode", 0 ) eq "1" );
             readingsSingleUpdate( $bhash, "receiveFhemCommand", "set ".$fhemCmd, 0 );
-            Log3 $bname, 4, "AMADCommBridge ($name) - AMADCommBridge_CommBridge: set reading receive fhem command";
-	
+            Log3 $bname, 3, "AMADCommBridge ($name) - AMADCommBridge_CommBridge: set reading receive fhem command";
+
             $response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM execute set command now\r\n";
             $c = $hash->{CD};
             print $c "HTTP/1.1 200 OK\r\n",
@@ -737,12 +804,12 @@ sub AMADCommBridge_ResponseProcessing($$) {
                 "Connection: close\r\n",
                 "Content-Length: ".length($response)."\r\n\r\n",
                 $response;
-	
+
             return;
         }
     
-        elsif ( $fhemcmd =~ /voiceinputvalue\b/ ) {
-            my $fhemCmd = lc $data[1];
+        elsif ( $fhemcmd eq 'voiceinputvalue' ) {
+            my $fhemCmd = $decode_json->{payload}{voiceinputdata};
         
             readingsBeginUpdate( $bhash);
             readingsBulkUpdate( $bhash, "receiveVoiceCommand", $fhemCmd );
@@ -761,8 +828,8 @@ sub AMADCommBridge_ResponseProcessing($$) {
             return;
         }
     
-        elsif ( $fhemcmd =~ /readingsval\b/ ) {
-            my $fhemCmd = $data[1];
+        elsif ( $fhemcmd eq 'readingsval' ) {
+            my $fhemCmd = $decode_json->{payload}{readingsvalcmd};
             my @datavalue = split( ' ', $fhemCmd );
 
             $response = ReadingsVal( $datavalue[0], $datavalue[1], $datavalue[2] );
@@ -772,8 +839,7 @@ sub AMADCommBridge_ResponseProcessing($$) {
                 "Connection: close\r\n",
                 "Content-Length: ".length($response)."\r\n\r\n",
                 $response;
-        
-            Log3 $bname, 4, "AMADCommBridge ($name) - AMADCommBridge_CommBridge: response ReadingsVal Value to Automagic Device";
+
             return;
         }
     
@@ -813,9 +879,57 @@ sub AMADCommBridge_ResponseProcessing($$) {
         $response;
 }
 
+
 ##################
 ### my little helper
 ##################
+
+sub AMADCommBridge_ParseMsg($$) {
+
+    my ($hash, $buffer) = @_;
+    
+    my $name = $hash->{NAME};
+    my $open = 0;
+    my $close = 0;
+    my $msg = '';
+    my $tail = '';
+    
+    
+    if($buffer) {
+        foreach my $c (split //, $buffer) {
+            if($open == $close && $open > 0) {
+                $tail .= $c;
+                Log3 $name, 5, "AMADCommBridge ($name) - $open == $close && $open > 0";
+                
+            } elsif(($open == $close) && ($c ne '{')) {
+            
+                Log3 $name, 5, "AMADCommBridge ($name) - Garbage character before message: " . $c;
+        
+            } else {
+      
+                if($c eq '{') {
+
+                    $open++;
+                
+                } elsif($c eq '}') {
+                
+                    $close++;
+                }
+                
+                $msg .= $c;
+            }
+        }
+        
+        if($open != $close) {
+    
+            $tail = $msg;
+            $msg = '';
+        }
+    }
+    
+    Log3 $name, 5, "AMADCommBridge ($name) - return msg: $msg and tail: $tail";
+    return ($msg,$tail);
+}
 
 ##### bleibt zu Anschauungszwecken erhalten
 #sub AMADCommBridge_Header2Hash($) {

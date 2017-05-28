@@ -54,8 +54,8 @@ use Encode qw(encode);
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3alpha27";
-my $flowsetversion = "2.6.12";
+my $modulversion = "3.9.49";
+my $flowsetversion = "3.9.48";
 
 
 
@@ -69,10 +69,10 @@ sub AMADDevice_encrypt($);
 sub AMADDevice_GetUpdate($);
 sub AMADDevice_Initialize($);
 sub AMADDevice_WriteReadings($$);
-sub AMADDevice_SelectSetCmd($$@);
 sub AMADDevice_Set($$@);
 sub AMADDevice_Undef($$);
 sub AMADDevice_Parse($$);
+sub AMADDevice_statusRequest($);
 
 
 
@@ -81,7 +81,7 @@ sub AMADDevice_Initialize($) {
 
     my ($hash) = @_;
     
-    $hash->{Match}          = '.*';
+    $hash->{Match}          = '{"amad": {"amad_id":.+}}';
 
     $hash->{SetFn}      = "AMADDevice_Set";
     $hash->{DefFn}      = "AMADDevice_Define";
@@ -185,11 +185,11 @@ sub AMADDevice_Define($$) {
 
     if( $init_done ) {
         
-        #AMADDevice_GetUpdate($hash);
+        AMADDevice_GetUpdate($hash);
             
     } else {
         
-        #InternalTimer( gettimeofday()+30, "AMADDevice_GetUpdate", $hash, 0 ) if( ($hash->{HOST}) );
+        InternalTimer( gettimeofday()+30, "AMADDevice_GetUpdate", $hash, 0 ) if( ($hash->{HOST}) );
     }
 
     $modules{AMADDevice}{defptr}{$amad_id} = $hash;
@@ -317,15 +317,14 @@ sub AMADDevice_Attr(@) {
 sub AMADDevice_GetUpdate($) {
 
     my ( $hash ) = @_;
-    my $name = $hash->{NAME};
-    my $bhash = $modules{AMADDevice}{defptr}{BRIDGE};
-    my $bname = $bhash->{NAME};
+    my $name    = $hash->{NAME};
+    my $bname   = $hash->{IODev}->{NAME};
     
     RemoveInternalTimer( $hash );
 
     if( $init_done && ( ReadingsVal( $name, "deviceState", "unknown" ) eq "unknown" or ReadingsVal( $name, "deviceState", "online" ) eq "online" ) && AttrVal( $name, "disable", 0 ) ne "1" && ReadingsVal( $bname, "fhemServerIP", "not set" ) ne "not set" ) {
-    
-        AMADDevice_statusRequest( $hash );
+
+        AMADDevice_statusRequest($hash);
         AMADDevice_checkDeviceState( $hash );
         
     } else {
@@ -335,6 +334,36 @@ sub AMADDevice_GetUpdate($) {
 
         InternalTimer( gettimeofday()+15, "AMADDevice_GetUpdate", $hash, 0 );
     }
+}
+
+sub AMADDevice_statusRequest($) {
+
+    my $hash        = shift;
+    my $name        = $hash->{NAME};
+    
+    my $host                = $hash->{HOST};
+    my $port                = $hash->{PORT};
+    my $amad_id             = $hash->{AMAD_ID};
+    my $uri;
+    my $header              = 'Connection: close';
+    my $method;
+    
+    
+    my $activetask      = AttrVal( $name, "checkActiveTask", "none" );
+    my $userFlowState   = AttrVal( $name, "setUserFlowState", "none" );
+    my $apssid          = AttrVal( $name, "setAPSSID", "none" );
+    my $fhemip          = ReadingsVal($hash->{IODev}->{NAME}, "fhemServerIP", "none");
+    my $bport           = $hash->{IODev}->{PORT};
+    my $amad_id         = $hash->{AMAD_ID};
+
+
+    $uri     = $host . ":" . $port . "/fhem-amad/deviceInfo/";       # Pfad muß so im Automagic als http request Trigger drin stehen
+    $header  .= "\r\nfhemip: $fhemip\r\nfhemdevice: $name\r\nactivetask: $activetask\r\napssid: $apssid\r\nbport: $bport\r\nuserflowstate: $userFlowState\r\namadid: $amad_id";
+    $method  = "GET";
+    
+    
+    IOWrite($hash,$amad_id,$uri,$header,$method);
+    Log3 $name, 5, "AMADDevice ($name) - IOWrite: $uri $method IODevHash=$hash->{IODev}";
 }
 
 sub AMADDevice_WriteReadings($$) {
@@ -359,7 +388,7 @@ sub AMADDevice_WriteReadings($$) {
     
     while( ( $t, $v ) = each %{$decode_json->{payload}} ) {
         readingsBulkUpdate( $hash, $t, $v ) if( defined( $v ) );
-        $v =~ s/\bnull\b/off/g if( ($t eq "nextAlarmDay" || $t eq "nextAlarmTime") && $v eq "null" );
+        $v =~ s/\bnull\b/off/g if( ($t eq "nextAlarmDay" or $t eq "nextAlarmTime") and $v eq "null" );
         $v =~ s/\bnull\b//g;
     }
     
@@ -388,7 +417,7 @@ sub AMADDevice_Set($$@) {
     my $port                = $hash->{PORT};
     my $amad_id             = $hash->{AMAD_ID};
     my $uri;
-    my $header;
+    my $header              = 'Connection: close';
     my $method;
 
 
@@ -557,16 +586,8 @@ sub AMADDevice_Set($$@) {
 
     elsif( lc $cmd eq 'statusrequest' ) {
 
-        my $activetask = AttrVal( $name, "checkActiveTask", "none" );
-        my $userFlowState = AttrVal( $name, "setUserFlowState", "none" );
-        my $apssid = AttrVal( $name, "setAPSSID", "none" );
-        my $fhemip  = ReadingsVal($hash->{IODev}->{NAME}, "fhemServerIP", "none");
-        my $bport   = $hash->{IODev}->{PORT};
-        
-
-        $uri     = $host . ":" . $port . "/fhem-amad/deviceInfo/";       # Pfad muß so im Automagic als http request Trigger drin stehen
-        $header  = "fhemip: $fhemip\r\nfhemdevice: $name\r\nactivetask: $activetask\r\napssid: $apssid\r\nbport: $bport\r\nuserflowstate: $userFlowState";
-        $method  = "GET";
+       AMADDevice_statusRequest($hash);
+       return;
     }
 
     elsif( lc $cmd eq 'openapp' ) {
@@ -715,9 +736,9 @@ sub AMADDevice_Set($$@) {
 
         return "Unknown argument $cmd, choose one of $list";
     }
-    
-    $header = undef unless( defined($header) and ($header) );
-    IOWrite($hash,$amad_id,$uri,$method,$header);
+
+
+    IOWrite($hash,$amad_id,$uri,$header,$method);
     Log3 $name, 5, "AMADDevice ($name) - IOWrite: $uri $method IODevHash=$hash->{IODev}";
 
     return undef;
@@ -736,12 +757,12 @@ sub AMADDevice_Parse($$) {
         return;
     }
     
-    Log3 $name, 3, "AMADDevice ($name) - ParseFn was called";
-    Log3 $name, 3, "AMADDevice ($name) - ParseFn was called, !!! JSON: $json";
-    Log3 $name, 3, "AMADDevice ($name) - ParseFn was called, !!! AMAD_ID: $decode_json->{amad}{amad_id}";
+    Log3 $name, 4, "AMADDevice ($name) - ParseFn was called";
+    Log3 $name, 4, "AMADDevice ($name) - ParseFn was called, !!! JSON: $json";
+    Log3 $name, 4, "AMADDevice ($name) - ParseFn was called, !!! AMAD_ID: $decode_json->{amad}{amad_id}";
 
 
-    my $fhemDevice  = $decode_json->{payload}{fhemdevice} if( defined($decode_json->{payload}{fhemdevice}) );
+    my $fhemDevice  = $decode_json->{firstrun}{fhemdevice} if( defined($decode_json->{firstrun}) and defined($decode_json->{firstrun}{fhemdevice}) );
     my $amad_id     = $decode_json->{amad}{amad_id};
         
     if( my $hash        = $modules{AMADDevice}{defptr}{$amad_id} ) {        
@@ -754,7 +775,7 @@ sub AMADDevice_Parse($$) {
             
     } else {
 
-        return "UNDEFINED $fhemDevice AMADDevice $decode_json->{payload}{'amaddevice_ip'} $decode_json->{amad}{'amad_id'} IODev=$name";
+        return "UNDEFINED $fhemDevice AMADDevice $decode_json->{firstrun}{'amaddevice_ip'} $decode_json->{amad}{'amad_id'} IODev=$name";
     }
 }
 
