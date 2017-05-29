@@ -41,8 +41,8 @@
 ###### Möglicher Aufbau eines JSON Strings für die AMADCommBridge
 #
 #  first initial String
-#   {"amad": {"amad_id": "1495827100156","fhemcmd": "setreading"},"payload": {},"firstrun": {"fhemdevice": "TabletWohnzimmer","fhemserverip": "fhem02.tuxnet.local","amaddevice_ip": "10.6.9.35"}}
-#   {"amad": {"amad_id": "1495827100156","fhemcmd": "setreading"},"payload": {},"firstrun": {"fhemdevice": "TabletWohnzimmer","fhemserverip": "fhem02.tuxnet.local","amaddevice_ip": "10.6.9.35"}}
+#   {"amad": {"amad_id": "1495827100156","fhemcmd": "setreading"},"firstrun": {"fhemdevice": "TabletWohnzimmer","fhemserverip": "fhem02.tuxnet.local","amaddevice_ip": "10.6.9.35"}}
+#   {"amad": {"amad_id": "1495827100156","fhemcmd": "setreading"},"firstrun": {"fhemdevice": "TabletWohnzimmer","fhemserverip": "fhem02.tuxnet.local","amaddevice_ip": "10.6.9.35"}}
 #
 #  default String
 #   {"amad": {"amad_id": "37836534","fhemcmd": "setreading"},"payload": {"reading0": "value0","reading1": "value1","readingX": "valueX"}}
@@ -68,8 +68,8 @@ use TcpServerUtils;
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3.9.48";
-my $flowsetversion = "3.9.48";
+my $modulversion = "3.9.52";
+my $flowsetversion = "3.9.52";
 
 
 
@@ -563,7 +563,7 @@ sub AMADCommBridge_Open($) {
     readingsSingleUpdate ( $hash, "state", "opened", 1 ) if( defined($hash->{FD}) );
     Log3 $name, 3, "AMADCommBridge ($name) - Socket opened.";
 
-    return;
+    return $ret;
 }
 
 sub AMADCommBridge_Close($) {
@@ -603,9 +603,9 @@ sub AMADCommBridge_Read($) {
 
 
     # When there is an error in connection return
-    if( !defined($ret ) || $ret <= 0 ) {
+    if( !defined($ret ) or $ret <= 0 ) {
         CommandDelete( undef, $name );
-        Log3 $name, 5, "AMADCommBridge ($name) - Error in connection";
+        Log3 $name, 5, "AMADCommBridge ($name) - Connection closed for $name";
         return;
     }
     
@@ -674,7 +674,7 @@ sub AMADCommBridge_ProcessRead($$) {
     Log3 $name, 5, "AMADCommBridge ($name) - Incoming data: " . $json;
 
     $buffer = $buffer . $json;
-    Log3 $name, 5, "AMADCommBridge ($name) - Current processing buffer (PARTIAL + incoming data): " . $buffer;
+    Log3 $name, 4, "AMADCommBridge ($name) - Current processing buffer (PARTIAL + incoming data): " . $buffer;
 
     my ($correct_json,$tail) = AMADCommBridge_ParseMsg($hash, $buffer);
 
@@ -722,10 +722,11 @@ sub AMADCommBridge_ResponseProcessing($$) {
 
     my $response;
     my $c;
-    #my $json        = $data[1];
     my $decode_json;
 
+    
     $decode_json    = eval{decode_json($json)};
+    
     if($@){
         Log3 $bname, 3, "AMADCommBridge ($name) - ERROR while request: $@";
         readingsSingleUpdate($bhash, "JSON info", "JSON ERROR", 1);
@@ -744,8 +745,11 @@ sub AMADCommBridge_ResponseProcessing($$) {
     my $fhemDevice;
     
     if( defined($decode_json->{firstrun}) and ($decode_json->{firstrun}) ) {
-        $fhemDevice  = $decode_json->{payload}{fhemdevice} if( defined($decode_json->{firstrun}{fhemdevice}) );
+    
+        $fhemDevice  = $decode_json->{firstrun}{fhemdevice} if( defined($decode_json->{firstrun}{fhemdevice}) );
+        
     } else {
+    
         $fhemDevice  = $modules{AMADDevice}{defptr}{$amad_id}->{NAME};
     }
 
@@ -771,7 +775,7 @@ sub AMADCommBridge_ResponseProcessing($$) {
     if( defined($fhemcmd) and ($fhemcmd) ) {
         if ( $fhemcmd eq 'setreading' ) {
             return Log3 $bname, 3, "AMADCommBridge ($name) - AMADCommBridge: processing receive no reading values from Device: $fhemDevice"
-            unless( defined($decode_json->{payload}) and ($decode_json->{payload}) );
+            unless( (defined($decode_json->{payload}) and ($decode_json->{payload})) or (defined($decode_json->{firstrun}) and ($decode_json->{firstrun})) );
             
             Log3 $bname, 4, "AMADCommBridge ($bname) - AMADCommBridge: processing receive reading values - Device: $fhemDevice Data: $decode_json->{payload}";
 
@@ -795,7 +799,7 @@ sub AMADCommBridge_ResponseProcessing($$) {
         
             fhem ("set $fhemCmd") if( ReadingsVal( $bname, "expertMode", 0 ) eq "1" );
             readingsSingleUpdate( $bhash, "receiveFhemCommand", "set ".$fhemCmd, 0 );
-            Log3 $bname, 3, "AMADCommBridge ($name) - AMADCommBridge_CommBridge: set reading receive fhem command";
+            Log3 $bname, 4, "AMADCommBridge ($name) - AMADCommBridge_CommBridge: set reading receive fhem command";
 
             $response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM execute set command now\r\n";
             $c = $hash->{CD};
@@ -842,7 +846,8 @@ sub AMADCommBridge_ResponseProcessing($$) {
 
             return;
         }
-    
+
+
 #         elsif ( $fhemcmd =~ /fhemfunc\b/ ) {
 #             my $fhemCmd = $data[1];
 # 

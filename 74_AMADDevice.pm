@@ -54,8 +54,8 @@ use Encode qw(encode);
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3.9.49";
-my $flowsetversion = "3.9.48";
+my $modulversion = "3.9.52";
+my $flowsetversion = "3.9.52";
 
 
 
@@ -185,11 +185,11 @@ sub AMADDevice_Define($$) {
 
     if( $init_done ) {
         
-        AMADDevice_GetUpdate($hash);
+        InternalTimer( gettimeofday()+3, "AMADDevice_GetUpdate", $hash, 0 ) if( ($hash->{HOST}) );
             
     } else {
         
-        InternalTimer( gettimeofday()+30, "AMADDevice_GetUpdate", $hash, 0 ) if( ($hash->{HOST}) );
+        InternalTimer( gettimeofday()+15, "AMADDevice_GetUpdate", $hash, 0 ) if( ($hash->{HOST}) );
     }
 
     $modules{AMADDevice}{defptr}{$amad_id} = $hash;
@@ -354,7 +354,6 @@ sub AMADDevice_statusRequest($) {
     my $apssid          = AttrVal( $name, "setAPSSID", "none" );
     my $fhemip          = ReadingsVal($hash->{IODev}->{NAME}, "fhemServerIP", "none");
     my $bport           = $hash->{IODev}->{PORT};
-    my $amad_id         = $hash->{AMAD_ID};
 
 
     $uri     = $host . ":" . $port . "/fhem-amad/deviceInfo/";       # Pfad muß so im Automagic als http request Trigger drin stehen
@@ -758,8 +757,7 @@ sub AMADDevice_Parse($$) {
     }
     
     Log3 $name, 4, "AMADDevice ($name) - ParseFn was called";
-    Log3 $name, 4, "AMADDevice ($name) - ParseFn was called, !!! JSON: $json";
-    Log3 $name, 4, "AMADDevice ($name) - ParseFn was called, !!! AMAD_ID: $decode_json->{amad}{amad_id}";
+    Log3 $name, 5, "AMADDevice ($name) - ParseFn was called, !!! AMAD_ID: $decode_json->{amad}{amad_id}";
 
 
     my $fhemDevice  = $decode_json->{firstrun}{fhemdevice} if( defined($decode_json->{firstrun}) and defined($decode_json->{firstrun}{fhemdevice}) );
@@ -782,6 +780,7 @@ sub AMADDevice_Parse($$) {
 ##################################
 ##################################
 #### my little helpers ###########
+
 sub AMADDevice_checkDeviceState($) {
 
     my ( $hash ) = @_;
