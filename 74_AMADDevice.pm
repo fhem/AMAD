@@ -54,8 +54,8 @@ use Encode qw(encode);
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3.9.52";
-my $flowsetversion = "3.9.52";
+my $modulversion = "3.9.55";
+my $flowsetversion = "3.9.55";
 
 
 
@@ -178,8 +178,8 @@ sub AMADDevice_Define($$) {
     $attr{$name}{room} = "AMAD" if( !defined( $attr{$name}{room} ) );
         
     readingsBeginUpdate($hash);
-    readingsBulkUpdate( $hash, "state", "initialized");
-    readingsBulkUpdate( $hash, "deviceState", "unknown");
+    readingsBulkUpdateIfChanged( $hash, "state", "initialized",1);
+    readingsBulkUpdateIfChanged( $hash, "deviceState", "unknown",1);
     readingsEndUpdate($hash,1);
         
 
@@ -376,7 +376,7 @@ sub AMADDevice_WriteReadings($$) {
     #### schreiben der Readings
 
     Log3 $name, 5, "AMADDevice ($name) - Processing data: $decode_json";
-    readingsSingleUpdate( $hash, "state", "active", 1) if( ReadingsVal( $name, "state", 0 ) ne "initialized" or ReadingsVal( $name, "state", 0 ) ne "active" );
+    readingsSingleUpdate( $hash, "state", "active", 1) if( ReadingsVal( $name, "state", 0 ) ne "initialized" and ReadingsVal( $name, "state", 0 ) ne "active" );
     
     ### Event Readings
     my $t;
@@ -386,20 +386,22 @@ sub AMADDevice_WriteReadings($$) {
     readingsBeginUpdate($hash);
     
     while( ( $t, $v ) = each %{$decode_json->{payload}} ) {
-        readingsBulkUpdate( $hash, $t, $v ) if( defined( $v ) );
+        
         $v =~ s/\bnull\b/off/g if( ($t eq "nextAlarmDay" or $t eq "nextAlarmTime") and $v eq "null" );
         $v =~ s/\bnull\b//g;
+        
+        readingsBulkUpdateIfChanged( $hash, $t, $v, 1 ) if( defined( $v ) );
     }
     
-    readingsBulkUpdate( $hash, "deviceState", "offline" ) if( $decode_json->{payload}{airplanemode} && $decode_json->{payload}{airplanemode} eq "on" );
-    readingsBulkUpdate( $hash, "deviceState", "online" ) if( $decode_json->{payload}{airplanemode} && $decode_json->{payload}{airplanemode} eq "off" );
+    readingsBulkUpdateIfChanged( $hash, "deviceState", "offline", 1 ) if( $decode_json->{payload}{airplanemode} && $decode_json->{payload}{airplanemode} eq "on" );
+    readingsBulkUpdateIfChanged( $hash, "deviceState", "online", 1 ) if( $decode_json->{payload}{airplanemode} && $decode_json->{payload}{airplanemode} eq "off" );
 
-    readingsBulkUpdate( $hash, "lastStatusRequestState", "statusRequest_done" );
+    readingsBulkUpdateIfChanged( $hash, "lastStatusRequestState", "statusRequest_done", 1 );
 
     $hash->{helper}{infoErrorCounter} = 0;
     ### End Response Processing
     
-    readingsBulkUpdate( $hash, "state", "active" ) if( ReadingsVal( $name, "state", 0 ) eq "initialized" );
+    readingsBulkUpdateIfChanged( $hash, "state", "active", 1 ) if( ReadingsVal( $name, "state", 0 ) eq "initialized" );
     readingsEndUpdate( $hash, 1 );
     
     $hash->{helper}{deviceStateErrorCounter} = 0 if( $hash->{helper}{deviceStateErrorCounter} > 0 and ReadingsVal( $name, "deviceState", "offline") eq "online" );
@@ -790,14 +792,14 @@ sub AMADDevice_checkDeviceState($) {
 
     RemoveInternalTimer( $hash );
     
-    if( ReadingsAge( $name, "deviceState", 90 ) > 90 ) {
+    if( ReadingsAge( $name, "deviceState", 240 ) > 240 ) {
     
         AMADDevice_statusRequest( $hash ) if( $hash->{helper}{deviceStateErrorCounter} == 0 );
-        readingsSingleUpdate( $hash, "deviceState", "offline", 1 ) if( ReadingsAge( $name, "deviceState", 180) > 180 and $hash->{helper}{deviceStateErrorCounter} > 0 );
+        readingsSingleUpdate( $hash, "deviceState", "offline", 1 ) if( ReadingsAge( $name, "deviceState", 300) > 300 and $hash->{helper}{deviceStateErrorCounter} > 0 );
         $hash->{helper}{deviceStateErrorCounter} = ( $hash->{helper}{deviceStateErrorCounter} + 1 );
     }
     
-    InternalTimer( gettimeofday()+90, "AMADDevice_checkDeviceState", $hash, 0 );
+    InternalTimer( gettimeofday()+240, "AMADDevice_checkDeviceState", $hash, 0 );
     
     Log3 $name, 4, "AMADDevice ($name) - AMADDevice_checkDeviceState: set new Timer";
 }
