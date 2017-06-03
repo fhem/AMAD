@@ -54,8 +54,8 @@ use Encode qw(encode);
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3.9.60";
-my $flowsetversion = "3.9.60";
+my $modulversion = "3.9.61";
+my $flowsetversion = "3.9.61";
 
 
 
