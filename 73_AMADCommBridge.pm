@@ -68,8 +68,8 @@ use TcpServerUtils;
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3.9.61";
-my $flowsetversion = "3.9.62";
+my $modulversion = "3.9.65";
+my $flowsetversion = "3.9.65";
 
 
 
@@ -110,8 +110,10 @@ sub AMADCommBridge_Initialize($) {
     $hash->{UndefFn}    = "AMADCommBridge_Undef";
     
     $hash->{AttrFn}     = "AMADCommBridge_Attr";
-    $hash->{AttrList}   = "expertMode:1 ".
+    $hash->{AttrList}   = "fhemControlMode:trigger,setControl,thirdPartControl ".
+                          "debugJSON:0,1 ".
                           "disable:1 ".
+                          "allowFrom ".
                           $readingFnAttributes;
     
     foreach my $d(sort keys %{$modules{AMADCommBridge}{defptr}}) {
@@ -192,6 +194,19 @@ sub AMADCommBridge_Attr(@) {
             readingsSingleUpdate ( $hash, "state", "enabled", 1 );
             AMADCommBridge_Open($hash);
             Log3 $name, 3, "AMADCommBridge ($name) - enabled";
+        }
+    }
+    
+    elsif( $attrName eq "fhemControlMode" ) {
+        if( $cmd eq "set" ) {
+        
+            CommandSet(undef,'set TYPE=AMADDevice:FILTER=deviceState=online statusRequest');
+            Log3 $name, 3, "AMADCommBridge ($name) - set fhemControlMode global Variable at Device";
+            
+        } else {
+
+            CommandSet(undef,'set TYPE=AMADDevice:FILTER=deviceState=online statusRequest');
+            Log3 $name, 3, "AMADCommBridge ($name) - set fhemControlMode global Variable NONE at Device";
         }
     }
     
@@ -705,7 +720,14 @@ sub AMADCommBridge_ResponseProcessing($$) {
     
     if($@){
         Log3 $bname, 4, "AMADCommBridge ($name) - ERROR while request: $@";
-        readingsSingleUpdate($bhash, "JSON info", "JSON ERROR", 1);
+        
+        if( AttrVal( $bname, 'debugJSON', 0 ) == 1 ) {
+            readingsBeginUpdate($bhash);
+            readingsBulkUpdate($bhash, 'JSON_ERROR', $@, 1);
+            readingsBulkUpdate($bhash, 'JSON_ERROR_STRING', $json, 1);
+            readingsEndUpdate($bhash, 1);
+        }
+        
         $response = "header lines: \r\n AMADCommBridge receive a JSON error\r\n AMADCommBridge to do nothing\r\n";
         $c = $hash->{CD};
         print $c "HTTP/1.1 200 OK\r\n",
@@ -773,8 +795,8 @@ sub AMADCommBridge_ResponseProcessing($$) {
         elsif ( $fhemcmd eq 'set' ) {
             my $fhemCmd = $decode_json->{payload}{setcmd};
         
-            fhem ("set $fhemCmd") if( ReadingsVal( $bname, "expertMode", 0 ) eq "1" );
-            readingsSingleUpdate( $bhash, "receiveFhemCommand", "set ".$fhemCmd, 0 );
+            fhem ("set $fhemCmd") if( AttrVal( $bname, 'fhemControlMode', 'trigger' ) eq 'setControl' );
+            readingsSingleUpdate( $bhash, "receiveFhemCommand", "set ".$fhemCmd, 1 ) if( AttrVal( $bname, 'fhemControlMode', 'trigger' ) eq 'trigger' );;
             Log3 $bname, 4, "AMADCommBridge ($name) - AMADCommBridge_CommBridge: set reading receive fhem command";
 
             $response = "header lines: \r\n AMADCommBridge receive Data complete\r\n FHEM execute set command now\r\n";
@@ -792,8 +814,8 @@ sub AMADCommBridge_ResponseProcessing($$) {
             my $fhemCmd = $decode_json->{payload}{voiceinputdata};
         
             readingsBeginUpdate( $bhash);
-            readingsBulkUpdateIfChanged( $bhash, "receiveVoiceCommand", $fhemCmd, 1 );
-            readingsBulkUpdateIfChanged( $bhash, "receiveVoiceDevice", $fhemDevice, 1 );
+            readingsBulkUpdate( $bhash, "receiveVoiceCommand", $fhemCmd, 1 );
+            readingsBulkUpdate( $bhash, "receiveVoiceDevice", $fhemDevice, 1 );
             readingsEndUpdate( $bhash, 1 );
             Log3 $bname, 4, "AMADCommBridge ($name) - AMADCommBridge_CommBridge: set reading receive voice command: $fhemCmd from Device $fhemDevice";
 

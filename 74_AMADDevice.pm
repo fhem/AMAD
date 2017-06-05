@@ -54,8 +54,8 @@ use Encode qw(encode);
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3.9.61";
-my $flowsetversion = "3.9.62";
+my $modulversion = "3.9.65";
+my $flowsetversion = "3.9.65";
 
 
 
@@ -104,7 +104,6 @@ sub AMADDevice_Initialize($) {
                 "setTtsMsgLang:de,en ".
                 "setAPSSID ".
                 "root:0,1 ".
-                "port ".
                 "disable:1 ".
                 $readingFnAttributes;
     
@@ -251,34 +250,6 @@ sub AMADDevice_Attr(@) {
         InternalTimer( gettimeofday(), "AMADDevice_GetUpdate", $hash, 0 )
     }
     
-    elsif( $attrName eq "port" ) {
-        if( $cmd eq "set" ) {
-        
-            $hash->{PORT} = $attrVal;
-            Log3 $name, 3, "AMADDevice ($name) - set port to $attrVal";
-
-            if( $hash->{BRIDGE} ) {
-                delete $modules{AMADDevice}{defptr}{BRIDGE};
-                TcpServer_Close( $hash );
-                Log3 $name, 3, "AMADDevice ($name) - CommBridge Port changed. CommBridge are closed and new open!";
-                
-                AMADDevice_CommBridge_Open( $hash );
-            }
-        } else {
-        
-            $hash->{PORT} = 8090;
-            Log3 $name, 3, "AMADDevice ($name) - set port to default";
-    
-            if( $hash->{BRIDGE} ) {
-                delete $modules{AMADDevice}{defptr}{BRIDGE};
-                TcpServer_Close( $hash );
-                Log3 $name, 3, "AMADDevice ($name) - CommBridge Port changed. CommBridge are closed and new open!";
-                
-                AMADDevice_CommBridge_Open( $hash );
-            }
-        }
-    }
-    
     elsif( $attrName eq "setScreenlockPIN" ) {
         if( $cmd eq "set" && $attrVal ) {
         
@@ -320,7 +291,6 @@ sub AMADDevice_GetUpdate($) {
     my $name    = $hash->{NAME};
     my $bname   = $hash->{IODev}->{NAME};
     
-    RemoveInternalTimer( $hash );
 
     if( $init_done && ( ReadingsVal( $name, "deviceState", "unknown" ) eq "unknown" or ReadingsVal( $name, "deviceState", "online" ) eq "online" ) && AttrVal( $name, "disable", 0 ) ne "1" && ReadingsVal( $bname, "fhemServerIP", "not set" ) ne "not set" ) {
 
@@ -353,11 +323,12 @@ sub AMADDevice_statusRequest($) {
     my $userFlowState   = AttrVal( $name, "setUserFlowState", "none" );
     my $apssid          = AttrVal( $name, "setAPSSID", "none" );
     my $fhemip          = ReadingsVal($hash->{IODev}->{NAME}, "fhemServerIP", "none");
+    my $fhemCtlMode     = AttrVal($hash->{IODev}->{NAME},'fhemControlMode','none' );
     my $bport           = $hash->{IODev}->{PORT};
 
 
     $uri     = $host . ":" . $port . "/fhem-amad/deviceInfo/";       # Pfad muß so im Automagic als http request Trigger drin stehen
-    $header  .= "\r\nfhemip: $fhemip\r\nfhemdevice: $name\r\nactivetask: $activetask\r\napssid: $apssid\r\nbport: $bport\r\nuserflowstate: $userFlowState\r\namadid: $amad_id";
+    $header  .= "\r\nfhemip: $fhemip\r\nfhemdevice: $name\r\nactivetask: $activetask\r\napssid: $apssid\r\nbport: $bport\r\nuserflowstate: $userFlowState\r\namadid: $amad_id\r\nfhemctlmode: $fhemCtlMode";
     $method  = "GET";
     
     
@@ -390,7 +361,8 @@ sub AMADDevice_WriteReadings($$) {
         $v =~ s/\bnull\b/off/g if( ($t eq "nextAlarmDay" or $t eq "nextAlarmTime") and $v eq "null" );
         $v =~ s/\bnull\b//g;
         
-        readingsBulkUpdateIfChanged( $hash, $t, $v, 1 ) if( defined( $v ) );
+        readingsBulkUpdateIfChanged($hash, $t, $v, 1) if( defined( $v ) );
+        readingsBulkUpdate($hash, '.'.$t, $v) if( $t eq 'deviceState' );
     }
     
     readingsBulkUpdateIfChanged( $hash, "deviceState", "offline", 1 ) if( $decode_json->{payload}{airplanemode} && $decode_json->{payload}{airplanemode} eq "on" );
@@ -790,12 +762,11 @@ sub AMADDevice_checkDeviceState($) {
 
     Log3 $name, 4, "AMADDevice ($name) - AMADDevice_checkDeviceState: run Check";
 
-    RemoveInternalTimer( $hash );
     
-    if( ReadingsAge( $name, "deviceState", 240 ) > 240 ) {
+    if( ReadingsAge( $name, ".deviceState", 240 ) > 240 ) {
     
         AMADDevice_statusRequest( $hash ) if( $hash->{helper}{deviceStateErrorCounter} == 0 );
-        readingsSingleUpdate( $hash, "deviceState", "offline", 1 ) if( ReadingsAge( $name, "deviceState", 300) > 300 and $hash->{helper}{deviceStateErrorCounter} > 0 );
+        readingsSingleUpdate( $hash, "deviceState", "offline", 1 ) if( ReadingsAge( $name, ".deviceState", 300) > 300 and $hash->{helper}{deviceStateErrorCounter} > 0 );
         $hash->{helper}{deviceStateErrorCounter} = ( $hash->{helper}{deviceStateErrorCounter} + 1 );
     }
     
