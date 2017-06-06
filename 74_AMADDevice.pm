@@ -54,8 +54,8 @@ use Encode qw(encode);
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3.9.65";
-my $flowsetversion = "3.9.65";
+my $modulversion = "3.9.66";
+my $flowsetversion = "3.9.66";
 
 
 
@@ -258,6 +258,17 @@ sub AMADDevice_Attr(@) {
         } else {
         
             CommandDeleteReading( undef, "$name screenLock" );
+        }
+    }
+    
+    elsif( $attrName eq "setAPSSID" ) {
+        if( $cmd eq "set" && $attrVal ) {
+        
+            AMADDevice_statusRequest($hash);
+            
+        } else {
+        
+            AMADDevice_statusRequest($hash);
         }
     }
     
