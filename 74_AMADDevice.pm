@@ -54,7 +54,7 @@ use Encode qw(encode);
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3.9.66";
+my $modulversion = "3.9.67";
 my $flowsetversion = "3.9.66";
 
 
@@ -102,6 +102,7 @@ sub AMADDevice_Initialize($) {
                 "setTtsMsgSpeed ".
                 "setUserFlowState ".
                 "setTtsMsgLang:de,en ".
+                "setVolUpDownStep:1,2,4,5 ".
                 "setAPSSID ".
                 "root:0,1 ".
                 "disable:1 ".
@@ -380,6 +381,12 @@ sub AMADDevice_WriteReadings($$) {
     readingsBulkUpdateIfChanged( $hash, "deviceState", "online", 1 ) if( $decode_json->{payload}{airplanemode} && $decode_json->{payload}{airplanemode} eq "off" );
 
     readingsBulkUpdateIfChanged( $hash, "lastStatusRequestState", "statusRequest_done", 1 );
+    
+    if( ReadingsVal($name,'volume',1) > 0 ) {
+        readingsBulkUpdateIfChanged( $hash, "mute", "off", 1 );
+    } else {
+        readingsBulkUpdateIfChanged( $hash, "mute", "on", 1 );
+    }
 
     $hash->{helper}{infoErrorCounter} = 0;
     ### End Response Processing
@@ -439,25 +446,45 @@ sub AMADDevice_Set($$@) {
         $method     = "POST";
     }
     
-    elsif( lc $cmd eq 'volume' ) {
+    elsif( lc $cmd eq 'volume' or $cmd eq 'mute' or $cmd =~ 'volume[Down|Up]' ) {
     
-        my $vol = join( " ", @args );
+        my $vol;
+        
+        if( $cmd eq 'volume' ) {
+            $vol = join( " ", @args );
 
-        if( $vol =~ /^\+(.*)/ or $vol =~ /^-(.*)/ ) {
+            if( $vol =~ /^\+(.*)/ or $vol =~ /^-(.*)/ ) {
 
-            if( $vol =~ /^\+(.*)/ ) {
-            
-                $vol =~ s/^\+//g;
-                $vol = ReadingsVal( $name, "volume", 15 ) + $vol;
+                if( $vol =~ /^\+(.*)/ ) {
+                
+                    $vol =~ s/^\+//g;
+                    $vol = ReadingsVal( $name, "volume", 0 ) + $vol;
+                }
+                
+                elsif( $vol =~ /^-(.*)/ ) {
+                
+                    $vol =~ s/^-//g;
+                    printf $vol;
+                    $vol = ReadingsVal( $name, "volume", 15 ) - $vol;
+                }
             }
             
-            elsif( $vol =~ /^-(.*)/ ) {
+        } elsif( $cmd eq 'mute') {
+            if($args[0] eq 'on') {
+                $vol = 0;
+                readingsSingleUpdate($hash,'.volume',ReadingsVal($name,'volume',0),0);
+            } else {
+                $vol = ReadingsVal($name,'.volume',0);
+            }
             
-                $vol =~ s/^-//g;
-                printf $vol;
-                $vol = ReadingsVal( $name, "volume", 15 ) - $vol;
+        } elsif( $cmd =~ 'volume[Down|Up]') {
+            if( $cmd eq 'volumeUp' ) {
+                $vol = ReadingsVal( $name, "volume", 0 ) + AttrVal($name,'setVolUpDownStep',3);
+            } else {
+                $vol = ReadingsVal( $name, "volume", 0 ) - AttrVal($name,'setVolUpDownStep',3);
             }
         }
+        
 
         $uri        = $host . ":" . $port . "/fhem-amad/setCommands/setVolume?volume=$vol";
         $method     = "POST";
@@ -709,7 +736,7 @@ sub AMADDevice_Set($$@) {
         my $btdev = AttrVal( $name, "setBluetoothDevice", "none" );
         
         
-        my $list = "screenMsg ttsMsg volume:slider,0,1,15 mediaGoogleMusic:play/pause,stop,next,back mediaAmazonMusic:play/pause,stop,next,back mediaSpotifyMusic:play/pause,stop,next,back mediaTuneinRadio:play/pause,stop,next,back mediaAldiMusic:play/pause,stop,next,back mediaYouTube:play/pause,stop,next,back mediaVlcPlayer:play/pause,stop,next,back mediaAudible:play/pause,stop,next,back screenBrightness:slider,0,1,255 screen:on,off,lock,unlock openURL nextAlarmTime:time timer:slider,1,1,60 statusRequest:noArg bluetooth:on,off notifySndFile clearNotificationBar:All,Automagic activateVoiceInput:noArg volumeNotification:slider,0,1,7 volumeRingSound:slider,0,1,7 vibrate:noArg sendIntent openCall closeCall:noArg currentFlowsetUpdate:noArg installFlowSource doNotDisturb:never,always,alarmClockOnly,onlyImportant userFlowState sendSMS startDaydream:noArg";
+        my $list = "screenMsg ttsMsg volume:slider,0,1,15 mediaGoogleMusic:play/pause,stop,next,back mediaAmazonMusic:play/pause,stop,next,back mediaSpotifyMusic:play/pause,stop,next,back mediaTuneinRadio:play/pause,stop,next,back mediaAldiMusic:play/pause,stop,next,back mediaYouTube:play/pause,stop,next,back mediaVlcPlayer:play/pause,stop,next,back mediaAudible:play/pause,stop,next,back screenBrightness:slider,0,1,255 screen:on,off,lock,unlock openURL nextAlarmTime:time timer:slider,1,1,60 statusRequest:noArg bluetooth:on,off notifySndFile clearNotificationBar:All,Automagic activateVoiceInput:noArg volumeNotification:slider,0,1,7 volumeRingSound:slider,0,1,7 vibrate:noArg sendIntent openCall closeCall:noArg currentFlowsetUpdate:noArg installFlowSource doNotDisturb:never,always,alarmClockOnly,onlyImportant userFlowState sendSMS startDaydream:noArg volumeUp:noArg volumeDown:noArg mute:on,off";
 
         $list .= " screenOrientation:auto,landscape,portrait"   if( AttrVal( $name, "setScreenOrientation", "0" ) eq "1" );
         $list .= " screenFullscreen:on,off"                     if( AttrVal( $name, "setFullscreen", "0" ) eq "1" );
