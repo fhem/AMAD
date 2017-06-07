@@ -54,8 +54,8 @@ use Encode qw(encode);
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3.9.67";
-my $flowsetversion = "3.9.66";
+my $modulversion = "3.9.68";
+my $flowsetversion = "3.9.68";
 
 
 
@@ -804,7 +804,7 @@ sub AMADDevice_checkDeviceState($) {
     if( ReadingsAge( $name, ".deviceState", 240 ) > 240 ) {
     
         AMADDevice_statusRequest( $hash ) if( $hash->{helper}{deviceStateErrorCounter} == 0 );
-        readingsSingleUpdate( $hash, "deviceState", "offline", 1 ) if( ReadingsAge( $name, ".deviceState", 300) > 300 and $hash->{helper}{deviceStateErrorCounter} > 0 );
+        readingsSingleUpdate( $hash, "deviceState", "offline", 1 ) if( ReadingsAge( $name, ".deviceState", 300) > 300 and $hash->{helper}{deviceStateErrorCounter} > 0 and ReadingsVal($name,'deviceState','online') ne 'offline' );
         $hash->{helper}{deviceStateErrorCounter} = ( $hash->{helper}{deviceStateErrorCounter} + 1 );
     }
     
