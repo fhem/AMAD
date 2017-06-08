@@ -54,8 +54,8 @@ use Encode qw(encode);
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3.9.68";
-my $flowsetversion = "3.9.68";
+my $modulversion = "3.9.69";
+my $flowsetversion = "3.9.70";
 
 
 
@@ -82,6 +82,7 @@ sub AMADDevice_Initialize($) {
     my ($hash) = @_;
     
     $hash->{Match}          = '{"amad": {"amad_id":.+}}';
+
 
     $hash->{SetFn}      = "AMADDevice_Set";
     $hash->{DefFn}      = "AMADDevice_Define";

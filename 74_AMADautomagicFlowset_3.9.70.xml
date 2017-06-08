@@ -3,7 +3,7 @@
   <trigger type="battery_level">
     <useDefaultName>true</useDefaultName>
     <name>Akku Ladestand: grösser als 0%</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <levelPercentage>0</levelPercentage>
     <batteryLevelCondition>HIGHER_THAN</batteryLevelCondition>
     <ignoreTemperatureChanges>true</ignoreTemperatureChanges>
@@ -12,7 +12,7 @@
   <trigger type="app_task_ended">
     <useDefaultName>false</useDefaultName>
     <name>App Task Beendet</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <method>CLASSIC</method>
     <packageNameFilter>*</packageNameFilter>
   </trigger>
@@ -26,7 +26,7 @@
   <trigger type="notification_status_bar_displayed">
     <useDefaultName>true</useDefaultName>
     <name>Benachrichtigung in Statusbar angezeigt: ch.gridvision.ppam.androidautomagic</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <packageNameFilter>ch.gridvision.ppam.androidautomagic</packageNameFilter>
     <textMatchField>TEXT</textMatchField>
     <textMatchType>CONTAINS_TEXT</textMatchType>
@@ -37,7 +37,7 @@
   <trigger type="notification_status_bar_displayed">
     <useDefaultName>true</useDefaultName>
     <name>Benachrichtigung in Statusbar angezeigt: com.whatsapp</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <packageNameFilter>com.whatsapp</packageNameFilter>
     <textMatchField>TEXT</textMatchField>
     <textMatchType>CONTAINS_TEXT</textMatchType>
@@ -48,7 +48,7 @@
   <trigger type="notification_status_bar_displayed">
     <useDefaultName>true</useDefaultName>
     <name>Benachrichtigung in Statusbar angezeigt: org.telegram.messenger</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <packageNameFilter>org.telegram.messenger</packageNameFilter>
     <textMatchField>TEXT</textMatchField>
     <textMatchType>CONTAINS_TEXT</textMatchType>
@@ -59,7 +59,7 @@
   <trigger type="notification_status_bar_removed">
     <useDefaultName>true</useDefaultName>
     <name>Benachrichtigung in Statusbar entfernt: ch.gridvision.ppam.androidautomagic</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <packageNameFilter>ch.gridvision.ppam.androidautomagic</packageNameFilter>
     <textMatchField>TEXT</textMatchField>
     <textMatchType>CONTAINS_TEXT</textMatchType>
@@ -70,7 +70,7 @@
   <trigger type="bluetooth_device_disconnected">
     <useDefaultName>true</useDefaultName>
     <name>Bluetooth Gerät getrennt: Alle Geräte</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <all>true</all>
     <deviceAddress></deviceAddress>
     <deviceName></deviceName>
@@ -78,7 +78,7 @@
   <trigger type="bluetooth_device_connected">
     <useDefaultName>true</useDefaultName>
     <name>Bluetooth Gerät verbunden: Alle Geräte</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <all>true</all>
     <deviceAddress></deviceAddress>
     <deviceName></deviceName>
@@ -86,7 +86,7 @@
   <trigger type="bluetooth_state">
     <useDefaultName>true</useDefaultName>
     <name>Bluetooth Status: Schaltet aus, Aus</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <turningOn>false</turningOn>
     <on>false</on>
     <turningOff>true</turningOff>
@@ -95,7 +95,7 @@
   <trigger type="bluetooth_state">
     <useDefaultName>true</useDefaultName>
     <name>Bluetooth Status: Schaltet ein, Ein</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <turningOn>true</turningOn>
     <on>true</on>
     <turningOff>false</turningOff>
@@ -104,55 +104,55 @@
   <trigger type="daydream_state">
     <useDefaultName>true</useDefaultName>
     <name>Daydream Status: Gestartet</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <started>true</started>
   </trigger>
   <trigger type="daydream_state">
     <useDefaultName>true</useDefaultName>
     <name>Daydream Status: Gestoppt</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <started>false</started>
   </trigger>
   <trigger type="screen_orientation">
     <useDefaultName>true</useDefaultName>
     <name>Display Orientierung: Landscape</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <portrait>false</portrait>
   </trigger>
   <trigger type="screen_orientation">
     <useDefaultName>true</useDefaultName>
     <name>Display Orientierung: Portrait</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <portrait>true</portrait>
   </trigger>
   <trigger type="display_state">
     <useDefaultName>true</useDefaultName>
     <name>Display Status: Aus</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <displayOn>false</displayOn>
   </trigger>
   <trigger type="display_state">
     <useDefaultName>true</useDefaultName>
     <name>Display Status: Ein</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <displayOn>true</displayOn>
   </trigger>
   <trigger type="dock_event">
     <useDefaultName>true</useDefaultName>
     <name>Dock Event: Docked</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <docked>true</docked>
   </trigger>
   <trigger type="dock_event">
     <useDefaultName>true</useDefaultName>
     <name>Dock Event: Undocked</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <docked>false</docked>
   </trigger>
   <trigger type="incoming_call">
     <useDefaultName>true</useDefaultName>
     <name>Eingehender Anruf. Status: Klingelt, Nummern: Alle</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <all>true</all>
     <incomingNumbersList></incomingNumbersList>
     <handleSuppressedCallnumber>true</handleSuppressedCallnumber>
@@ -164,13 +164,13 @@
   <trigger type="airplane_mode">
     <useDefaultName>true</useDefaultName>
     <name>Flugmodus: Aus</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <on>false</on>
   </trigger>
   <trigger type="general_broadcast">
     <useDefaultName>true</useDefaultName>
     <name>Genereller Broadcast: wenn com.android.deskclock.ALARM_ALERT</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <action>com.android.deskclock.ALARM_ALERT</action>
     <categoryList></categoryList>
     <dataSchemeList></dataSchemeList>
@@ -185,7 +185,7 @@
   <trigger type="general_broadcast">
     <useDefaultName>true</useDefaultName>
     <name>Genereller Broadcast: wenn com.android.deskclock.ALARM_DISMISS</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <action>com.android.deskclock.ALARM_DISMISS</action>
     <categoryList></categoryList>
     <dataSchemeList></dataSchemeList>
@@ -200,7 +200,7 @@
   <trigger type="general_broadcast">
     <useDefaultName>true</useDefaultName>
     <name>Genereller Broadcast: wenn com.android.deskclock.ALARM_DONE</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <action>com.android.deskclock.ALARM_DONE</action>
     <categoryList></categoryList>
     <dataSchemeList></dataSchemeList>
@@ -215,7 +215,7 @@
   <trigger type="general_broadcast">
     <useDefaultName>true</useDefaultName>
     <name>Genereller Broadcast: wenn com.android.deskclock.ALARM_SNOOZE</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <action>com.android.deskclock.ALARM_SNOOZE</action>
     <categoryList></categoryList>
     <dataSchemeList></dataSchemeList>
@@ -230,7 +230,7 @@
   <trigger type="general_broadcast">
     <useDefaultName>true</useDefaultName>
     <name>Genereller Broadcast: wenn org.smblott.intentradio.STATE</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <action>org.smblott.intentradio.STATE</action>
     <categoryList></categoryList>
     <dataSchemeList></dataSchemeList>
@@ -254,7 +254,7 @@ irname=getString("name")</extras>
   <trigger type="http_request">
     <useDefaultName>false</useDefaultName>
     <name>HTTP Request: /fhem-amad/deviceInfo/</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <path>/fhem-amad/deviceInfo/</path>
     <port>8090</port>
     <acquireWifiLock>true</acquireWifiLock>
@@ -262,7 +262,7 @@ irname=getString("name")</extras>
   <trigger type="http_request">
     <useDefaultName>false</useDefaultName>
     <name>HTTP Request: /fhem-amad/setCommands/*</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <path>/fhem-amad/setCommands/*</path>
     <port>8090</port>
     <acquireWifiLock>true</acquireWifiLock>
@@ -270,13 +270,13 @@ irname=getString("name")</extras>
   <trigger type="media_session_changed">
     <useDefaultName>false</useDefaultName>
     <name>Medien Session verändert</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <packageNameFilter>com.amazon.mp3,com.amazon.avod.thirdpartyclient,com.audible.application,com.rhapsody.alditalk,com.spotify.music,com.google.android.videos,com.google.android.music,org.smblott.intentradioio,de.maxdome.app.android,tunein.player,org.videolan.vlc,com.google.android.youtube</packageNameFilter>
   </trigger>
   <trigger type="periodic_timer">
     <useDefaultName>false</useDefaultName>
     <name>Periodischer Timer: alle 120s</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <frequency>120000</frequency>
     <wakeDevice>true</wakeDevice>
     <fixedTimes>false</fixedTimes>
@@ -298,12 +298,12 @@ irname=getString("name")</extras>
   <trigger type="voice_command_requested">
     <useDefaultName>true</useDefaultName>
     <name>Sprachbefehl angefordert</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
   </trigger>
   <trigger type="power_connected">
     <useDefaultName>true</useDefaultName>
     <name>Stromversorgung: Angeschlossen</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <powerConnected>true</powerConnected>
     <chargingACAdapter>true</chargingACAdapter>
     <chargingUSB>true</chargingUSB>
@@ -312,7 +312,7 @@ irname=getString("name")</extras>
   <trigger type="power_connected">
     <useDefaultName>true</useDefaultName>
     <name>Stromversorgung: Entfernt</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <powerConnected>false</powerConnected>
     <chargingACAdapter>true</chargingACAdapter>
     <chargingUSB>true</chargingUSB>
@@ -321,7 +321,7 @@ irname=getString("name")</extras>
   <trigger type="system_setting_changed">
     <useDefaultName>false</useDefaultName>
     <name>Systemeinstellung verändert: System next_alarm</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <settingCategory>SYSTEM</settingCategory>
     <settingName>next_alarm_formatted</settingName>
     <variable>setting</variable>
@@ -329,7 +329,7 @@ irname=getString("name")</extras>
   <trigger type="system_setting_changed">
     <useDefaultName>true</useDefaultName>
     <name>Systemeinstellung verändert: System screen_brightness</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <settingCategory>SYSTEM</settingCategory>
     <settingName>screen_brightness</settingName>
     <variable>screenBrightness</variable>
@@ -337,7 +337,7 @@ irname=getString("name")</extras>
   <trigger type="system_setting_changed">
     <useDefaultName>true</useDefaultName>
     <name>Systemeinstellung verändert: System volume_music_bt_a2dp</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <settingCategory>SYSTEM</settingCategory>
     <settingName>volume_music_bt_a2dp</settingName>
     <variable>volume</variable>
@@ -345,7 +345,7 @@ irname=getString("name")</extras>
   <trigger type="system_setting_changed">
     <useDefaultName>true</useDefaultName>
     <name>Systemeinstellung verändert: System volume_music_headphone</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <settingCategory>SYSTEM</settingCategory>
     <settingName>volume_music_headphone</settingName>
     <variable>volume</variable>
@@ -353,7 +353,7 @@ irname=getString("name")</extras>
   <trigger type="system_setting_changed">
     <useDefaultName>false</useDefaultName>
     <name>Systemeinstellung verändert: System volume_music_headset</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <settingCategory>SYSTEM</settingCategory>
     <settingName>volume_music_headset</settingName>
     <variable>volume</variable>
@@ -361,7 +361,7 @@ irname=getString("name")</extras>
   <trigger type="system_setting_changed">
     <useDefaultName>true</useDefaultName>
     <name>Systemeinstellung verändert: System volume_music_speaker</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <settingCategory>SYSTEM</settingCategory>
     <settingName>volume_music_speaker</settingName>
     <variable>volume</variable>
@@ -369,7 +369,7 @@ irname=getString("name")</extras>
   <trigger type="system_setting_changed">
     <useDefaultName>true</useDefaultName>
     <name>Systemeinstellung verändert: System volume_ring</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <settingCategory>SYSTEM</settingCategory>
     <settingName>volume_ring</settingName>
     <variable>volumeRingSound</variable>
@@ -377,7 +377,7 @@ irname=getString("name")</extras>
   <trigger type="system_setting_changed">
     <useDefaultName>true</useDefaultName>
     <name>Systemeinstellung verändert: System volume_ring_speaker</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <settingCategory>SYSTEM</settingCategory>
     <settingName>volume_ring_speaker</settingName>
     <variable>volumeNotification</variable>
@@ -385,25 +385,25 @@ irname=getString("name")</extras>
   <trigger type="interruptions_mode">
     <useDefaultName>true</useDefaultName>
     <name>Unterbrechnungen-Modus: Alle / Immer unterbrechen</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <interruptionsMode>OFF</interruptionsMode>
   </trigger>
   <trigger type="interruptions_mode">
     <useDefaultName>true</useDefaultName>
     <name>Unterbrechnungen-Modus: Keine / Nicht unterbrechen</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <interruptionsMode>NO_INTERRUPTIONS</interruptionsMode>
   </trigger>
   <trigger type="interruptions_mode">
     <useDefaultName>true</useDefaultName>
     <name>Unterbrechnungen-Modus: Nur Wecker (Android 6+)</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <interruptionsMode>ALARMS_ONLY</interruptionsMode>
   </trigger>
   <trigger type="interruptions_mode">
     <useDefaultName>true</useDefaultName>
     <name>Unterbrechnungen-Modus: Wichtig / Nur wichtige Unterbrechnungen zulassen</name>
-    <enabled>true</enabled>
+    <enabled>false</enabled>
     <interruptionsMode>IMPORTANT_INTERRUPTIONS</interruptionsMode>
   </trigger>
   <trigger type="wifi_disconnected">
@@ -1065,8 +1065,8 @@ or trigger == "HTTP Request: /fhem-amad/deviceInfo/"</expression>
   </condition>
   <condition type="expression">
     <useDefaultName>true</useDefaultName>
-    <name>Expression: trigger == "WLAN Getrennt: toGo" or trigger == "WLAN Verbunden: toGo"</name>
-    <expression>trigger == "WLAN Getrennt: toGo" or trigger == "WLAN Verbunden: toGo"</expression>
+    <name>Expression: trigger == "WLAN Verbunden: toGo"</name>
+    <expression>trigger == "WLAN Verbunden: toGo"</expression>
   </condition>
   <condition type="expression">
     <useDefaultName>false</useDefaultName>
@@ -1859,16 +1859,16 @@ Connection: close</customHTTPHeaders>
   </action>
   <action type="write_to_file">
     <useDefaultName>true</useDefaultName>
-    <name>In Datei Schreiben: getDate() - Aktiviere Flows in /storage/emulated/0/file.txt (anhängen)</name>
+    <name>In Datei Schreiben: Aktiviere Flows in /storage/emulated/0/file.txt (anhängen)</name>
     <path>/storage/emulated/0/file.txt</path>
-    <text>getDate() - Aktiviere Flows</text>
+    <text>Aktiviere Flows</text>
     <append>true</append>
   </action>
   <action type="write_to_file">
     <useDefaultName>true</useDefaultName>
-    <name>In Datei Schreiben: getDate() - Deaktiviere Flows in /storage/emulated/0/file.txt (anhängen)</name>
+    <name>In Datei Schreiben: Deaktiviere Flows in /storage/emulated/0/file.txt (anhängen)</name>
     <path>/storage/emulated/0/file.txt</path>
-    <text>getDate() - Deaktiviere Flows</text>
+    <text>Deaktiviere Flows</text>
     <append>true</append>
   </action>
   <action type="init_variable_next_alarm">
@@ -2715,7 +2715,7 @@ fhemcmd = "setreading";</script>
   <action type="script">
     <useDefaultName>false</useDefaultName>
     <name>Script: Set FHEMDATA JSON</name>
-    <script>fhemdata = "\"flowsetVersionAtDevice\": \"3.9.68\",";
+    <script>fhemdata = "\"flowsetVersionAtDevice\": \"3.9.70\",";
 
 
 
@@ -3370,7 +3370,7 @@ Soll der Assistent gelöscht werden?</text>
   </action>
   <flow type="flow">
     <name>First Run Assistant</name>
-    <group>AMADNG Info/Control Flowset v3.9.68</group>
+    <group>AMADNG Info/Control Flowset v3.9.70</group>
     <enabled>false</enabled>
     <executionPolicy>PARALLEL</executionPolicy>
     <triggercontainer id="t1" x="69.999725" y="-1487.5">
@@ -3610,8 +3610,8 @@ Auf Wiedersehen.</actioncontainer>
   </flow>
   <flow type="flow">
     <name>Informations</name>
-    <group>AMADNG Info/Control Flowset v3.9.68</group>
-    <enabled>true</enabled>
+    <group>AMADNG Info/Control Flowset v3.9.70</group>
+    <enabled>false</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <emergencyStopCount>900</emergencyStopCount>
     <triggercontainer id="t1" x="1015.0" y="-927.5">
@@ -4057,7 +4057,7 @@ Auf Wiedersehen.</actioncontainer>
   </flow>
   <flow type="flow">
     <name>Send Data to AMADCommBridge</name>
-    <group>AMADNG Info/Control Flowset v3.9.68</group>
+    <group>AMADNG Info/Control Flowset v3.9.70</group>
     <enabled>true</enabled>
     <executionPolicy>PARALLEL</executionPolicy>
     <emergencyStopCount>900</emergencyStopCount>
@@ -4079,15 +4079,19 @@ Auf Wiedersehen.</actioncontainer>
     <actioncontainer id="t13" x="-245.0" y="682.5">HTTP Request: send SET data to AMADCommBridge JSON</actioncontainer>
     <actioncontainer id="t14" x="-735.0" y="402.5">Script: Set FHEMDATA JSON First Run Assistant</actioncontainer>
     <actioncontainer id="t15" x="0.0" y="682.5">HTTP Request: send READINGSVAL data to AMADCommBridge JSON</actioncontainer>
-    <conditioncontainer id="t16" x="770.0" y="192.5">Expression: trigger == "WLAN Getrennt: toGo" or trigger == "WLAN Verbunden: toGo"</conditioncontainer>
-    <conditioncontainer id="t17" x="770.0" y="402.5">Expression: trigger == "WLAN Getrennt: toGo"</conditioncontainer>
-    <conditioncontainer id="t18" x="-245.0" y="-402.5">Host erreichbar: {global_fhemip}:{global_bridgeport}</conditioncontainer>
+    <conditioncontainer id="t16" x="-245.0" y="-402.5">Host erreichbar: {global_fhemip}:{global_bridgeport}</conditioncontainer>
+    <conditioncontainer id="t17" x="1085.0" y="227.50002">Flow Aktiv: SetCommands</conditioncontainer>
+    <conditioncontainer id="t18" x="700.0" y="-402.5">Expression: trigger == "WLAN Getrennt: toGo"</conditioncontainer>
     <actioncontainer id="t19" x="700.0" y="682.5">Setze Flow Status: Deaktivieren Informations,SetCommands</actioncontainer>
-    <actioncontainer id="t20" x="840.0" y="682.5">Setze Flow Status: Aktivieren Informations,SetCommands</actioncontainer>
-    <actioncontainer id="t21" x="875.0" y="1102.5">In Datei Schreiben: getDate() - Aktiviere Flows in /storage/emulated/0/file.txt (anhängen)</actioncontainer>
-    <actioncontainer id="t22" x="665.0" y="1102.5">In Datei Schreiben: getDate() - Deaktiviere Flows in /storage/emulated/0/file.txt (anhängen)</actioncontainer>
-    <actioncontainer id="t23" x="-490.0" y="402.5">Script: Set FHEMDATA JSON</actioncontainer>
-    <connection from="t1" to="t18" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <conditioncontainer id="t20" x="735.0001" y="227.50009">Flow Aktiv: SetCommands</conditioncontainer>
+    <conditioncontainer id="t21" x="1049.9999" y="-402.5">Expression: trigger == "WLAN Verbunden: toGo"</conditioncontainer>
+    <actioncontainer id="t22" x="1120.0" y="682.5">Setze Flow Status: Aktivieren Informations,SetCommands</actioncontainer>
+    <actioncontainer id="t23" x="1119.9998" y="1067.5">In Datei Schreiben: Aktiviere Flows in /storage/emulated/0/file.txt (anhängen)</actioncontainer>
+    <actioncontainer id="t24" x="700.0" y="1067.5">In Datei Schreiben: Deaktiviere Flows in /storage/emulated/0/file.txt (anhängen)</actioncontainer>
+    <conditioncontainer id="t25" x="1015.00006" y="157.49994">Flow Aktiv: Informations</conditioncontainer>
+    <conditioncontainer id="t26" x="665.00006" y="157.5">Flow Aktiv: Informations</conditioncontainer>
+    <actioncontainer id="t27" x="-490.0" y="402.5">Script: Set FHEMDATA JSON</actioncontainer>
+    <connection from="t1" to="t16" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t2" to="t6" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t3" to="t7" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t4" to="t14" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -4095,24 +4099,28 @@ Auf Wiedersehen.</actioncontainer>
     <connection from="t6" to="t13" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t7" to="t10" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t8" to="t15" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t11" to="t23" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t11" to="t27" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t14" to="t12" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t16" to="t17" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t17" to="t19" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t17" to="t20" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t18" to="t11" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t18" to="t2" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t18" to="t5" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t18" to="t3" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t18" to="t4" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t16" to="t11" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t16" to="t2" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t16" to="t5" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t16" to="t3" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t16" to="t4" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t16" to="t18" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t16" to="t21" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t17" to="t22" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t18" to="t16" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t18" to="t16" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t23" to="t9" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t18" to="t26" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t20" to="t19" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t21" to="t25" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t25" to="t17" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t26" to="t20" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t27" to="t9" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
   </flow>
   <flow type="flow">
     <name>SetCommands</name>
-    <group>AMADNG Info/Control Flowset v3.9.68</group>
-    <enabled>true</enabled>
+    <group>AMADNG Info/Control Flowset v3.9.70</group>
+    <enabled>false</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <emergencyStopCount>900</emergencyStopCount>
     <triggercontainer id="t1" x="-805.0" y="-3062.5">
@@ -4458,7 +4466,7 @@ Auf Wiedersehen.</actioncontainer>
   </flow>
   <flow type="flow">
     <name>Update AMAD Flowset</name>
-    <group>AMADNG Info/Control Flowset v3.9.68</group>
+    <group>AMADNG Info/Control Flowset v3.9.70</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <triggercontainer id="t1" x="420.0" y="-682.5">
@@ -4514,7 +4522,7 @@ Auf Wiedersehen.</actioncontainer>
   </flow>
   <flow type="flow">
     <name>VoiceControl</name>
-    <group>AMADNG Info/Control Flowset v3.9.68</group>
+    <group>AMADNG Info/Control Flowset v3.9.70</group>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <triggercontainer id="t1" x="70.0" y="-52.5" />
