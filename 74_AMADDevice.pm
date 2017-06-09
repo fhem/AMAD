@@ -50,7 +50,7 @@ my $missingModul = "";
 use strict;
 use warnings;
 
-eval "use Encode qw(encode;encode_utf8);1" or $missingModul .= "Encode ";
+eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
