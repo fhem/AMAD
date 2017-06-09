@@ -50,12 +50,12 @@ my $missingModul = "";
 use strict;
 use warnings;
 
-use Encode qw(encode);
+eval "use Encode qw(encode;encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3.9.69";
-my $flowsetversion = "3.9.71";
+my $modulversion = "3.9.72";
+my $flowsetversion = "3.9.72";
 
 
 
@@ -762,7 +762,7 @@ sub AMADDevice_Parse($$) {
     my $name            = $io_hash->{NAME};
 
 
-    my $decode_json        = eval{decode_json($json)};
+    my $decode_json        = eval{decode_json(encode_utf8($json))};
     if($@){
         Log3 $name, 3, "AMADDevice ($name) - error while request: $@";
         #readingsSingleUpdate($hash, "state", "error", 1);

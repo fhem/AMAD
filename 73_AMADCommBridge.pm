@@ -68,8 +68,8 @@ use TcpServerUtils;
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3.9.68";
-my $flowsetversion = "3.9.71";
+my $modulversion = "3.9.72";
+my $flowsetversion = "3.9.72";
 
 
 
