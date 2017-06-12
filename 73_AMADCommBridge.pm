@@ -68,8 +68,8 @@ use TcpServerUtils;
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3.9.72";
-my $flowsetversion = "3.9.73";
+my $modulversion = "3.9.73";
+my $flowsetversion = "3.9.74";
 
 
 
@@ -811,7 +811,7 @@ sub AMADCommBridge_ResponseProcessing($$) {
         }
     
         elsif ( $fhemcmd eq 'voiceinputvalue' ) {
-            my $fhemCmd = $decode_json->{payload}{voiceinputdata};
+            my $fhemCmd = lc($decode_json->{payload}{voiceinputdata});
         
             readingsBeginUpdate( $bhash);
             readingsBulkUpdate( $bhash, "receiveVoiceCommand", $fhemCmd, 1 );
