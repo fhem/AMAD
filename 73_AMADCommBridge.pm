@@ -68,8 +68,8 @@ use TcpServerUtils;
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3.9.73";
-my $flowsetversion = "3.9.75";
+my $modulversion = "3.9.75";
+my $flowsetversion = "3.9.76";
 
 
 
@@ -969,8 +969,8 @@ sub AMADCommBridge_ParseMsg($$) {
 
 =begin html
 
-<a name="AMAD"></a>
-<h3>AMAD</h3>
+<a name="AMADCommBridge"></a>
+<h3>AMADCommBridge</h3>
 <ul>
   <u><b>AMAD - Automagic Android Device</b></u>
   <br>
@@ -1144,8 +1144,8 @@ sub AMADCommBridge_ParseMsg($$) {
 =end html
 =begin html_DE
 
-<a name="AMAD"></a>
-<h3>AMAD</h3>
+<a name="AMADCommBridge"></a>
+<h3>AMADCommBridge</h3>
 <ul>
   <u><b>AMAD - Automagic Android Device</b></u>
   <br>
