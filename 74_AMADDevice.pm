@@ -54,7 +54,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3.9.76";
+my $modulversion = "3.9.77";
 my $flowsetversion = "3.9.76";
 
 
@@ -104,6 +104,7 @@ sub AMADDevice_Initialize($) {
                 "setUserFlowState ".
                 "setTtsMsgLang:de,en ".
                 "setVolUpDownStep:1,2,4,5 ".
+                "setVolMax ".
                 "setAPSSID ".
                 "root:0,1 ".
                 "disable:1 ".
@@ -376,6 +377,8 @@ sub AMADDevice_WriteReadings($$) {
         
         readingsBulkUpdateIfChanged($hash, $t, $v, 1) if( defined( $v ) );
         readingsBulkUpdate($hash, '.'.$t, $v) if( $t eq 'deviceState' );
+        readingsBulkUpdate($hash, $t, $v) if( $t eq 'incomingCallerName' );
+        readingsBulkUpdate($hash, $t, $v) if( $t eq 'incomingCallerNumber' );
     }
     
     readingsBulkUpdateIfChanged( $hash, "deviceState", "offline", 1 ) if( $decode_json->{payload}{airplanemode} && $decode_json->{payload}{airplanemode} eq "on" );
@@ -411,6 +414,8 @@ sub AMADDevice_Set($$@) {
     my $uri;
     my $header              = 'Connection: close';
     my $method;
+    
+    my $volMax              = AttrVal($name,'setVolMax',15);
 
 
     if( lc $cmd eq 'screenmsg' ) {
@@ -737,13 +742,14 @@ sub AMADDevice_Set($$@) {
         my $btdev = AttrVal( $name, "setBluetoothDevice", "none" );
         
         
-        my $list = "screenMsg ttsMsg volume:slider,0,1,15 mediaGoogleMusic:play/pause,stop,next,back mediaSamsungMusic:play/pause,stop,next,back mediaAmazonMusic:play/pause,stop,next,back mediaSpotifyMusic:play/pause,stop,next,back mediaTuneinRadio:play/pause,stop,next,back mediaAldiMusic:play/pause,stop,next,back mediaYouTube:play/pause,stop,next,back mediaVlcPlayer:play/pause,stop,next,back mediaAudible:play/pause,stop,next,back screenBrightness:slider,0,1,255 screen:on,off,lock,unlock openURL nextAlarmTime:time timer:slider,1,1,60 statusRequest:noArg bluetooth:on,off notifySndFile clearNotificationBar:All,Automagic activateVoiceInput:noArg volumeNotification:slider,0,1,7 volumeRingSound:slider,0,1,7 vibrate:noArg sendIntent openCall closeCall:noArg currentFlowsetUpdate:noArg installFlowSource doNotDisturb:never,always,alarmClockOnly,onlyImportant userFlowState sendSMS startDaydream:noArg volumeUp:noArg volumeDown:noArg mute:on,off";
+        my $list = "screenMsg ttsMsg mediaGoogleMusic:play/pause,stop,next,back mediaSamsungMusic:play/pause,stop,next,back mediaAmazonMusic:play/pause,stop,next,back mediaSpotifyMusic:play/pause,stop,next,back mediaTuneinRadio:play/pause,stop,next,back mediaAldiMusic:play/pause,stop,next,back mediaYouTube:play/pause,stop,next,back mediaVlcPlayer:play/pause,stop,next,back mediaAudible:play/pause,stop,next,back screenBrightness:slider,0,1,255 screen:on,off,lock,unlock openURL nextAlarmTime:time timer:slider,1,1,60 statusRequest:noArg bluetooth:on,off notifySndFile clearNotificationBar:All,Automagic activateVoiceInput:noArg volumeNotification:slider,0,1,7 volumeRingSound:slider,0,1,7 vibrate:noArg sendIntent openCall closeCall:noArg currentFlowsetUpdate:noArg installFlowSource doNotDisturb:never,always,alarmClockOnly,onlyImportant userFlowState sendSMS startDaydream:noArg volumeUp:noArg volumeDown:noArg mute:on,off";
 
         $list .= " screenOrientation:auto,landscape,portrait"   if( AttrVal( $name, "setScreenOrientation", "0" ) eq "1" );
         $list .= " screenFullscreen:on,off"                     if( AttrVal( $name, "setFullscreen", "0" ) eq "1" );
         $list .= " openApp:$apps"                               if( AttrVal( $name, "setOpenApp", "none" ) ne "none" );
         $list .= " system:reboot,shutdown,airplanemodeON"       if( AttrVal( $name, "root", "0" ) eq "1" );
         $list .= " changetoBTDevice:$btdev"                     if( AttrVal( $name, "setBluetoothDevice", "none" ) ne "none" );
+        $list .= " volume:slider,0,1,$volMax";
 
 
         return "Unknown argument $cmd, choose one of $list";
@@ -764,8 +770,7 @@ sub AMADDevice_Parse($$) {
 
     my $decode_json     = eval{decode_json(encode_utf8($json))};
     if($@){
-        Log3 $name, 3, "AMADDevice ($name) - error while request: $@";
-        #readingsSingleUpdate($hash, "state", "error", 1);
+        Log3 $name, 3, "AMADDevice ($name) - JSON error while request: $@";
         return;
     }
     
@@ -994,6 +999,8 @@ sub AMADDevice_decrypt($) {
     <li>userFlowState - set Flow/s active or inactive,<b><i>set Nexus7Wohnzimmer Badezimmer:inactive vorheizen</i> or <i>set Nexus7Wohnzimmer Badezimmer vorheizen,Nachtlicht Steven:inactive</i></b></li>
     <li>vibrate - vibrate Android device</li>
     <li>volume - set media volume. Works on internal speaker or, if connected, bluetooth speaker or speaker connected via stereo jack</li>
+    <li>volumeUp - Increases the volume by the value from the attribute. Is no Attribut set, the default is 2</li>
+    <li>volumeDown - Decreases the volume by the value from the attribute. Is no Attribut set, the default is 2.</li>
     <li>volumeNotification - set notifications volume</li>
   </ul>
   <br>
@@ -1007,10 +1014,12 @@ sub AMADDevice_decrypt($) {
     <li>screenLock - Locks screen with request for PIN. <b>attribute setScreenlockPIN - enter PIN here. Only use numbers, 4-16 numbers required.</b></li>
     <li>screenOrientation - Auto,Landscape,Portait, set screen orientation (automatic, horizontal, vertical). <b>attribute setScreenOrientation</b></li>
     <li>system - issue system command (only with rooted Android devices). reboot,shutdown,airplanemodeON (can only be switched ON) <b>attribute root</b>, in Automagic "Preferences" "Root functions" need to be enabled.</li>
-    <li>setAPSSID - set WLAN AccesPoint SSID to prevent WLAN sleeps</li>
-    <li>setNotifySndFilePath - set systempath to notifyfile (default /storage/emulated/0/Notifications/</li>
-    <li>setTtsMsgSpeed - set speaking speed for TTS (Value between 0.5 - 4.0, 0.5 Step) default is 1.0</li>
-    <li>setTtsMsgLang - set speaking language for TTS, de or en (default is de)</li>
+    <li>setAPSSID - Sets WLAN AccesPoint SSID to prevent WLAN sleeps</li>
+    <li>setNotifySndFilePath - Sets systempath to notifyfile (default /storage/emulated/0/Notifications/</li>
+    <li>setTtsMsgSpeed - Sets speaking speed for TTS (Value between 0.5 - 4.0, 0.5 Step) default is 1.0</li>
+    <li>setTtsMsgLang - Sets speaking language for TTS, de or en (default is de)</li>
+    <li>setVolMax - Sets the maximum volume for the volume Slider</li>
+    <li>setVolUpDownStep - Sets the Stepvalue for volumeUp/Down</li>
     <br>
     To be able to use "openApp" the corresponding attribute "setOpenApp" needs to contain the app package name.
     <br><br>
@@ -1169,7 +1178,9 @@ sub AMADDevice_decrypt($) {
     <li>ttsMsg - versendet eine Nachricht welche als Sprachnachricht ausgegeben wird</li>
     <li>userFlowState - aktiviert oder deaktiviert einen oder mehrere Flows,<b><i>set Nexus7Wohnzimmer Badezimmer vorheizen:inactive</i> oder <i>set Nexus7Wohnzimmer Badezimmer vorheizen,Nachtlicht Steven:inactive</i></b></li>
     <li>vibrate - l&auml;sst das Androidger&auml;t vibrieren</li>
-    <li>volume - setzt die Medialautst&auml;rke. Entweder die internen Lautsprecher oder sofern angeschlossen die Bluetoothlautsprecher und per Klinkenstecker angeschlossene Lautsprecher, + oder - vor dem Wert reduziert die aktuelle Lautst&auml;rke um den Wert</li>
+    <li>volume - setzt die Medialautst&auml;rke. Entweder die internen Lautsprecher oder sofern angeschlossen die Bluetoothlautsprecher und per Klinkenstecker angeschlossene Lautsprecher, + oder - vor dem Wert reduziert die aktuelle Lautst&auml;rke um den Wert. Der maximale Sliderwert kann &uuml;ber das Attribut setVolMax geregelt werden.</li>
+    <li>volumeUp - erh&ouml;t die Lautst&auml;rke um den angegeben Wert im entsprechenden Attribut. Ist kein Attribut angegeben wird per default 2 genommen.</li>
+    <li>volumeDown - reduziert die Lautst&auml;rke um den angegeben Wert im entsprechenden Attribut. Ist kein Attribut angegeben wird per default 2 genommen.</li>
     <li>volumeNotification - setzt die Benachrichtigungslautst&auml;rke.</li>
   </ul>
   <br>
@@ -1188,6 +1199,8 @@ sub AMADDevice_decrypt($) {
     <li>setNotifySndFilePath - setzt den korrekten Systempfad zur Notifydatei (default ist /storage/emulated/0/Notifications/</li>
     <li>setTtsMsgSpeed - setzt die Sprachgeschwindigkeit bei der Sprachausgabe(Werte zwischen 0.5 bis 4.0 in 0.5er Schritten) default ist 1.0</li>
     <li>setTtsMsgSpeed - setzt die Sprache bei der Sprachausgabe, de oder en (default ist de)</li>
+    <li>setVolUpDownStep - setzt den Step f&uuml;r volumeUp und volumeDown</li>
+    <li>setVolMax - setzt die maximale Volume Gr&uoml;e</li>
     <br>
     Um openApp verwenden zu k&ouml;nnen, muss als Attribut der Package Name der App angegeben werden.
     <br><br>
