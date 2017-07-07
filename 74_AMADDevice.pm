@@ -54,7 +54,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3.9.77";
+my $modulversion = "3.9.78";
 my $flowsetversion = "3.9.76";
 
 
@@ -105,6 +105,7 @@ sub AMADDevice_Initialize($) {
                 "setTtsMsgLang:de,en ".
                 "setVolUpDownStep:1,2,4,5 ".
                 "setVolMax ".
+                "setVolStep:2,3,4,5 ".
                 "setNotifyVolMax ".
                 "setRingSoundVolMax ".
                 "setAPSSID ".
@@ -377,7 +378,11 @@ sub AMADDevice_WriteReadings($$) {
         $v =~ s/\bnull\b/off/g if( ($t eq "nextAlarmDay" or $t eq "nextAlarmTime") and $v eq "null" );
         $v =~ s/\bnull\b//g;
         
-        readingsBulkUpdateIfChanged($hash, $t, $v, 1) if( defined( $v ) );
+        readingsBulkUpdateIfChanged($hash, $t, $v, 1) if( defined( $v ) and ($t ne 'deviceState'
+                                                            or $t ne 'incomingCallerName'
+                                                            or $t ne 'incomingCallerNumber')
+                                                        );
+                                                            
         readingsBulkUpdate($hash, '.'.$t, $v) if( $t eq 'deviceState' );
         readingsBulkUpdate($hash, $t, $v) if( $t eq 'incomingCallerName' );
         readingsBulkUpdate($hash, $t, $v) if( $t eq 'incomingCallerNumber' );
@@ -418,6 +423,7 @@ sub AMADDevice_Set($$@) {
     my $method;
     
     my $volMax              = AttrVal($name,'setVolMax',15);
+    my $volStep             = AttrVal($name,'setVolStep',1);
     my $notifyVolMax        = AttrVal($name,'setNotifyVolMax',7);
     my $ringSoundVolMax     = AttrVal($name,'setRingSoundVolMax',7);
 
@@ -753,7 +759,7 @@ sub AMADDevice_Set($$@) {
         $list .= " openApp:$apps"                               if( AttrVal( $name, "setOpenApp", "none" ) ne "none" );
         $list .= " system:reboot,shutdown,airplanemodeON"       if( AttrVal( $name, "root", "0" ) eq "1" );
         $list .= " changetoBTDevice:$btdev"                     if( AttrVal( $name, "setBluetoothDevice", "none" ) ne "none" );
-        $list .= " volume:slider,0,1,$volMax";
+        $list .= " volume:slider,0,$volStep,$volMax";
         $list .= " volumeNotification:slider,0,1,$notifyVolMax";
         $list .= " volumeRingSound:slider,0,1,$ringSoundVolMax";
         
