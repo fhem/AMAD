@@ -70,7 +70,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3.9.77";
+my $modulversion = "3.9.80";
 my $flowsetversion = "3.9.76";
 
 
@@ -103,7 +103,7 @@ sub AMADCommBridge_Initialize($) {
     $hash->{ReadFn}     = "AMADCommBridge_Read";
     $hash->{WriteFn}    = "AMADCommBridge_Write";
     $hash->{Clients}    = ":AMADDevice:";
-    $hash->{MatchList}  = { "1:AMADDevice"      => '{"amad": {"amad_id":.+}}' };
+    $hash->{MatchList}  = { "1:AMADDevice"      => '{"amad": \{"amad_id":.+}}' };
     
     
     # Consumer
@@ -133,7 +133,7 @@ sub AMADCommBridge_Define($$) {
     my @a = split( "[ \t][ \t]*", $def );
 
     
-    return "too few parameters: define <name> AMADCommBridge '<tcp-port>'" if( @a < 2) and ( @a > 3);
+    return "too few parameters: define <name> AMADCommBridge '<tcp-port>'" if( @a < 2 and @a > 3 );
     return "Cannot define a HEOS device. Perl modul $missingModul is missing." if ( $missingModul );
     
     my $name                = $a[0];

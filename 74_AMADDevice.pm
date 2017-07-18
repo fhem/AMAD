@@ -54,7 +54,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3.9.79";
+my $modulversion = "3.9.80";
 my $flowsetversion = "3.9.76";
 
 
@@ -81,7 +81,7 @@ sub AMADDevice_Initialize($) {
 
     my ($hash) = @_;
     
-    $hash->{Match}          = '{"amad": {"amad_id":.+}}';
+    $hash->{Match}          = '{"amad": \{"amad_id":.+}}';
 
 
     $hash->{SetFn}      = "AMADDevice_Set";
@@ -881,181 +881,7 @@ sub AMADDevice_decrypt($) {
 
 <a name="AMADDevice"></a>
 <h3>AMADDevice</h3>
-<ul>
-  <u><b>AMADDevice - Automagic Android Device</b></u>
-  <br>
-  This module integrates Android devices into FHEM and displays several settings <b><u>using the Android app "Automagic"</u></b>.
-  Automagic is comparable to the "Tasker" app for automating tasks and configuration settings. But Automagic is more user-friendly. The "Automagic Premium" app currently costs EUR 2.90.
-  <br>
-  Any information retrievable by Automagic can be displayed in FHEM by this module. Just define your own Automagic-"flow" and send the data to the AMADDeviceCommBridge. One even can control several actions on Android devices.
-  <br>
-  To be able to make use of all these functions the Automagic app and additional flows need to be installed on the Android device. The flows can be retrieved from the FHEM directory, the app can be bought in Google Play Store.
-  <br><br>
-  <b>How to use AMADDevice?</b>
-  <ul>
-    <li>install the "Automagic Premium" app from the Google Play store.</li>
-    <li>install the flowset 74_AMADDeviceautomagicFlowset$VERSION.xml from the directory $INSTALLFHEM/FHEM/lib/ on your Android device and activate.</li>
-  </ul>
-  <br>
-  Now you need to define a device in FHEM.
-  <br><br>
-  <a name="AMADDevicedefine"></a>
-  <b>Define</b>
-  <ul><br>
-    <code>define &lt;name&gt; AMADDevice &lt;IP-ADDRESS&gt;</code>
-    <br><br>
-    Example:
-    <ul><br>
-      <code>define WandTabletWohnzimmer AMADDevice 192.168.0.23</code><br>
-    </ul>
-    <br>
-    With this command two new AMADDevice devices in a room called AMADDevice are created. The parameter &lt;IP-ADDRESS&lt; defines the IP address of your Android device. The second device created is the AMADDeviceCommBridge which serves as a communication device from each Android device to FHEM.<br>
-    !!!Coming Soon!!! The communication port of each AMADDevice device may be set by the definition of the "port" attribute. <b>One needs background knowledge of Automagic and HTTP requests as this port will be set in the HTTP request trigger of both flows, therefore the port also needs to be set there.
-    <br>
-    The communication port of the AMADDeviceCommBridge device can easily be changed within the attribut "port".</b>
-  </ul>
-  <br><a name="AMADDeviceCommBridge"></a>
-  <b>AMADDevice Communication Bridge</b>
-  <ul>
-    Creating your first AMADDevice device automatically creates the AMADDeviceCommBridge device in the room AMADDevice. With the help  of the AMADDeviceCommBridge any Android device communicates initially to FHEM.<b>To make the IP addresse of the FHEM server known to the Android device, the FHEM server IP address needs to be configured in the AMADDeviceCommBridge. WITHOUT THIS STEP THE AMADDeviceCommBridge WILL NOT WORK PROPERLY.</b><br>
-    Please us the following command for configuration of the FHEM server IP address in the AMADDeviceCommBridge: <i>set AMADDeviceCommBridge fhemServerIP &lt;FHEM-IP&gt;.</i><br>
-    Additionally the <i>expertMode</i> may be configured. By this setting a direct communication with FHEM will be established without the restriction of needing to make use of a notify to execute set commands.
-  </ul><br>
-  <br>
-  <b><u>You are finished now! After 15 seconds latest the readings of your AMADDevice Android device should be updated. Consequently each 15 seconds a status request will be sent. If the state of your AMADDevice Android device does not change to "active" over a longer period of time one should take a look into the log file for error messages.</u></b>
-  <br><br><br>
-  <a name="AMADDevicereadings"></a>
-  <b>Readings</b>
-  <ul>
-    <li>airplanemode - on/off, state of the aeroplane mode</li>
-    <li>androidVersion - currently installed version of Android</li>
-    <li>automagicState - state of the Automagic App <b>(prerequisite Android >4.3). In case you have Android >4.3 and the reading says "not supported", you need to enable Automagic inside Android / Settings / Sound & notification / Notification access</b></li>
-    <li>batteryHealth - the health of the battery (1=unknown, 2=good, 3=overheat, 4=dead, 5=over voltage, 6=unspecified failure, 7=cold)</li>
-    <li>batterytemperature - the temperature of the battery</li>
-    <li>bluetooth - on/off, bluetooth state</li>
-    <li>checkActiveTask - state of an app (needs to be defined beforehand). 0=not active or not active in foreground, 1=active in foreground, <b>see note below</b></li>
-    <li>connectedBTdevices - list of all devices connected via bluetooth</li>
-    <li>connectedBTdevicesMAC - list of MAC addresses of all devices connected via bluetooth</li>
-    <li>currentMusicAlbum - currently playing album of mediaplayer</li>
-    <li>currentMusicApp - currently playing player app (Amazon Music, Google Play Music, Google Play Video, Spotify, YouTube, TuneIn Player, Aldi Life Music)</li>
-    <li>currentMusicArtist - currently playing artist of mediaplayer</li>
-    <li>currentMusicIcon - cover of currently play album<b>Noch nicht fertig implementiert</b></li>
-    <li>currentMusicState - state of currently/last used mediaplayer</li>
-    <li>currentMusicTrack - currently playing song title of mediaplayer</li>
-    <li>daydream - on/off, daydream currently active</li>
-    <li>deviceState - state of Android devices. unknown, online, offline.</li>
-    <li>doNotDisturb - state of do not Disturb Mode</li>
-    <li>dockingState - undocked/docked, Android device in docking station</li>
-    <li>flow_SetCommands - active/inactive, state of SetCommands flow</li>
-    <li>flow_informations - active/inactive, state of Informations flow</li>
-    <li>flowsetVersionAtDevice - currently installed version of the flowsets on the Android device</li>
-    <li>incomingCallerName - Callername from last Call</li>
-    <li>incomingCallerNumber - Callernumber from last Call</li>
-    <li>incommingWhatsAppMessageFrom - last WhatsApp message</li>
-    <li>incommingWhatsTelegramMessageFrom - last telegram message</li>
-    <li>intentRadioName - name of the most-recent streamed intent radio</li>
-    <li>intentRadioState - state of intent radio player</li>
-    <li>keyguardSet - 0/1 keyguard set, 0=no 1=yes, does not indicate whether it is currently active</li>
-    <li>lastSetCommandError - last error message of a set command</li>
-    <li>lastSetCommandState - last state of a set command, command send successful/command send unsuccessful</li>
-    <li>lastStatusRequestError - last error message of a statusRequest command</li>
-    <li>lastStatusRequestState - ast state of a statusRequest command, command send successful/command send unsuccessful</li>
-    <li>nextAlarmDay - currently set day of alarm</li>
-    <li>nextAlarmState - alert/done, current state of "Clock" stock-app</li>
-    <li>nextAlarmTime - currently set time of alarm</li>
-    <li>powerLevel - state of battery in %</li>
-    <li>powerPlugged - 0=no/1,2=yes, power supply connected</li>
-    <li>screen - on locked,unlocked/off locked,unlocked, state of display</li>
-    <li>screenBrightness - 0-255, level of screen-brightness</li>
-    <li>screenFullscreen - on/off, full screen mode</li>
-    <li>screenOrientation - Landscape/Portrait, screen orientation (horizontal,vertical)</li>
-    <li>screenOrientationMode - auto/manual, mode for screen orientation</li>
-    <li>state - current state of AMADDevice device</li>
-    <li>userFlowState - current state of a Flow, established under setUserFlowState Attribut</li>
-    <li>volume - media volume setting</li>
-    <li>volumeNotification - notification volume setting</li>
-    <br>
-    Prerequisite for using the reading checkActivTask the package name of the application to be checked needs to be defined in the attribute <i>checkActiveTask</i>. Example: <i>attr Nexus10Wohnzimmer
-    checkActiveTask com.android.chrome</i> f&uuml;r den Chrome Browser.
-    <br><br>
-  </ul>
-  <br><br>
-  <a name="AMADDeviceset"></a>
-  <b>Set</b>
-  <ul>
-    <li>activateVoiceInput - start voice input on Android device</li>
-    <li>bluetooth - on/off, switch bluetooth on/off</li>
-    <li>clearNotificationBar - All/Automagic, deletes all or only Automagic notifications in status bar</li>
-    <li>closeCall - hang up a running call</li>
-    <li>currentFlowsetUpdate - start flowset update on Android device</li>
-    <li>installFlowSource - install a Automagic flow on device, <u>XML file must be stored in /tmp/ with extension xml</u>. <b>Example:</b> <i>set TabletWohnzimmer installFlowSource WlanUebwerwachen.xml</i></li>
-    <li>doNotDisturb - sets the do not Disturb Mode, always Disturb, never Disturb, alarmClockOnly alarm Clock only, onlyImportant only important Disturbs</li>
-    <li>mediaAmazonMusic - play/stop/next/back , controlling the amazon music media player</li>
-    <li>mediaGoogleMusic - play/stop/next/back , controlling the google play music media player</li>
-    <li>mediaSpotifyMusic - play/stop/next/back , controlling the spotify media player</li>
-    <li>mediaTuneinRadio - play/stop/next/back , controlling the TuneinRadio media player</li>
-    <li>mediaAldiMusic - play/stop/next/back , controlling the Aldi music media player</li>
-    <li>mediaAudible - play/stop/next/back , controlling the Audible media player</li>
-    <li>mediaYouTube - play/stop/next/back , controlling the YouTube media player</li>
-    <li>mediaVlcPlayer - play/stop/next/back , controlling the VLC media player</li>
-    <li>nextAlarmTime - sets the alarm time. Only valid for the next 24 hours.</li>
-    <li>notifySndFile - plays a media-file <b>which by default needs to be stored in the folder "/storage/emulated/0/Notifications/" of the Android device. You may use the attribute setNotifySndFilePath for defining a different folder.</b></li>
-    <li>openCall - initial a call and hang up after optional time / set DEVICE openCall 0176354 10 call this number and hang up after 10s</li>
-    <li>screenBrightness - 0-255, set screen brighness</li>
-    <li>screenMsg - display message on screen of Android device</li>
-    <li>sendintent - send intent string <u>Example:</u><i> set $AMADDeviceDEVICE sendIntent org.smblott.intentradio.PLAY url http://stream.klassikradio.de/live/mp3-192/stream.klassikradio.de/play.m3u name Klassikradio</i>, first parameter contains the action, second parameter contains the extra. At most two extras can be used.</li>
-    <li>sendSMS - Sends an SMS to a specific phone number. Bsp.: sendSMS Dies ist ein Test|555487263</li>
-    <li>startDaydream - start Daydream</li>
-    <li>statusRequest - Get a new status report of Android device. Not all readings can be updated using a statusRequest as some readings are only updated if the value of the reading changes.</li>
-    <li>timer - set a countdown timer in the "Clock" stock app. Only seconds are allowed as parameter.</li>
-    <li>ttsMsg - send a message which will be played as voice message</li>
-    <li>userFlowState - set Flow/s active or inactive,<b><i>set Nexus7Wohnzimmer Badezimmer:inactive vorheizen</i> or <i>set Nexus7Wohnzimmer Badezimmer vorheizen,Nachtlicht Steven:inactive</i></b></li>
-    <li>vibrate - vibrate Android device</li>
-    <li>volume - set media volume. Works on internal speaker or, if connected, bluetooth speaker or speaker connected via stereo jack</li>
-    <li>volumeUp - Increases the volume by the value from the attribute. Is no Attribut set, the default is 2</li>
-    <li>volumeDown - Decreases the volume by the value from the attribute. Is no Attribut set, the default is 2.</li>
-    <li>volumeNotification - set notifications volume</li>
-  </ul>
-  <br>
-  <b>Set (depending on attribute values)</b>
-  <ul>
-    <li>changetoBtDevice - switch to another bluetooth device. <b>Attribute setBluetoothDevice needs to be set. See note below!</b></li>
-    <li>openApp - start an app. <b>attribute setOpenApp</b></li>
-    <li>openURL - opens a URLS in the standard browser as long as no other browser is set by the <b>attribute setOpenUrlBrowser</b>.<b>Example:</b><i> attr Tablet setOpenUrlBrowser de.ozerov.fully|de.ozerov.fully.MainActivity, first parameter: package name, second parameter: Class Name</i></li>
-    <li>screen - on/off/lock/unlock, switch screen on/off or lock/unlock screen. In Automagic "Preferences" the "Device admin functions" need to be enabled, otherwise "Screen off" does not work. <b>attribute setScreenOnForTimer</b> changes the time the display remains switched on!</li>
-    <li>screenFullscreen - on/off, activates/deactivates full screen mode. <b>attribute setFullscreen</b></li>
-    <li>screenLock - Locks screen with request for PIN. <b>attribute setScreenlockPIN - enter PIN here. Only use numbers, 4-16 numbers required.</b></li>
-    <li>screenOrientation - Auto,Landscape,Portait, set screen orientation (automatic, horizontal, vertical). <b>attribute setScreenOrientation</b></li>
-    <li>system - issue system command (only with rooted Android devices). reboot,shutdown,airplanemodeON (can only be switched ON) <b>attribute root</b>, in Automagic "Preferences" "Root functions" need to be enabled.</li>
-    <li>setAPSSID - Sets WLAN AccesPoint SSID to prevent WLAN sleeps</li>
-    <li>setNotifySndFilePath - Sets systempath to notifyfile (default /storage/emulated/0/Notifications/</li>
-    <li>setTtsMsgSpeed - Sets speaking speed for TTS (Value between 0.5 - 4.0, 0.5 Step) default is 1.0</li>
-    <li>setTtsMsgLang - Sets speaking language for TTS, de or en (default is de)</li>
-    <li>setVolMax - Sets the maximum volume for the volume Slider</li>
-    <li>setNotifyVolMax - Sets the maximum volume for the notify volume Slider</li>
-    <li>setRingSoundVolMax - Sets the maximum volume for the ring sound volume Slider</li>
-    <li>setVolUpDownStep - Sets the Stepvalue for volumeUp/Down</li>
-    <br>
-    To be able to use "openApp" the corresponding attribute "setOpenApp" needs to contain the app package name.
-    <br><br>
-    To be able to switch between bluetooth devices the attribute "setBluetoothDevice" needs to contain (a list of) bluetooth devices defined as follows: <b>attr &lt;DEVICE&gt; BTdeviceName1|MAC,BTDeviceName2|MAC</b> No spaces are allowed in any BTdeviceName. Defining MAC please make sure to use the character : (colon) after each  second digit/character.<br>
-    Example: <i>attr Nexus10Wohnzimmer setBluetoothDevice Logitech_BT_Adapter|AB:12:CD:34:EF:32,Anker_A3565|GH:56:IJ:78:KL:76</i> 
-  </ul>
-  <br><br>
-  <a name="AMADDevicestate"></a>
-  <b>state</b>
-  <ul>
-    <li>initialized - shown after initial define.</li>
-    <li>active - device is active.</li>
-    <li>disabled - device is disabled by the attribute "disable".</li>
-  </ul>
-  <br><br><br>
-  <u><b>Further examples and reading:</b></u>
-  <ul><br>
-    <a href="http://www.fhemwiki.de/wiki/AMADDevice#Anwendungsbeispiele">Wiki page for AMADDevice (german only)</a>
-  </ul>
-  <br><br><br>
-</ul>
+
 
 =end html
 =begin html_DE
