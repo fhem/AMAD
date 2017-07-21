@@ -902,7 +902,7 @@ sub AMADDevice_decrypt($) {
   <ul>
     <li>stelle sicher das als aller erstes die AMADCommBridge in FHEM definiert wurde</li>
     <li>installiere die App "Automagic Premium" aus dem PlayStore.</li>
-    <li>installiere das Flowset 74_AMADDeviceautomagicFlowset$VERSION.xml aus dem Ordner $INSTALLFHEM/FHEM/lib/ auf dem Androidger&auml;t
+    <li>installiere das Flowset 74_AMADDeviceautomagicFlowset$VERSION.xml aus dem Ordner $INSTALLFHEM/FHEM/lib/ auf dem Androidger&auml;t</li>
     <li>aktiviere den Installationsassistanten Flow in Automagic. Wenn man nun Automagic in den Hintergrund schickt, z.B. Hometaste dr&uuml;cken, startet der Assistant und legt automatisch ein Device für das Androidger&auml;t an.</li>
   </ul>
   <br><br>
@@ -916,7 +916,7 @@ sub AMADDevice_decrypt($) {
     <br><br>
     Beispiel:
     <ul><br>
-      <code>define WandTabletWohnzimmer AMADDevice 192.168.0.23 123456 IODev=NAME_des_AMADCommBridge_Devices<code><br>
+      <code>define WandTabletWohnzimmer AMADDevice 192.168.0.23 123456 IODev=NAME_des_AMADCommBridge_Devices</code><br>
     </ul>
     <br>
     In diesem Fall wird ein AMADDevice von Hand angelegt. Die AMAD_ID, hier 123456, mu&szlig; auch exakt so als globale Variable in Automagic eingetragen sein.

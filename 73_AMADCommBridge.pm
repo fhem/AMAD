@@ -544,19 +544,27 @@ sub AMADCommBridge_Open($) {
     my $port    = $hash->{PORT};
     
 
-    # Oeffnen des TCP Sockets
-    my $ret = TcpServer_Open( $hash, $port, "global" );
+    if( not defined($hash->{FD}) and (! $hash->{FD}) ) {
+        # Oeffnen des TCP Sockets
+        my $ret = TcpServer_Open( $hash, $port, "global" );
     
-    if( $ret && !$init_done ) {
+        if( $ret && !$init_done ) {
     
-        Log3 $name, 3, "AMADCommBridge ($name) - $ret. Exiting.";
-        exit(1);
+            Log3 $name, 3, "AMADCommBridge ($name) - $ret. Exiting.";
+            exit(1);
+        }
+    
+        readingsSingleUpdate ( $hash, "state", "opened", 1 ) if( defined($hash->{FD}) );
+        Log3 $name, 3, "AMADCommBridge ($name) - Socket opened.";
+
+        return $ret;
+    
+    } else {
+    
+        Log3 $name, 3, "AMADCommBridge ($name) - Socket already opened";
     }
     
-    readingsSingleUpdate ( $hash, "state", "opened", 1 ) if( defined($hash->{FD}) );
-    Log3 $name, 3, "AMADCommBridge ($name) - Socket opened.";
-
-    return $ret;
+    return;
 }
 
 sub AMADCommBridge_Close($) {
