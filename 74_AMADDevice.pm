@@ -900,38 +900,27 @@ sub AMADDevice_decrypt($) {
   <br><br>
   <b>Wie genau verwendet man nun AMADDevice?</b>
   <ul>
-    <li>man installiert die App "Automagic Premium" aus dem PlayStore.</li>
-    <li>dann installiert man das Flowset 74_AMADDeviceautomagicFlowset$VERSION.xml aus dem Ordner $INSTALLFHEM/FHEM/lib/ auf dem Androidger&auml;t und aktiviert die Flows.</li>
+    <li>stelle sicher das als aller erstes die AMADCommBridge in FHEM definiert wurde</li>
+    <li>installiere die App "Automagic Premium" aus dem PlayStore.</li>
+    <li>installiere das Flowset 74_AMADDeviceautomagicFlowset$VERSION.xml aus dem Ordner $INSTALLFHEM/FHEM/lib/ auf dem Androidger&auml;t
+    <li>aktiviere den Installationsassistanten Flow in Automagic. Wenn man nun Automagic in den Hintergrund schickt, z.B. Hometaste dr&uuml;cken, startet der Assistant und legt automatisch ein Device für das Androidger&auml;t an.</li>
   </ul>
-  <br>
-  Es mu&szlig; noch ein Device in FHEM anlegt werden.
+  <br><br>
+  <u><b>Ein AMADDevice Ger&auml;t von Hand anlegen.</b></u>
   <br><br>
   <a name="AMADDevicedefine"></a>
   <b>Define</b>
   <ul><br>
-    <code>define &lt;name&gt; AMADDevice &lt;IP-ADRESSE&gt;</code>
+  10.6.9.10 1496497380000 IODev=AMADBridge
+    <code>define &lt;name&gt; AMADDevice &lt;IP-ADRESSE&gt; &lt;AMAD_ID&gt; IODev=&lt;IODEVICE&gt;</code>
     <br><br>
     Beispiel:
     <ul><br>
-      <code>define WandTabletWohnzimmer AMADDevice 192.168.0.23</code><br>
+      <code>define WandTabletWohnzimmer AMADDevice 192.168.0.23 123456 IODev=NAME_des_AMADCommBridge_Devices<code><br>
     </ul>
     <br>
-    Diese Anweisung erstellt zwei neues AMADDevice-Device im Raum AMADDevice.Der Parameter &lt;IP-ADRESSE&gt; legt die IP Adresse des Android Ger&auml;tes fest.<br>
-    Das zweite Device ist die AMADDeviceCommBridge welche als Kommunikationsbr&uuml;cke vom Androidger&auml;t zu FHEM diehnt. !!!Comming Soon!!! Wer den Port &auml;ndern m&ouml;chte, kann dies &uuml;ber das Attribut "port" tun. <b>Ihr solltet aber wissen was Ihr tut, da dieser Port im HTTP Request Trigger der beiden Flows eingestellt ist. Demzufolge mu&szlig; der Port dort auch ge&auml;ndert werden. Der Port f&uuml;r die Bridge kann ohne Probleme im Bridge Device mittels dem Attribut "port" ver&auml;ndert werden.
-    <br>
-    Der Port f&uuml;r die Bridge kann ohne Probleme im Bridge Device mittels dem Attribut "port" ver&auml;ndert werden.</b>
+    In diesem Fall wird ein AMADDevice von Hand angelegt. Die AMAD_ID, hier 123456, mu&szlig; auch exakt so als globale Variable in Automagic eingetragen sein.
   </ul>
-  <br><a name="AMADDeviceCommBridge"></a>
-  <b>AMADDevice Communication Bridge</b>
-  <ul>
-    Beim ersten anlegen einer AMADDevice Deviceinstanz wird automatisch ein Ger&auml;t Namens AMADDeviceCommBridge im Raum AMADDevice mit angelegt. Dieses Ger&auml;t diehnt zur Kommunikation vom Androidger&auml;t zu FHEM ohne das zuvor eine Anfrage von FHEM aus ging. <b>Damit das Androidger&auml;t die IP von FHEM kennt, muss diese sofort nach dem anlegen der Bridge &uuml;ber den set Befehl in ein entsprechendes Reading in die Bridge  geschrieben werden. DAS IST SUPER WICHTIG UND F&Uuml;R DIE FUNKTION DER BRIDGE NOTWENDIG.</b><br>
-    Hierf&uuml;r mu&szlig; folgender Befehl ausgef&uuml;hrt werden. <i>set AMADDeviceCommBridge fhemServerIP &lt;FHEM-IP&gt;.</i><br>
-    Als zweites Reading kann <i>expertMode</i> gesetzen werden. Mit diesem Reading wird eine unmittelbare Komminikation mit FHEM erreicht ohne die Einschr&auml;nkung &uuml;ber ein
-    Notify gehen zu m&uuml;ssen und nur reine set Befehle ausf&uuml;hren zu k&ouml;nnen.
-  </ul><br>
-  <b><u>NUN bitte die Flows AKTIVIEREN!!!</u></b><br>
-  <br>
-  <b><u>Fertig! Nach anlegen der Ger&auml;teinstanz und dem eintragen der fhemServerIP in der CommBridge sollten nach sp&auml;testens 15 Sekunden bereits die ersten Readings reinkommen. Nun wird alle 15 Sekunden probiert einen Status Request erfolgreich ab zu schlie&szlig;en. Wenn der Status sich &uuml;ber einen l&auml;ngeren Zeitraum nicht auf "active" &auml;ndert, sollte man im Log nach eventuellen Fehlern suchen.</u></b>
   <br><br><br>
   <a name="AMADDevicereadings"></a>
   <b>Readings</b>
