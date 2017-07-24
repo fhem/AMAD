@@ -70,8 +70,8 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "3.9.80";
-my $flowsetversion = "3.9.76";
+my $modulversion = "4.0.0";
+my $flowsetversion = "4.0.0";
 
 
 
@@ -979,7 +979,61 @@ sub AMADCommBridge_ParseMsg($$) {
 
 <a name="AMADCommBridge"></a>
 <h3>AMADCommBridge</h3>
-comming soon
+<ul>
+  <u><b>AMAD - Automagic Android Device</b></u></p>
+  <b>AMADCommBridge - Communication bridge for all AMAD devices</b>
+  </br>
+  This module is the central point for the successful integration of Android devices in FHEM. It also provides a link level between AMAD supported devices and FHEM. All communication between AMAD Android and FHEM runs through this interface.</br>
+  Therefore, the initial setup of an AMAD device is also performed exactly via this module instance.
+  </br></br>
+  In order to successfully establish an Android device in FHEM, an AMADCommBridge device must be created in the first step.
+  <br><br>
+  <a name="AMADCommBridgedefine"></a>
+  <b>Define</b>
+  <ul><br>
+    <code>define &lt;name&gt; AMADCommBridge</code>
+    <br><br>
+    Example:
+    <ul><br>
+      <code>define AMADBridge AMADCommBridge</code><br>
+    </ul>
+    <br>
+    This statement creates a new AMADCommBridge device named AMADBridge.
+  </ul></br>
+  In the following, only the Flowset has to be installed on the Android device and the Flow 'First Run Assistant' run. (Simply press the Homebutton)</br>
+  The wizard then guides you through the setup of your AMAD device and ensures that at the end of the installation process the Android device is created as an AMAD device in FHEM.
+  </ul>
+  <br><br>
+  <a name="AMADCommBridgereadings"></a>
+  <b>Readings</b>
+  <ul><br>
+    <li>JSON_ERROR - JSON Error message reported by Perl</li>
+    <li>JSON_ERROR_STRING - The string that caused the JSON error message</li>
+    <li>fhemServerIP - The IP address of the FHEM server, is set by the module based on the JSON string from the installation wizard. Can also be set by user using set command</li>
+    <li>receiveFhemCommand - is set the fhemControlMode attribute to trigger, the reading is set as soon as an FHEM command is sent. A notification can then be triggered.</br>
+    If set instead of trigger setControl as value for fhemControlMode, the reading is not executed but the set command executed immediately.</li>
+    <li>receiveVoiceCommand - The speech control is activated by AMAD (set DEVICE activateVoiceInput), the last recognized voice command is written into this reading.</li>
+    <li>receiveVoiceDevice - Name of the device from where the last recognized voice command was sent</li>
+    <li>state - state of the Bridge, open, closed</li>
+  </ul>
+  <br><br>
+  <a name="AMADCommBridgeattribute"></a>
+  <b>Attributes</b>
+  <ul><br>
+    <li>allowFrom - Regexp the allowed IP addresses or hostnames. If this attribute is set, only connections from these addresses are accepted.</br>
+    Attention: If allowfrom is not set, and no kind allowed instance is defined, and the remote has a non-local address, then the connection is rejected. The following addresses are considered local:</br>
+    IPV4: 127/8, 10/8, 192.168/16, 172.16/10, 169.254/16</br>
+    IPV6: ::1, fe80/10</li>
+    <li>debugJSON - If set to 1, JSON error messages are written in readings. See JSON_ERROR * under Readings</li>
+    <li>fhemControlMode - Controls the permissible type of control of FHEM devices. You can control the bridge in two ways FHEM devices. Either by direct FHEM command from a flow, or as a voice command by means of voice control (set DEVICE activateVoiceInput)
+    <ul><li>trigger - If the value trigger is set, all FHEM set commands sent to the bridge are written to the reading receiveFhemCommand and can be executed using notify. Voice control is possible; readings receiveVoice * are set. On the Android device several voice commands can be linked by means of "and". Example: turn on the light scene in the evening and turn on the TV</li>
+    <li>setControl - All set commands sent via the flow are automatically executed. The triggering of a reading is not necessary. The control by means of language behaves like the value trigger</li>
+    <li>thirdPartControl - Behaves as triggered, but in the case of voice control, a series of voice commands by means of "and" is not possible. Used for voice control via modules of other module authors ((z.B. 39_TEERKO.pm)</li></ul>
+    </li>
+  </ul>
+  </br></br>
+  If you have problems with the wizard, an Android device can also be applied manually, you will find in the Commandref to the AMADDevice module.
+</ul>
 
 =end html
 =begin html_DE
@@ -1007,8 +1061,8 @@ comming soon
     <br>
     Diese Anweisung erstellt ein neues AMADCommBridge Device Namens AMADBridge. 
   </ul></br>
-  Im folgenden mu&szlig; lediglich das Flowset auf dem Android Ger&auml;t installiert werden und der Flow 'First Run Assistant' ausgef&uuml;hrt werden. (einfach den Homebutton drücken)</br>
-  Der Assistant geleitet Dich dann durch die Einrichtung Deines AMAD Ger&auml;tes und sorgt daf&uuml;r das am Ende des Installationsprozess das Androidger&auml;t als AMAD Device in FHEM angelegt wird.
+  Im folgenden mu&szlig; lediglich das Flowset auf dem Android Ger&auml;t installiert werden und der Flow 'First Run Assistent' ausgef&uuml;hrt werden. (einfach den Homebutton drücken)</br>
+  Der Assistent geleitet Dich dann durch die Einrichtung Deines AMAD Ger&auml;tes und sorgt daf&uuml;r das am Ende des Installationsprozess das Androidger&auml;t als AMAD Device in FHEM angelegt wird.
   </ul>
   <br><br>
   <a name="AMADCommBridgereadings"></a>
@@ -1018,7 +1072,7 @@ comming soon
     <li>JSON_ERROR_STRING - der String welcher die JSON Fehlermeldung verursacht hat</li>
     <li>fhemServerIP - die Ip-Adresse des FHEM Servers, wird vom Modul auf Basis des JSON Strings vom Installationsassistenten gesetzt. Kann aber auch mittels set Befehles vom User gesetzt werden</li>
     <li>receiveFhemCommand - ist das Attribut fhemControlMode auf trigger gestellt, wird das Reading gesetzt sobald ein FHEM Befehl übersendet wird. Hierauf kann dann ein Notify triggern.</br>
-    Wird anstelle von trigger setControl als Wert für fhemControlMode eingestellt, wird das Reading nicht gestzt sondern der set Behel sofort ausgeführt.</li>
+    Wird anstelle von trigger setControl als Wert für fhemControlMode eingestellt, wird das Reading nicht gestzt sondern der set Befehl sofort ausgeführt.</li>
     <li>receiveVoiceCommand - wird die Sprachsteuerung von AMAD aktiviert (set DEVICE activateVoiceInput) so wird der letzte erkannten Sprachbefehle in dieses Reading geschrieben.</li>
     <li>receiveVoiceDevice - Name des Devices von wo aus der letzte erkannte Sprachbefehl gesendet wurde</li>
     <li>state - Status der Bridge, open, closed</li>
@@ -1039,7 +1093,7 @@ comming soon
     </li>
   </ul>
   </br></br>
-  Wie man bei Problemen mit dem Assistenten ein Androidger&auml;t auch von Hand anlegen kann, erf&auml;rst Du in der Commandref zum AMADDevice Modul.
+  Wie man bei Problemen mit dem Assistenten ein Androidger&auml;t auch von Hand anlegen kann, erf&auml;hrst Du in der Commandref zum AMADDevice Modul.
 </ul>
 
 =end html_DE
