@@ -55,7 +55,7 @@ eval "use JSON;1" or $missingModul .= "JSON ";
 
 
 my $modulversion = "4.0.3";
-my $flowsetversion = "4.0.0";
+my $flowsetversion = "4.0.1";
 
 
 
