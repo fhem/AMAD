@@ -5,6 +5,10 @@
 #  (c) 2015-2017 Copyright: Marko Oldenburg (leongaultier at gmail dot com)
 #  All rights reserved
 #
+#   Special thanks goes to comitters:
+#       - Jens Wohlgemuth       Thanks for Commandref
+#
+#
 #  This script is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation; either version 2 of the License, or
@@ -54,8 +58,8 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.0.3";
-my $flowsetversion = "4.0.1";
+my $modulversion = "4.0.4";
+my $flowsetversion = "4.0.2";
 
 
 
@@ -618,11 +622,11 @@ sub AMADDevice_Set($$@) {
        return;
     }
 
-    elsif( lc $cmd eq 'openapp' ) {
+    elsif( lc $cmd eq 'openapp' or lc $cmd eq 'closeapp' ) {
     
         my $app = join( " ", @args );
 
-        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/openApp?app=$app";
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/".$cmd."?app=".$app;
         $method = "POST";
     }
     
@@ -685,6 +689,12 @@ sub AMADDevice_Set($$@) {
     elsif( lc $cmd eq 'vibrate' ) {
 
         $uri    = $host . ":" . $port . "/fhem-amad/setCommands/setvibrate";
+        $method = "POST";
+    }
+    
+    elsif( lc $cmd eq 'showhomescreen' ) {
+
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/showhomescreen";
         $method = "POST";
     }
     
@@ -753,11 +763,12 @@ sub AMADDevice_Set($$@) {
         my $btdev = AttrVal( $name, "setBluetoothDevice", "none" );
         
         
-        my $list = "screenMsg ttsMsg mediaGoogleMusic:play/pause,stop,next,back mediaSamsungMusic:play/pause,stop,next,back mediaAmazonMusic:play/pause,stop,next,back mediaSpotifyMusic:play/pause,stop,next,back mediaTuneinRadio:play/pause,stop,next,back mediaAldiMusic:play/pause,stop,next,back mediaYouTube:play/pause,stop,next,back mediaVlcPlayer:play/pause,stop,next,back mediaAudible:play/pause,stop,next,back screenBrightness:slider,0,1,255 screen:on,off,lock,unlock openURL nextAlarmTime:time timer:slider,1,1,60 statusRequest:noArg bluetooth:on,off notifySndFile clearNotificationBar:All,Automagic activateVoiceInput:noArg vibrate:noArg sendIntent openCall closeCall:noArg currentFlowsetUpdate:noArg installFlowSource doNotDisturb:never,always,alarmClockOnly,onlyImportant userFlowState sendSMS startDaydream:noArg volumeUp:noArg volumeDown:noArg mute:on,off";
+        my $list = "screenMsg ttsMsg mediaGoogleMusic:play/pause,stop,next,back mediaSamsungMusic:play/pause,stop,next,back mediaAmazonMusic:play/pause,stop,next,back mediaSpotifyMusic:play/pause,stop,next,back mediaTuneinRadio:play/pause,stop,next,back mediaAldiMusic:play/pause,stop,next,back mediaYouTube:play/pause,stop,next,back mediaVlcPlayer:play/pause,stop,next,back mediaAudible:play/pause,stop,next,back screenBrightness:slider,0,1,255 screen:on,off,lock,unlock openURL nextAlarmTime:time timer:slider,1,1,60 statusRequest:noArg bluetooth:on,off notifySndFile clearNotificationBar:All,Automagic activateVoiceInput:noArg vibrate:noArg sendIntent openCall closeCall:noArg currentFlowsetUpdate:noArg installFlowSource doNotDisturb:never,always,alarmClockOnly,onlyImportant userFlowState sendSMS startDaydream:noArg volumeUp:noArg volumeDown:noArg mute:on,off showHomeScreen:noArg";
 
         $list .= " screenOrientation:auto,landscape,portrait"   if( AttrVal( $name, "setScreenOrientation", "0" ) eq "1" );
         $list .= " screenFullscreen:on,off"                     if( AttrVal( $name, "setFullscreen", "0" ) eq "1" );
         $list .= " openApp:$apps"                               if( AttrVal( $name, "setOpenApp", "none" ) ne "none" );
+        $list .= " closeApp:$apps"                              if( AttrVal( $name, "setOpenApp", "none" ) ne "none" );
         $list .= " system:reboot,shutdown,airplanemodeON"       if( AttrVal( $name, "root", "0" ) eq "1" );
         $list .= " changetoBTDevice:$btdev"                     if( AttrVal( $name, "setBluetoothDevice", "none" ) ne "none" );
         $list .= " volume:slider,0,1,$volMax";
