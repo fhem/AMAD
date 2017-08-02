@@ -59,7 +59,7 @@ eval "use JSON;1" or $missingModul .= "JSON ";
 
 
 my $modulversion = "4.0.4";
-my $flowsetversion = "4.0.2";
+my $flowsetversion = "4.0.1";
 
 
 
@@ -622,11 +622,11 @@ sub AMADDevice_Set($$@) {
        return;
     }
 
-    elsif( lc $cmd eq 'openapp' or lc $cmd eq 'closeapp' ) {
+    elsif( lc $cmd eq 'openapp' ) {
     
         my $app = join( " ", @args );
 
-        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/".$cmd."?app=".$app;
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/openApp?app=".$app;
         $method = "POST";
     }
     
@@ -768,7 +768,6 @@ sub AMADDevice_Set($$@) {
         $list .= " screenOrientation:auto,landscape,portrait"   if( AttrVal( $name, "setScreenOrientation", "0" ) eq "1" );
         $list .= " screenFullscreen:on,off"                     if( AttrVal( $name, "setFullscreen", "0" ) eq "1" );
         $list .= " openApp:$apps"                               if( AttrVal( $name, "setOpenApp", "none" ) ne "none" );
-        $list .= " closeApp:$apps"                              if( AttrVal( $name, "setOpenApp", "none" ) ne "none" );
         $list .= " system:reboot,shutdown,airplanemodeON"       if( AttrVal( $name, "root", "0" ) eq "1" );
         $list .= " changetoBTDevice:$btdev"                     if( AttrVal( $name, "setBluetoothDevice", "none" ) ne "none" );
         $list .= " volume:slider,0,1,$volMax";
