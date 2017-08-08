@@ -58,8 +58,8 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.0.4";
-my $flowsetversion = "4.0.1";
+my $modulversion = "4.0.5";
+my $flowsetversion = "4.0.2";
 
 
 
@@ -383,15 +383,18 @@ sub AMADDevice_WriteReadings($$) {
         $v =~ s/\bnull\b//g;
         $v = encode_utf8($v);
         
-        readingsBulkUpdateIfChanged($hash, $t, $v, 1) if( defined( $v ) and ($t ne 'deviceState'
+        readingsBulkUpdateIfChanged($hash, $t, $v, 1)   if( defined( $v ) and ($t ne 'deviceState'
                                                             or $t ne 'incomingCallerName'
-                                                            or $t ne 'incomingCallerNumber')
+                                                            or $t ne 'incomingCallerNumber'
+                                                            or $t ne 'nfcLastTagID')
                                                         );
 
         readingsBulkUpdateIfChanged( $hash, $t, ($v / AttrVal($name,'setVolFactor',1)) ) if( $t eq 'volume' and AttrVal($name,'setVolFactor',1) > 1 );
         readingsBulkUpdate( $hash, '.'.$t, $v ) if( $t eq 'deviceState' );
-        readingsBulkUpdate( $hash, $t, $v ) if( $t eq 'incomingCallerName' );
-        readingsBulkUpdate( $hash, $t, $v ) if( $t eq 'incomingCallerNumber' );
+        readingsBulkUpdate( $hash, $t, $v ) if( $t eq 'incomingCallerName'
+                                                    or $t eq 'incomingCallerNumber'
+                                                    or $t eq 'nfcLastTagID'
+                                            );
     }
     
     readingsBulkUpdateIfChanged( $hash, "deviceState", "offline", 1 ) if( $decode_json->{payload}{airplanemode} && $decode_json->{payload}{airplanemode} eq "on" );
@@ -630,6 +633,14 @@ sub AMADDevice_Set($$@) {
         $method = "POST";
     }
     
+    elsif( lc $cmd eq 'nfc' ) {
+    
+        my $mod = join( " ", @args );
+
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/setnfc?nfc=".$mod;
+        $method = "POST";
+    }
+    
     elsif( lc $cmd eq 'system' ) {
     
         my $systemcmd   = join( " ", @args );
@@ -770,6 +781,7 @@ sub AMADDevice_Set($$@) {
         $list .= " openApp:$apps"                               if( AttrVal( $name, "setOpenApp", "none" ) ne "none" );
         $list .= " system:reboot,shutdown,airplanemodeON"       if( AttrVal( $name, "root", "0" ) eq "1" );
         $list .= " changetoBTDevice:$btdev"                     if( AttrVal( $name, "setBluetoothDevice", "none" ) ne "none" );
+        $list .= " nfc:on,off"                                  if( AttrVal( $name, "root", "0" ) eq "1" );
         $list .= " volume:slider,0,1,$volMax";
         $list .= " volumeNotification:slider,0,1,$notifyVolMax";
         $list .= " volumeRingSound:slider,0,1,$ringSoundVolMax";
