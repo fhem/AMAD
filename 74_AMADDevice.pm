@@ -977,6 +977,8 @@ sub AMADDevice_decrypt($) {
     <li>nextAlarmDay - currently set day of alarm</li>
     <li>nextAlarmState - alert/done, current state of "Clock" stock-app</li>
     <li>nextAlarmTime - currently set time of alarm</li>
+    <li>nfc - state of nfc service on/off</li>
+    <li>nfcLastTagID - nfc_id of last scan nfc Tag</li>
     <li>powerLevel - state of battery in %</li>
     <li>powerPlugged - 0=no/1,2=yes, power supply connected</li>
     <li>screen - on locked,unlocked/off locked,unlocked, state of display</li>
@@ -1032,6 +1034,7 @@ sub AMADDevice_decrypt($) {
   <b>Set (depending on attribute values)</b>
   <ul>
     <li>changetoBtDevice - switch to another bluetooth device. <b>Attribute setBluetoothDevice needs to be set. See note below!</b></li>
+    <li>nfc - activate or deactivate the nfc Modul on/off. <b>attribute root</b></li>
     <li>openApp - start an app. <b>attribute setOpenApp</b></li>
     <li>openURL - opens a URLS in the standard browser as long as no other browser is set by the <b>attribute setOpenUrlBrowser</b>.<b>Example:</b><i> attr Tablet setOpenUrlBrowser de.ozerov.fully|de.ozerov.fully.MainActivity, first parameter: package name, second parameter: Class Name</i></li>
     <li>screen - on/off/lock/unlock, switch screen on/off or lock/unlock screen. In Automagic "Preferences" the "Device admin functions" need to be enabled, otherwise "Screen off" does not work. <b>attribute setScreenOnForTimer</b> changes the time the display remains switched on!</li>
@@ -1143,6 +1146,8 @@ sub AMADDevice_decrypt($) {
     <li>nextAlarmDay - aktiver Alarmtag</li>
     <li>nextAlarmState - aktueller Status des <i>"Androidinternen"</i> Weckers</li>
     <li>nextAlarmTime - aktive Alarmzeit</li>
+    <li>nfc - Status des NFC on/off</li>
+    <li>nfcLastTagID - nfc_id des zu letzt gescannten Tag's</li>
     <li>powerLevel - Status der Batterie in %</li>
     <li>powerPlugged - Netzteil angeschlossen? 0=NEIN, 1|2=JA</li>
     <li>screen - on locked/unlocked, off locked/unlocked gibt an ob der Bildschirm an oder aus ist und gleichzeitig gesperrt oder nicht gesperrt</li>
@@ -1200,6 +1205,7 @@ sub AMADDevice_decrypt($) {
   <ul>
     <li>changetoBtDevice - wechselt zu einem anderen Bluetooth Ger&auml;t. <b>Attribut setBluetoothDevice mu&szlig; gesetzt sein. Siehe Hinweis unten!</b></li>
     <li>notifySndFile - spielt die angegebene Mediadatei auf dem Androidger&auml;t ab. <b>Die aufzurufende Mediadatei sollte sich im Ordner /storage/emulated/0/Notifications/ befinden. Ist dies nicht der Fall kann man &uuml;ber das Attribut setNotifySndFilePath einen Pfad vorgeben.</b></li>
+    <li>nfc -  schaltet nfc an oder aus /on/off<b>Attribut root</b></li>
     <li>openApp - &ouml;ffnet eine ausgew&auml;hlte App. <b>Attribut setOpenApp</b></li>
     <li>openURL - &ouml;ffnet eine URL im Standardbrowser, sofern kein anderer Browser &uuml;ber das <b>Attribut setOpenUrlBrowser</b> ausgew&auml;hlt wurde.<b> Bsp:</b><i> attr Tablet setOpenUrlBrowser de.ozerov.fully|de.ozerov.fully.MainActivity, das erste ist der Package Name und das zweite der Class Name</i></li>
     <li>setAPSSID - setzt die AccessPoint SSID um ein WLAN sleep zu verhindern</li>
