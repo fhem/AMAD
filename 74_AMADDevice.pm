@@ -978,7 +978,7 @@ sub AMADDevice_decrypt($) {
     <li>nextAlarmState - alert/done, current state of "Clock" stock-app</li>
     <li>nextAlarmTime - currently set time of alarm</li>
     <li>nfc - state of nfc service on/off</li>
-    <li>nfcLastTagID - nfc_id of last scan nfc Tag</li>
+    <li>nfcLastTagID - nfc_id of last scan nfc Tag / In order for the ID to be recognized correctly, the trigger NFC TagIDs must be processed in Flow NFC Tag Support and the TagId's Commase-separated must be entered.</li>
     <li>powerLevel - state of battery in %</li>
     <li>powerPlugged - 0=no/1,2=yes, power supply connected</li>
     <li>screen - on locked,unlocked/off locked,unlocked, state of display</li>
@@ -1147,7 +1147,7 @@ sub AMADDevice_decrypt($) {
     <li>nextAlarmState - aktueller Status des <i>"Androidinternen"</i> Weckers</li>
     <li>nextAlarmTime - aktive Alarmzeit</li>
     <li>nfc - Status des NFC on/off</li>
-    <li>nfcLastTagID - nfc_id des zu letzt gescannten Tag's</li>
+    <li>nfcLastTagID - nfc_id des zu letzt gescannten Tag's / Damit die ID korrekt erkannt wird muss im Flow NFC Tag Support der Trigger NFC TagIDs bearbeitet werden und die TagId's Kommasepariert eingetragen werden.</li>
     <li>powerLevel - Status der Batterie in %</li>
     <li>powerPlugged - Netzteil angeschlossen? 0=NEIN, 1|2=JA</li>
     <li>screen - on locked/unlocked, off locked/unlocked gibt an ob der Bildschirm an oder aus ist und gleichzeitig gesperrt oder nicht gesperrt</li>
