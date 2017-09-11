@@ -79,6 +79,8 @@ sub AMADDevice_Parse($$);
 sub AMADDevice_statusRequest($);
 sub AMADDevice_CreateVolumeValue($$@);
 sub AMADDevice_CreateTtsMsgValue($@);
+sub AMADDevice_CreateScreenValue($$);
+sub AMADDevice_CreateChangeBtDeviceValue($$);
 
 
 
@@ -447,7 +449,6 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif( lc $cmd eq 'ttsmsg' ) {
-
         my ($msg,$speed,$lang,$ttsmsgvol)   = AMADDevice_CreateTtsMsgValue($hash,@args);
         
         $uri                                = $host . ":" . $port . "/fhem-amad/setCommands/ttsMsg?message=".urlEncode($msg)."&msgspeed=".$speed."&msglang=".$lang."&msgvol=".$ttsmsgvol;
@@ -455,18 +456,14 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif( lc $cmd eq 'userflowstate' ) {
-
         my $datas           = join( " ", @args );
         my ($flow,$state)   = split( ":", $datas);
-        
-        $flow               =~ s/\s/%20/g;    
 
-        $uri                = $host . ":" . $port . "/fhem-amad/setCommands/flowState?flowstate=".$state."&flowname=".$flow;
+        $uri                = $host . ":" . $port . "/fhem-amad/setCommands/flowState?flowstate=".$state."&flowname=".urlEncode($flow);
         $method     = "POST";
     }
     
     elsif( lc $cmd eq 'volume' or $cmd eq 'mute' or $cmd =~ 'volume[Down|Up]' ) {
-
         my $vol     = AMADDevice_CreateVolumeValue($hash,$cmd,@args);
     
         $uri        = $host . ":" . $port . "/fhem-amad/setCommands/setVolume?volume=$vol";
@@ -474,7 +471,6 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif( lc $cmd eq 'volumenotification' ) {
-    
         my $vol = join( " ", @args );
 
         $uri    = $host . ":" . $port . "/fhem-amad/setCommands/setNotifiVolume?notifivolume=$vol";
@@ -482,7 +478,6 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif( lc $cmd eq 'volumeringsound' ) {
-    
         my $vol = join( " ", @args );
 
         $uri    = $host . ":" . $port . "/fhem-amad/setCommands/setRingSoundVolume?ringsoundvolume=$vol";
@@ -490,7 +485,6 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif( lc $cmd =~ /^media/ ) {
-    
         my $btn = join( " ", @args );
 
         $uri    = $host . ":" . $port . "/fhem-amad/setCommands/multimediaControl?mplayer=".$cmd."&button=".$btn;
@@ -498,7 +492,6 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif( lc $cmd eq 'screenbrightness' ) {
-    
         my $bri = join( " ", @args );
 
         $uri    = $host . ":" . $port . "/fhem-amad/setCommands/setBrightness?brightness=$bri";
@@ -506,26 +499,12 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif( lc $cmd eq 'screen' ) {
-    
         my $mod = join( " ", @args );
-        my $scot = AttrVal( $name, "setScreenOnForTimer", undef );
-        $scot = 60 if( !$scot );
 
-        if ($mod eq "on" || $mod eq "off") {
-
-            $uri    = $host . ":" . $port . "/fhem-amad/setCommands/setScreenOnOff?screen=".$mod."&screenontime=".$scot if ($mod eq "on" || $mod eq "off");
-            $method = "POST";
-        }
-
-        elsif ($mod eq "lock" || $mod eq "unlock") {
-
-            return "Please set \"setScreenlockPIN\" Attribut first" if( AttrVal( $name, "setScreenlockPIN", "none" ) eq "none" );
-            my $PIN = AttrVal( $name, "setScreenlockPIN", undef );
-            $PIN = AMADDevice_decrypt($PIN);
-
-            $uri    = $host . ":" . $port . "/fhem-amad/setCommands/screenlock?lockmod=".$mod."&lockPIN=".$PIN;
-            $method = "POST";
-        }
+        $uri        = AMADDevice_CreateScreenValue($hash,$mod);
+        return "Please set \"setScreenlockPIN\" Attribut first"
+        unless($uri ne 'NO PIN');
+        $method     = "POST";
     }
     
     elsif( lc $cmd eq 'screenorientation' ) {
@@ -537,13 +516,11 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif( lc $cmd eq 'activatevoiceinput' ) {
-
         $uri    = $host . ":" . $port . "/fhem-amad/setCommands/setvoicecmd";
         $method = "POST";
     }
     
     elsif( lc $cmd eq 'screenfullscreen' ) {
-    
         my $mod = join( " ", @args );
 
         $uri    = $host . ":" . $port . "/fhem-amad/setCommands/setScreenFullscreen?fullscreen=$mod";
@@ -552,7 +529,6 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif( lc $cmd eq 'openurl' ) {
-    
         my $openurl = join( " ", @args );
         my $browser = AttrVal( $name, "setOpenUrlBrowser", "com.android.chrome|com.google.android.apps.chrome.Main" );
         my @browserapp = split( /\|/, $browser );
@@ -562,7 +538,6 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif (lc $cmd eq 'nextalarmtime') {
-    
         my $value   = join( " ", @args );
         my @alarm   = split( ":", $value );
 
@@ -571,7 +546,6 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif (lc $cmd eq 'timer') {
-    
         my $timer   = join( " ", @args );
 
         $uri        = $host . ":" . $port . "/fhem-amad/setCommands/setTimer?minute=$timer";
@@ -585,7 +559,6 @@ sub AMADDevice_Set($$@) {
     }
 
     elsif( lc $cmd eq 'openapp' ) {
-    
         my $app = join( " ", @args );
 
         $uri    = $host . ":" . $port . "/fhem-amad/setCommands/openApp?app=".$app;
@@ -593,7 +566,6 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif( lc $cmd eq 'nfc' ) {
-    
         my $mod = join( " ", @args );
 
         $uri    = $host . ":" . $port . "/fhem-amad/setCommands/setnfc?nfc=".$mod;
@@ -601,7 +573,6 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif( lc $cmd eq 'system' ) {
-    
         my $systemcmd   = join( " ", @args );
 
         $uri            = $host . ":" . $port . "/fhem-amad/setCommands/systemcommand?syscmd=$systemcmd";
@@ -611,7 +582,6 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif( lc $cmd eq 'donotdisturb' ) {
-    
         my $disturbmod  = join( " ", @args );
 
         $uri            = $host . ":" . $port . "/fhem-amad/setCommands/donotdisturb?disturbmod=$disturbmod";
@@ -619,7 +589,6 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif( lc $cmd eq 'bluetooth' ) {
-    
         my $mod = join( " ", @args );
 
         $uri    = $host . ":" . $port . "/fhem-amad/setCommands/setbluetooth?bluetooth=$mod";
@@ -627,7 +596,6 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif( lc $cmd eq 'notifysndfile' ) {
-    
         my $notify      = join( " ", @args );
         my $filepath    = AttrVal( $name, "setNotifySndFilePath", "/storage/emulated/0/Notifications/" );
 
@@ -636,20 +604,14 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif( lc $cmd eq 'changetobtdevice' ) {
-    
         my $swToBtDevice = join( " ", @args );    
-        my @swToBtMac = split( /\|/, $swToBtDevice );
-        my $btDevices = AttrVal( $name, "setBluetoothDevice", "none" ) if( AttrVal( $name, "setBluetoothDevice", "none" ) ne "none" );
-        my @btDevice = split( ',', $btDevices );
-        my @btDeviceOne = split( /\|/, $btDevice[0] );
-        my @btDeviceTwo = split( /\|/, $btDevice[1] );
 
-        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/setbtdevice?swToBtDeviceMac=".$swToBtMac[1]."&btDeviceOne=".$btDeviceOne[1]."&btDeviceTwo=".$btDeviceTwo[1];
+        my ($swToBtMac,$btDeviceOne,$btDeviceTwo) = AMADDevice_CreateChangeBtDeviceValue($hash,$swToBtDevice);
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/setbtdevice?swToBtDeviceMac=".$swToBtMac."&btDeviceOne=".$btDeviceOne."&btDeviceTwo=".$btDeviceTwo;
         $method = "POST";
     }
     
     elsif( lc $cmd eq 'clearnotificationbar' ) {
-    
         my $appname = join( " ", @args );
 
         $uri        = $host . ":" . $port . "/fhem-amad/setCommands/clearnotificationbar?app=$appname";
@@ -669,7 +631,6 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif( lc $cmd eq 'sendintent' ) {
-    
         my $intentstring = join( " ", @args );
         my ( $action, $exkey1, $exval1, $exkey2, $exval2 ) = split( "[ \t][ \t]*", $intentstring );
         $exkey1 = "" if( !$exkey1 );
@@ -682,7 +643,6 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif( lc $cmd eq 'installflowsource' ) {
-    
         my $flowname    = join( " ", @args );
 
         $uri            = $host . ":" . $port . "/fhem-amad/setCommands/installFlow?flowname=$flowname";
@@ -690,7 +650,6 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif( lc $cmd eq 'opencall' ) {
-    
         my $string = join( " ", @args );
         my ($callnumber, $time) = split( "[ \t][ \t]*", $string );
         $time   = "none" if( !$time );
@@ -720,11 +679,8 @@ sub AMADDevice_Set($$@) {
     elsif( lc $cmd eq 'sendsms' ) {
         my $string = join( " ", @args );
         my ($smsmessage, $smsnumber) = split( "\\|", $string );
-        
-        $smsmessage =~ s/%/%25/g;
-        $smsmessage =~ s/\s/%20/g;
     
-        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/sendSms?smsmessage=".$smsmessage."&smsnumber=".$smsnumber;
+        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/sendSms?smsmessage=".urlEncode($smsmessage)."&smsnumber=".$smsnumber;
         $method = "POST";
         
     } else {
@@ -913,6 +869,47 @@ sub AMADDevice_CreateTtsMsgValue($@) {
         
     return ($msg,$speed,$lang,$ttsmsgvol);
 }
+
+sub AMADDevice_CreateScreenValue($$) {
+
+    my ($hash,$mod)     = @_;
+
+    my $name            = $hash->{NAME};
+    my $scot            = AttrVal( $name, "setScreenOnForTimer", undef );
+    my $host            = $hash->{HOST};
+    my $port            = $hash->{PORT};
+    my $uri;
+    $scot               = 60 if( !$scot );
+
+    if ($mod eq "on" or $mod eq "off") {
+        return ($host . ":" . $port . "/fhem-amad/setCommands/setScreenOnOff?screen=".$mod."&screenontime=".$scot);
+    }
+
+    elsif ($mod eq "lock" or $mod eq "unlock") {
+        return "NO PIN"
+        unless( AttrVal( $name, "setScreenlockPIN", "none" ) ne "none" );
+        my $PIN = AttrVal( $name, "setScreenlockPIN", undef );
+        $PIN = AMADDevice_decrypt($PIN);
+
+        return ($host . ":" . $port . "/fhem-amad/setCommands/screenlock?lockmod=".$mod."&lockPIN=".$PIN);
+    }
+}
+
+sub AMADDevice_CreateChangeBtDeviceValue($$) {
+
+    my ($hash,$swToBtDevice)    = @_;
+
+    my $name                    = $hash->{NAME};
+    my @swToBtMac               = split( /\|/, $swToBtDevice );
+    my $btDevices               = AttrVal( $name, "setBluetoothDevice", "none" ) if( AttrVal( $name, "setBluetoothDevice", "none" ) ne "none" );
+    my @btDevice                = split( ',', $btDevices );
+    my @btDeviceOne             = split( /\|/, $btDevice[0] );
+    my @btDeviceTwo             = split( /\|/, $btDevice[1] );
+    
+    
+    return($swToBtMac[1],$btDeviceOne[1],$btDeviceTwo[1]);
+}
+
 
 
 
