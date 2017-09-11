@@ -78,6 +78,7 @@ sub AMADDevice_Undef($$);
 sub AMADDevice_Parse($$);
 sub AMADDevice_statusRequest($);
 sub AMADDevice_CreateVolumeValue($$@);
+sub AMADDevice_CreateTtsMsgValue($@);
 
 
 
@@ -447,13 +448,10 @@ sub AMADDevice_Set($$@) {
     
     elsif( lc $cmd eq 'ttsmsg' ) {
 
-        my $msg         = join( " ", @args );
-        my $speed       = AttrVal( $name, "setTtsMsgSpeed", "1.0" );
-        my $lang        = AttrVal( $name, "setTtsMsgLang","de" );
-        my $ttsmsgvol   = AttrVal( $name, "setTtsMsgVol","none");
-
-        $uri        = $host . ":" . $port . "/fhem-amad/setCommands/ttsMsg?message=".urlEncode($msg)."&msgspeed=".$speed."&msglang=".$lang."&msgvol=".$ttsmsgvol;
-        $method     = "POST";
+        my ($msg,$speed,$lang,$ttsmsgvol)   = AMADDevice_CreateTtsMsgValue($hash,@args);
+        
+        $uri                                = $host . ":" . $port . "/fhem-amad/setCommands/ttsMsg?message=".urlEncode($msg)."&msgspeed=".$speed."&msglang=".$lang."&msgvol=".$ttsmsgvol;
+        $method                             = "POST";
     }
     
     elsif( lc $cmd eq 'userflowstate' ) {
@@ -895,6 +893,27 @@ sub AMADDevice_CreateVolumeValue($$@) {
     return $vol;
 }
 
+sub AMADDevice_CreateTtsMsgValue($@) {
+
+    my ($hash,@args)       = @_;
+    
+    my $name        = $hash->{NAME};
+    my $msg;
+    my $speed       = AttrVal( $name, "setTtsMsgSpeed", "1.0" );
+    my $lang        = AttrVal( $name, "setTtsMsgLang","de" );
+    my $ttsmsgvol   = AttrVal( $name, "setTtsMsgVol","none");
+    
+    
+    $msg    = join( " ", @args );
+    
+    unless($args[0] ne '&en;' and $args[0] ne '&de;') {
+        $lang   = substr(splice(@args,0,1),1,2);
+        $msg    = join( " ", @args );
+    }
+        
+    return ($msg,$speed,$lang,$ttsmsgvol);
+}
+
 
 
 
@@ -1030,7 +1049,7 @@ sub AMADDevice_CreateVolumeValue($$@) {
     <li>startDaydream - start Daydream</li>
     <li>statusRequest - Get a new status report of Android device. Not all readings can be updated using a statusRequest as some readings are only updated if the value of the reading changes.</li>
     <li>timer - set a countdown timer in the "Clock" stock app. Only minutes are allowed as parameter.</li>
-    <li>ttsMsg - send a message which will be played as voice message</li>
+    <li>ttsMsg - send a message which will be played as voice message (to change laguage temporary set first character &en; or &de;)</li>
     <li>userFlowState - set Flow/s active or inactive,<b><i>set Nexus7Wohnzimmer Badezimmer:inactive vorheizen</i> or <i>set Nexus7Wohnzimmer Badezimmer vorheizen,Nachtlicht Steven:inactive</i></b></li>
     <li>vibrate - vibrate Android device</li>
     <li>volume - set media volume. Works on internal speaker or, if connected, bluetooth speaker or speaker connected via stereo jack</li>
@@ -1199,7 +1218,7 @@ sub AMADDevice_CreateVolumeValue($$@) {
     <li>startDaydream - startet den Daydream</li>
     <li>statusRequest - Fordert einen neuen Statusreport beim Device an. Es k&ouml;nnen nicht von allen Readings per statusRequest die Daten geholt werden. Einige wenige geben nur bei Status&auml;nderung ihren Status wieder.</li>
     <li>timer - setzt einen Timer innerhalb der als Standard definierten ClockAPP auf dem Device. Es k&ouml;nnen nur Minuten angegeben werden.</li>
-    <li>ttsMsg - versendet eine Nachricht welche als Sprachnachricht ausgegeben wird</li>
+    <li>ttsMsg - versendet eine Nachricht welche als Sprachnachricht ausgegeben wird (um die Sprache für diese eine Durchsage zu ändern setze vor Deinem eigentlichen Text &en; oder &de;)</li>
     <li>userFlowState - aktiviert oder deaktiviert einen oder mehrere Flows,<b><i>set Nexus7Wohnzimmer Badezimmer vorheizen:inactive</i> oder <i>set Nexus7Wohnzimmer Badezimmer vorheizen,Nachtlicht Steven:inactive</i></b></li>
     <li>vibrate - l&auml;sst das Androidger&auml;t vibrieren</li>
     <li>volume - setzt die Medialautst&auml;rke. Entweder die internen Lautsprecher oder sofern angeschlossen die Bluetoothlautsprecher und per Klinkenstecker angeschlossene Lautsprecher, + oder - vor dem Wert reduziert die aktuelle Lautst&auml;rke um den Wert. Der maximale Sliderwert kann &uuml;ber das Attribut setVolMax geregelt werden.</li>
