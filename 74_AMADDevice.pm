@@ -58,7 +58,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.0.8";
+my $modulversion = "4.0.9";
 my $flowsetversion = "4.0.7";
 
 
@@ -77,6 +77,7 @@ sub AMADDevice_Set($$@);
 sub AMADDevice_Undef($$);
 sub AMADDevice_Parse($$);
 sub AMADDevice_statusRequest($);
+sub AMADDevice_CreateVolumeValue($$@);
 
 
 
@@ -467,45 +468,9 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif( lc $cmd eq 'volume' or $cmd eq 'mute' or $cmd =~ 'volume[Down|Up]' ) {
+
+        my $vol     = AMADDevice_CreateVolumeValue($hash,$cmd,@args);
     
-        my $vol;
-        
-        if( $cmd eq 'volume' ) {
-            $vol = join( " ", @args );
-
-            if( $vol =~ /^\+(.*)/ or $vol =~ /^-(.*)/ ) {
-
-                if( $vol =~ /^\+(.*)/ ) {
-                
-                    $vol =~ s/^\+//g;
-                    $vol = ReadingsVal( $name, "volume", 0 ) + $vol;
-                }
-                
-                elsif( $vol =~ /^-(.*)/ ) {
-                
-                    $vol =~ s/^-//g;
-                    printf $vol;
-                    $vol = ReadingsVal( $name, "volume", 15 ) - $vol;
-                }
-            }
-            
-        } elsif( $cmd eq 'mute') {
-            if($args[0] eq 'on') {
-                $vol = 0;
-                readingsSingleUpdate($hash,'.volume',ReadingsVal($name,'volume',0),0);
-            } else {
-                $vol = ReadingsVal($name,'.volume',0);
-            }
-            
-        } elsif( $cmd =~ 'volume[Down|Up]') {
-            if( $cmd eq 'volumeUp' ) {
-                $vol = ReadingsVal( $name, "volume", 0 ) + AttrVal($name,'setVolUpDownStep',3);
-            } else {
-                $vol = ReadingsVal( $name, "volume", 0 ) - AttrVal($name,'setVolUpDownStep',3);
-            }
-        }
-        
-
         $uri        = $host . ":" . $port . "/fhem-amad/setCommands/setVolume?volume=$vol";
         $method     = "POST";
     }
@@ -883,6 +848,51 @@ sub AMADDevice_decrypt($) {
     }
 
     return $decodedPIN;
+}
+
+sub AMADDevice_CreateVolumeValue($$@) {
+
+    my ($hash,$cmd,@args)       = @_;
+    
+    my $name                    = $hash->{NAME};
+    my $vol;
+    
+
+    if( $cmd eq 'volume' ) {
+        $vol = join( " ", @args );
+
+        if( $vol =~ /^\+(.*)/ or $vol =~ /^-(.*)/ ) {
+
+            if( $vol =~ /^\+(.*)/ ) {
+                
+                $vol =~ s/^\+//g;
+                $vol = ReadingsVal( $name, "volume", 0 ) + $vol;
+            }
+                
+            elsif( $vol =~ /^-(.*)/ ) {
+                
+                $vol =~ s/^-//g;
+                $vol = ReadingsVal( $name, "volume", 15 ) - $vol;
+            }
+        }
+            
+    } elsif( $cmd eq 'mute') {
+        if($args[0] eq 'on') {
+            $vol = 0;
+            readingsSingleUpdate($hash,'.volume',ReadingsVal($name,'volume',0),0);
+        } else {
+            $vol = ReadingsVal($name,'.volume',0);
+        }
+            
+    } elsif( $cmd =~ 'volume[Down|Up]') {
+        if( $cmd eq 'volumeUp' ) {
+            $vol = ReadingsVal( $name, "volume", 0 ) + AttrVal($name,'setVolUpDownStep',3);
+        } else {
+            $vol = ReadingsVal( $name, "volume", 0 ) - AttrVal($name,'setVolUpDownStep',3);
+        }
+    }
+        
+    return $vol;
 }
 
 
