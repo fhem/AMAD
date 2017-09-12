@@ -1012,7 +1012,7 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
     <li>userFlowState - current state of a Flow, established under setUserFlowState Attribut</li>
     <li>volume - media volume setting</li>
     <li>volumeNotification - notification volume setting</li>
-    <li>wiredHeadsetPlugged - in/out headset plugged in or out</li>
+    <li>wiredHeadsetPlugged - 0/1 headset plugged out or in</li>
     <br>
     Prerequisite for using the reading checkActivTask the package name of the application to be checked needs to be defined in the attribute <i>checkActiveTask</i>. Example: <i>attr Nexus10Wohnzimmer
     checkActiveTask com.android.chrome</i> f&uuml;r den Chrome Browser.
@@ -1183,7 +1183,7 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
     <li>userFlowState - aktueller Status eines Flows, festgelegt unter dem setUserFlowState Attribut</li>
     <li>volume - Media Lautst&auml;rkewert</li>
     <li>volumeNotification - Benachrichtigungs Lautst&auml;rke</li>
-    <li>wiredHeadsetPlugged - in/out gibt an ob ein Headset eingesteckt ist oder nicht</li>
+    <li>wiredHeadsetPlugged - 0/1 gibt an ob ein Headset eingesteckt ist oder nicht</li>
     <br>
     Beim Reading checkActivTask mu&szlig; zuvor der Packagename der zu pr&uuml;fenden App als Attribut <i>checkActiveTask</i> angegeben werden. Beispiel: <i>attr Nexus10Wohnzimmer
     checkActiveTask com.android.chrome</i> f&uuml;r den Chrome Browser.

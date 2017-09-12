@@ -2597,13 +2597,13 @@ global_userflowstate = "none";</script>
   </action>
   <action type="script">
     <useDefaultName>true</useDefaultName>
-    <name>Script: headsetValue = "in"</name>
-    <script>headsetValue = "in"</script>
+    <name>Script: headsetValue = 1</name>
+    <script>headsetValue = 1</script>
   </action>
   <action type="script">
     <useDefaultName>true</useDefaultName>
-    <name>Script: headsetValue = "out"</name>
-    <script>headsetValue = "out"</script>
+    <name>Script: headsetValue = 0</name>
+    <script>headsetValue = 0</script>
   </action>
   <action type="script">
     <useDefaultName>true</useDefaultName>
@@ -4063,8 +4063,8 @@ Soll der Assistent gelöscht werden?</actioncontainer>
     <actioncontainer id="t163" x="5040.0" y="-3832.5">Script: volumeRingSound = "\"volumeRingSound\":" + " \"" + {volumeRingSound} + "\""; fhemcmd = "setreading";</actioncontainer>
     <actioncontainer id="t164" x="5320.0" y="-3832.5">Script: wiredHeadsetPlugged = "\"wiredHeadsetPlugged\":" + " \"" + {headsetValue} + "\""; fhemcmd = "setreading";</actioncontainer>
     <conditioncontainer id="t165" x="5320.0" y="-2782.5">Expression: trigger == "Kabelgebundenes Headset Verbunden" or trigger == "Kabelgebundenes Headset Getrennt"</conditioncontainer>
-    <actioncontainer id="t166" x="5250.0" y="-3482.5">Script: headsetValue = "in"</actioncontainer>
-    <actioncontainer id="t167" x="5390.0" y="-3482.5">Script: headsetValue = "out"</actioncontainer>
+    <actioncontainer id="t166" x="5250.0" y="-3482.5">Script: headsetValue = 1</actioncontainer>
+    <actioncontainer id="t167" x="5390.0" y="-3482.5">Script: headsetValue = 0</actioncontainer>
     <conditioncontainer id="t168" x="5040.0" y="-2782.5">Expression: trigger == "Systemeinstellung verändert: System volume_ring"</conditioncontainer>
     <conditioncontainer id="t169" x="4795.0" y="-2782.5">Expression: trigger == "Genereller Broadcast: wenn org.smblott.intentradio.STATE"</conditioncontainer>
     <conditioncontainer id="t170" x="4410.0" y="-2782.5">Expression: trigger == "Benachrichtigung in Statusbar angezeigt: org.telegram.messenger"</conditioncontainer>
