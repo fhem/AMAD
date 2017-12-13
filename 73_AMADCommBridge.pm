@@ -74,8 +74,8 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.2.0";
-my $flowsetversion = "4.2.0";
+my $modulversion = "4.1.99.1";
+my $flowsetversion = "4.0.11";
 
 
 
@@ -246,22 +246,35 @@ sub AMADCommBridge_Set($@) {
 
 sub AMADCommBridge_Write($@) {
 
-    my ($hash,$amad_id,$uri,$header,$method)    = @_;
+    my ($hash,$amad_id,$uri,$path,$header,$method)    = @_;
     my $name                                    = $hash->{NAME};
+    my $dhash                                   = $defs{$amad_id};
+    my $param;
+    my $remoteServer                            = AttrVal($dhash->{NAME},'remoteServer','Automagic');
+    
+    
+    
+    
+    $param = { url => "http://" . $uri . $path, timeout => 15, hash => $hash, amad_id => $amad_id, method => $method, header => $header, doTrigger => 1, callback => \&AMADCommBridge_ErrorHandling } if($remoteServer eq 'Automagic');
+    
+    $param =    {   url => "http://" . $uri,
+                    data => "{\"message\":\"AMAD=:=$path\", \"sender\":\"AMAD\", \"ttl\":60, \"communication_base_params\":{\"type\":\"Message\", \"fallback\":false, \"via\":\"Wifi\"},\"version\":\"1.62\"}",
+                    timeout => 15, hash => $hash, amad_id => $amad_id, method => $method,
+                    header => "agent: TeleHeater/2.2.3\r\nUser-Agent: TeleHeater/2.2.3\r\nAccept: application/json",
+                    doTrigger => 1, callback => \&AMADCommBridge_ErrorHandling 
+                } if($remoteServer eq 'Autoremote');
+
+    $param =    {   url => "http://" . $uri,
+                    data => "device=AMAD&cmd=".urlEncode($path),
+                    timeout => 15, hash => $hash, amad_id => $amad_id, method => $method,
+                    header => "agent: TeleHeater/2.2.3\r\nUser-Agent: TeleHeater/2.2.3\r\nAccept: application/json",
+                    doTrigger => 1, callback => \&AMADCommBridge_ErrorHandling 
+                } if($remoteServer eq 'TNES');
 
 
-    HttpUtils_NonblockingGet(
-        {
-            url         => "http://" . $uri,
-            timeout     => 15,
-            hash        => $hash,
-            amad_id     => $amad_id,
-            method      => $method,
-            header      => $header,
-            doTrigger   => 1,
-            callback    => \&AMADCommBridge_ErrorHandling,
-        }
-    );
+
+
+    HttpUtils_NonblockingGet($param);
     
     Log3 $name, 5, "AMADCommBridge ($name) - Send with URI: $uri, HEADER: $header, METHOD: $method";
 }

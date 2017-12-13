@@ -58,8 +58,8 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.2.0";
-my $flowsetversion = "4.2.0";
+my $modulversion = "4.1.99.1";
+my $flowsetversion = "4.0.11";
 
 
 
@@ -120,7 +120,7 @@ sub AMADDevice_Initialize($) {
                 "setAPSSID ".
                 "root:0,1 ".
                 "disable:1 ".
-                "disableSetCmd:0,1 ".
+                "remoteServer:Automagic,Autoremote,TNES,other ".
                 $readingFnAttributes;
     
     foreach my $d(sort keys %{$modules{AMADDevice}{defptr}}) {
@@ -144,24 +144,28 @@ sub AMADDevice_Define($$) {
         if( $param =~ m/IODev=([^\s]*)/ ) {
         
             $iodev = $1;
-            splice( @a, $i, 3 );
+            splice( @a, $i, 4 );
             last;
         }
         
         $i++;
     }
     
-    return "too few parameters: define <name> AMADDevice <HOST-IP> <amad_id>" if( @a != 3 );
+    return "too few parameters: define <name> AMADDevice <HOST-IP> <amad_id> <remoteServer>" if( @a != 4 );
     return "Cannot define a AMAD device. Perl modul $missingModul is missing." if ( $missingModul );
     
     
-    my ($name,$host,$amad_id)                        = @a;
+    my ($name,$host,$amad_id,$remoteServer)     = @a;
 
     $hash->{HOST}                               = $host;
     $hash->{AMAD_ID}                            = $amad_id;
-    $hash->{PORT}                               = 8090;
     $hash->{VERSIONMODUL}                       = $modulversion;
     $hash->{VERSIONFLOWSET}                     = $flowsetversion;
+    
+    $hash->{PORT}                               = 8090 if($remoteServer eq 'Automagic');
+    $hash->{PORT}                               = 1817 if($remoteServer eq 'Autoremote');
+    $hash->{PORT}                               = 8765 if($remoteServer eq 'TNES');
+    
     $hash->{helper}{infoErrorCounter}           = 0;
     $hash->{helper}{setCmdErrorCounter}         = 0;
     $hash->{helper}{deviceStateErrorCounter}    = 0;
@@ -188,14 +192,18 @@ sub AMADDevice_Define($$) {
     return "AMADDevice device $name on AMADCommBridge $iodev already defined."
     if( defined($d) && $d->{IODev} == $hash->{IODev} && $d->{NAME} ne $name );
 
-    Log3 $name, 3, "AMADDevice ($name) - defined with AMAD_ID: $amad_id on port $hash->{PORT}";
+    
 
-    $attr{$name}{room} = "AMAD" if( !defined( $attr{$name}{room} ) );
+    CommandAttr(undef,$name . "room AMAD") if(AttrVal($name,'room','none') eq 'none';
+    CommandAttr(undef,$name . "remoteServer $remoteServer") if(AttrVal($name,'remoteServer','none') eq 'none';
         
     readingsBeginUpdate($hash);
     readingsBulkUpdateIfChanged( $hash, "state", "initialized",1);
     readingsBulkUpdateIfChanged( $hash, "deviceState", "unknown",1);
     readingsEndUpdate($hash,1);
+    
+    
+    Log3 $name, 3, "AMADDevice ($name) - defined with AMAD_ID: $amad_id on port $hash->{PORT}";
         
 
     if( $init_done ) {
@@ -353,14 +361,14 @@ sub AMADDevice_statusRequest($) {
     my $fhemip          = ReadingsVal($hash->{IODev}->{NAME}, "fhemServerIP", "none");
     my $fhemCtlMode     = AttrVal($hash->{IODev}->{NAME},'fhemControlMode','none' );
     my $bport           = $hash->{IODev}->{PORT};
-    my $disableSetCmd   = AttrVal( $name, "disableSetCmd", "0" );
+    my $remoteServer    = AttrVal( $name, "remoteServer", "Automagic" );
 
     $header  .= "\r\nfhemip: $fhemip\r\nfhemdevice: $name\r\nactivetask: $activetask\r\napssid: $apssid\r\nbport: $bport\r\nuserflowstate: $userFlowState\r\namadid: $amad_id\r\nfhemctlmode: $fhemCtlMode";
     $method  = "GET";
     $path     ="/fhem-amad/deviceInfo/";       # Pfad muß so im Automagic als http request Trigger drin stehen
     readingsSingleUpdate( $hash, "lastSetCommand", $path, 1 );    
  
-    if ($disableSetCmd ne "1"){
+    if ($remoteServer eq "Automagic"){
       $uri    = $host . ":" . $port . $path;
       IOWrite($hash,$amad_id,$uri,$header,$method);
       Log3 $name, 5, "AMADDevice ($name) - IOWrite: $uri $method IODevHash=$hash->{IODev}";
@@ -434,18 +442,16 @@ sub AMADDevice_Set($$@) {
     my ($hash, $name, @aa)  = @_;
     my ($cmd, @args)        = @aa;
 
-    my $host                = $hash->{HOST};
-    my $port                = $hash->{PORT};
     my $amad_id             = $hash->{AMAD_ID};
-    my $uri;
-    my $path;
     my $header              = 'Connection: close';
+    my $uri                 = $hash->{HOST} . ":" . $hash->{PORT};
+    my $path;
     my $method;
     
     my $volMax              = AttrVal($name,'setVolMax',15);
     my $notifyVolMax        = AttrVal($name,'setNotifyVolMax',7);
     my $ringSoundVolMax     = AttrVal($name,'setRingSoundVolMax',7);
-    my $disableSetCmd   = AttrVal( $name, "disableSetCmd", "0" );
+    
 
     if( lc $cmd eq 'screenmsg' ) {
         my $msg = join( " ", @args );
@@ -513,6 +519,7 @@ sub AMADDevice_Set($$@) {
     
     elsif( lc $cmd eq 'screen' ) {
         my $mod = join( " ", @args );
+
 
         $path        = AMADDevice_CreateScreenValue($hash,$mod);
         return "Please set \"setScreenlockPIN\" Attribut first"
@@ -718,15 +725,13 @@ sub AMADDevice_Set($$@) {
 
         return "Unknown argument $cmd, choose one of $list";
     }
-    
-    readingsSingleUpdate( $hash, "lastSetCommand", $path, 1 );
 
-    if ($disableSetCmd ne "1"){
-        $uri    = $host . ":" . $port . $path;
-        IOWrite($hash,$amad_id,$uri,$header,$method);
-        Log3 $name, 5, "AMADDevice ($name) - IOWrite: $uri $method IODevHash=$hash->{IODev}";
-    }
+    readingsSingleUpdate( $hash, "lastSetCommand", $path, 1 );
     
+    
+    IOWrite($hash,$amad_id,$uri,$path,$header,$method);
+    Log3 $name, 5, "AMADDevice ($name) - IOWrite: $uri $method IODevHash=$hash->{IODev}";
+
     return undef;
 }
 
@@ -759,7 +764,7 @@ sub AMADDevice_Parse($$) {
             
     } else {
 
-        return "UNDEFINED $fhemDevice AMADDevice $decode_json->{firstrun}{'amaddevice_ip'} $decode_json->{amad}{'amad_id'} IODev=$name";
+        return "UNDEFINED $fhemDevice AMADDevice $decode_json->{firstrun}{'amaddevice_ip'} $decode_json->{amad}{'amad_id'} $decode_json->{firstrun}{remoteserver} IODev=$name";
     }
 }
 
