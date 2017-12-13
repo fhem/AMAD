@@ -140,18 +140,18 @@ sub AMADDevice_Define($$) {
     my $i = 0;
 
     ######## Kann in kommenden Versionen gelöscht werden ###############
-    #foreach my $param ( @a ) {
-    #    if( $param =~ m/IODev=([^\s]*)/ ) {
+    foreach my $param ( @a ) {
+        if( $param =~ m/IODev=([^\s]*)/ ) {
         
-    #        $iodev = $1;
-    #        splice( @a, $i, 3 );
-    #        last;
-    #    }
+            $iodev = $1;
+            splice( @a, $i, 4 );
+            last;
+        }
         
-    #    $i++;
-    #}
+        $i++;
+    }
     
-    return "too few parameters: define <name> AMADDevice <HOST-IP> <amad_id> <remoteServer>" if( @a != 5 );
+    return "too few parameters: define <name> AMADDevice <HOST-IP> <amad_id> <remoteServer>" if( @a != 4 );
     return "Cannot define a AMAD device. Perl modul $missingModul is missing." if ( $missingModul );
     
     
