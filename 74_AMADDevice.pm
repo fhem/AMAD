@@ -58,7 +58,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.1";
+my $modulversion = "4.1.99.3";
 my $flowsetversion = "4.0.11";
 
 
@@ -139,19 +139,19 @@ sub AMADDevice_Define($$) {
     my $iodev;
     my $i = 0;
 
-    
-    foreach my $param ( @a ) {
-        if( $param =~ m/IODev=([^\s]*)/ ) {
+    ######## Kann in kommenden Versionen gelöscht werden ###############
+    #foreach my $param ( @a ) {
+    #    if( $param =~ m/IODev=([^\s]*)/ ) {
         
-            $iodev = $1;
-            splice( @a, $i, 4 );
-            last;
-        }
+    #        $iodev = $1;
+    #        splice( @a, $i, 3 );
+    #        last;
+    #    }
         
-        $i++;
-    }
+    #    $i++;
+    #}
     
-    return "too few parameters: define <name> AMADDevice <HOST-IP> <amad_id> <remoteServer>" if( @a != 4 );
+    return "too few parameters: define <name> AMADDevice <HOST-IP> <amad_id> <remoteServer>" if( @a != 5 );
     return "Cannot define a AMAD device. Perl modul $missingModul is missing." if ( $missingModul );
     
     
@@ -194,8 +194,8 @@ sub AMADDevice_Define($$) {
 
     
 
-    CommandAttr(undef,$name . "room AMAD") if(AttrVal($name,'room','none') eq 'none';
-    CommandAttr(undef,$name . "remoteServer $remoteServer") if(AttrVal($name,'remoteServer','none') eq 'none';
+    CommandAttr(undef,"$name room AMAD") if(AttrVal($name,'room','none') eq 'none');
+    CommandAttr(undef,"$name remoteServer $remoteServer") if(AttrVal($name,'remoteServer','none') eq 'none');
         
     readingsBeginUpdate($hash);
     readingsBulkUpdateIfChanged( $hash, "state", "initialized",1);

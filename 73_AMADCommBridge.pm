@@ -74,7 +74,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.1";
+my $modulversion = "4.1.99.3";
 my $flowsetversion = "4.0.11";
 
 
@@ -153,7 +153,7 @@ sub AMADCommBridge_Define($$) {
     $hash->{VERSIONFLOWSET} = $flowsetversion;
 
 
-    $attr{$name}{room} = "AMAD" if( !defined( $attr{$name}{room} ) );
+    CommandAttr(undef,"$name room AMAD") if(AttrVal($name,'room','none') eq 'none');
     
     Log3 $name, 3, "AMADCommBridge ($name) - defined AMADCommBridge with Socketport $port";
 
