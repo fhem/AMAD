@@ -58,7 +58,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.13";
+my $modulversion = "4.1.99.15";
 my $flowsetversion = "4.0.11";
 
 
@@ -363,7 +363,10 @@ sub AMADDevice_statusRequest($) {
     my $bport           = $hash->{IODev}->{PORT};
 
     $header  .= "\r\nfhemip: $fhemip\r\nfhemdevice: $name\r\nactivetask: $activetask\r\napssid: $apssid\r\nbport: $bport\r\nuserflowstate: $userFlowState\r\namadid: $amad_id\r\nfhemctlmode: $fhemCtlMode";
-    $method  = "GET";
+    
+    $method  = "GET" AttrVal($name,'remoteServer','Automagic') eq 'Automagic';
+    $method  = "POST" AttrVal($name,'remoteServer','Automagic') ne 'Automagic';
+    
     $path     ="/fhem-amad/deviceInfo/";       # Pfad muß so im Automagic als http request Trigger drin stehen
     readingsSingleUpdate( $hash, "lastSetCommand", $path, 1 );
 
