@@ -74,7 +74,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.3";
+my $modulversion = "4.1.99.8";
 my $flowsetversion = "4.0.11";
 
 
@@ -248,7 +248,7 @@ sub AMADCommBridge_Write($@) {
 
     my ($hash,$amad_id,$uri,$path,$header,$method)    = @_;
     my $name                                    = $hash->{NAME};
-    my $dhash                                   = $defs{$amad_id};
+    my $dhash                                   = $modules{AMADDevice}{defptr}{$amad_id};
     my $param;
     my $remoteServer                            = AttrVal($dhash->{NAME},'remoteServer','Automagic');
     

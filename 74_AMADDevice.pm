@@ -58,7 +58,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.3";
+my $modulversion = "4.1.99.8";
 my $flowsetversion = "4.0.11";
 
 
@@ -349,9 +349,9 @@ sub AMADDevice_statusRequest($) {
     my $host                = $hash->{HOST};
     my $port                = $hash->{PORT};
     my $amad_id             = $hash->{AMAD_ID};
-    my $uri;
-    my $path;
+    my $uri                 = $hash->{HOST} . ":" . $hash->{PORT};
     my $header              = 'Connection: close';
+    my $path;
     my $method;
     
     
@@ -361,18 +361,15 @@ sub AMADDevice_statusRequest($) {
     my $fhemip          = ReadingsVal($hash->{IODev}->{NAME}, "fhemServerIP", "none");
     my $fhemCtlMode     = AttrVal($hash->{IODev}->{NAME},'fhemControlMode','none' );
     my $bport           = $hash->{IODev}->{PORT};
-    my $remoteServer    = AttrVal( $name, "remoteServer", "Automagic" );
 
     $header  .= "\r\nfhemip: $fhemip\r\nfhemdevice: $name\r\nactivetask: $activetask\r\napssid: $apssid\r\nbport: $bport\r\nuserflowstate: $userFlowState\r\namadid: $amad_id\r\nfhemctlmode: $fhemCtlMode";
     $method  = "GET";
     $path     ="/fhem-amad/deviceInfo/";       # Pfad muß so im Automagic als http request Trigger drin stehen
-    readingsSingleUpdate( $hash, "lastSetCommand", $path, 1 );    
- 
-    if ($remoteServer eq "Automagic"){
-      $uri    = $host . ":" . $port . $path;
-      IOWrite($hash,$amad_id,$uri,$header,$method);
-      Log3 $name, 5, "AMADDevice ($name) - IOWrite: $uri $method IODevHash=$hash->{IODev}";
-    }
+    readingsSingleUpdate( $hash, "lastSetCommand", $path, 1 );
+
+
+    IOWrite($hash,$amad_id,$uri,$path,$header,$method);
+    Log3 $name, 5, "AMADDevice ($name) - IOWrite: $uri $method IODevHash=$hash->{IODev}";
 }
 
 sub AMADDevice_WriteReadings($$) {
