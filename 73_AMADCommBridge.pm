@@ -74,7 +74,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.8";
+my $modulversion = "4.1.99.13";
 my $flowsetversion = "4.0.11";
 
 
@@ -257,14 +257,14 @@ sub AMADCommBridge_Write($@) {
     
     $param = { url => "http://" . $uri . $path, timeout => 15, hash => $hash, amad_id => $amad_id, method => $method, header => $header, doTrigger => 1, callback => \&AMADCommBridge_ErrorHandling } if($remoteServer eq 'Automagic');
     
-    $param =    {   url => "http://" . $uri,
+    $param =    {   url => "http://" . $uri . "/",
                     data => "{\"message\":\"AMAD=:=$path\", \"sender\":\"AMAD\", \"ttl\":60, \"communication_base_params\":{\"type\":\"Message\", \"fallback\":false, \"via\":\"Wifi\"},\"version\":\"1.62\"}",
                     timeout => 15, hash => $hash, amad_id => $amad_id, method => $method,
                     header => "agent: TeleHeater/2.2.3\r\nUser-Agent: TeleHeater/2.2.3\r\nAccept: application/json",
                     doTrigger => 1, callback => \&AMADCommBridge_ErrorHandling 
                 } if($remoteServer eq 'Autoremote');
 
-    $param =    {   url => "http://" . $uri,
+    $param =    {   url => "http://" . $uri . "/",
                     data => "device=AMAD&cmd=".urlEncode($path),
                     timeout => 15, hash => $hash, amad_id => $amad_id, method => $method,
                     header => "agent: TeleHeater/2.2.3\r\nUser-Agent: TeleHeater/2.2.3\r\nAccept: application/json",
