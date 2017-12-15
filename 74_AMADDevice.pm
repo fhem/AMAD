@@ -364,8 +364,8 @@ sub AMADDevice_statusRequest($) {
 
     $header  .= "\r\nfhemip: $fhemip\r\nfhemdevice: $name\r\nactivetask: $activetask\r\napssid: $apssid\r\nbport: $bport\r\nuserflowstate: $userFlowState\r\namadid: $amad_id\r\nfhemctlmode: $fhemCtlMode";
     
-    $method  = "GET" AttrVal($name,'remoteServer','Automagic') eq 'Automagic';
-    $method  = "POST" AttrVal($name,'remoteServer','Automagic') ne 'Automagic';
+    $method  = "GET" if( AttrVal($name,'remoteServer','Automagic') eq 'Automagic' );
+    $method  = "POST" if (AttrVal($name,'remoteServer','Automagic') ne 'Automagic' );
     
     $path     ="/fhem-amad/deviceInfo/";       # Pfad muß so im Automagic als http request Trigger drin stehen
     readingsSingleUpdate( $hash, "lastSetCommand", $path, 1 );
