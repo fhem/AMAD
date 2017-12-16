@@ -74,7 +74,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.15";
+my $modulversion = "4.1.99.17";
 my $flowsetversion = "4.0.11";
 
 
@@ -251,8 +251,12 @@ sub AMADCommBridge_Write($@) {
     my $dhash                                   = $modules{AMADDevice}{defptr}{$amad_id};
     my $param;
     my $remoteServer                            = AttrVal($dhash->{NAME},'remoteServer','Automagic');
-    
-    
+
+
+    Log3 $name, 4, "AMADCommBridge ($name) - AMADCommBridge_Write Path: $path";
+
+    return readingsSingleUpdate($dhash,'lastSetCommand',$path,1)
+    if( $remoteServer eq 'other' );
     
     
     $param = { url => "http://" . $uri . $path, timeout => 15, hash => $hash, amad_id => $amad_id, method => $method, header => $header, doTrigger => 1, callback => \&AMADCommBridge_ErrorHandling } if($remoteServer eq 'Automagic');
@@ -271,12 +275,9 @@ sub AMADCommBridge_Write($@) {
                     doTrigger => 1, callback => \&AMADCommBridge_ErrorHandling 
                 } if($remoteServer eq 'TNES');
 
+    Log3 $name, 5, "AMADCommBridge ($name) - Send with remoteServer: $remoteServer URL: $param->{url}, HEADER: $param->{header}, METHOD: $method, DATA: $param->{data}";
 
-
-
-    HttpUtils_NonblockingGet($param);
-    
-    Log3 $name, 5, "AMADCommBridge ($name) - Send with URI: $uri, HEADER: $header, METHOD: $method";
+    HttpUtils_NonblockingGet($param) if( defined($param) );
 }
 
 sub AMADCommBridge_ErrorHandling($$$) {
