@@ -59,7 +59,7 @@ eval "use JSON;1" or $missingModul .= "JSON ";
 
 
 my $modulversion = "4.0.12";
-my $flowsetversion = "4.0.11";
+my $flowsetversion = "4.0.12";
 
 
 
@@ -120,6 +120,7 @@ sub AMADDevice_Initialize($) {
                 "setAPSSID ".
                 "root:0,1 ".
                 "disable:1 ".
+                "remoteServer:Automagic,Autoremote,TNES,other ".
                 $readingFnAttributes;
     
     foreach my $d(sort keys %{$modules{AMADDevice}{defptr}}) {
@@ -134,27 +135,15 @@ sub AMADDevice_Define($$) {
 
     my ( $hash, $def ) = @_;
     my @a = split( "[ \t]+", $def );
-    splice( @a, 1, 1 );
-    my $iodev;
-    my $i = 0;
-
     
-    foreach my $param ( @a ) {
-        if( $param =~ m/IODev=([^\s]*)/ ) {
-        
-            $iodev = $1;
-            splice( @a, $i, 3 );
-            last;
-        }
-        
-        $i++;
-    }
-    
-    return "too few parameters: define <name> AMADDevice <HOST-IP> <amad_id>" if( @a != 3 );
+    return "too few parameters: define <name> AMADDevice <HOST-IP> <amad_id> <remoteServer>" if( @a < 4 );
     return "Cannot define a AMAD device. Perl modul $missingModul is missing." if ( $missingModul );
     
-    
-    my ($name,$host,$amad_id)                        = @a;
+
+    my $name                                    = $a[0];
+    my $host                                    = $a[2];
+    my $amad_id                                 = $a[3];
+    my $$remoteServer                           = $a[4];
 
     $hash->{HOST}                               = $host;
     $hash->{AMAD_ID}                            = $amad_id;
