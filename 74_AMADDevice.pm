@@ -742,7 +742,7 @@ sub AMADDevice_Parse($$) {
             
     } else {
 
-        return "UNDEFINED $fhemDevice AMADDevice $decode_json->{firstrun}{'amaddevice_ip'} $decode_json->{amad}{'amad_id'}";
+        return "UNDEFINED $fhemDevice AMADDevice $decode_json->{firstrun}{'amaddevice_ip'} $decode_json->{amad}{'amad_id'} Automagic";
     }
 }
 
