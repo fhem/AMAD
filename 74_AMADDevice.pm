@@ -137,7 +137,7 @@ sub AMADDevice_Define($$) {
     my ( $hash, $def ) = @_;
     my @a = split( "[ \t]+", $def );
     
-    return "too few parameters: define <name> AMADDevice <HOST-IP> <amad_id> <remoteServer>" if( @a != 4 );
+    return "too few parameters: define <name> AMADDevice <HOST-IP> <amad_id> <remoteServer>" if( @a != 5 );
     return "Cannot define a AMAD device. Perl modul $missingModul is missing." if ( $missingModul );
     
 
