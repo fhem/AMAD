@@ -121,6 +121,7 @@ sub AMADDevice_Initialize($) {
                 "root:0,1 ".
                 "disable:1 ".
                 "remoteServer:Automagic,Autoremote,TNES,other ".
+                "IODev ".
                 $readingFnAttributes;
     
     foreach my $d(sort keys %{$modules{AMADDevice}{defptr}}) {
@@ -143,7 +144,9 @@ sub AMADDevice_Define($$) {
     my $name                                    = $a[0];
     my $host                                    = $a[2];
     my $amad_id                                 = $a[3];
-    my $$remoteServer                           = $a[4];
+    my $remoteServer                            = $a[4];
+    
+    $hash->{DEF} = "$host $amad_id Automagic" if( $remoteServer ne 'Automagic' );
 
     $hash->{HOST}                               = $host;
     $hash->{AMAD_ID}                            = $amad_id;
@@ -154,21 +157,22 @@ sub AMADDevice_Define($$) {
     $hash->{helper}{setCmdErrorCounter}         = 0;
     $hash->{helper}{deviceStateErrorCounter}    = 0;
 
+
+
     
-
-
+    CommandAttr(undef,"$name IODev $modules{AMADCommBridge}{defptr}{BRIDGE}->{NAME}") if(AttrVal($name,'IODev','none') eq 'none');
+    
+    my $iodev           = AttrVal($name,'IODev','none');
+    
     AssignIoPort($hash,$iodev) if( !$hash->{IODev} );
     
     if(defined($hash->{IODev}->{NAME})) {
-    
         Log3 $name, 3, "AMADDevice ($name) - I/O device is " . $hash->{IODev}->{NAME};
-    
     } else {
-    
         Log3 $name, 1, "AMADDevice ($name) - no I/O device";
     }
-    
-    
+
+
     $iodev = $hash->{IODev}->{NAME};
     
     my $d = $modules{AMADDevice}{defptr}{$amad_id};
@@ -738,7 +742,7 @@ sub AMADDevice_Parse($$) {
             
     } else {
 
-        return "UNDEFINED $fhemDevice AMADDevice $decode_json->{firstrun}{'amaddevice_ip'} $decode_json->{amad}{'amad_id'} IODev=$name";
+        return "UNDEFINED $fhemDevice AMADDevice $decode_json->{firstrun}{'amaddevice_ip'} $decode_json->{amad}{'amad_id'}";
     }
 }
 
