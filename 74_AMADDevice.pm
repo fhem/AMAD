@@ -58,7 +58,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.22";
+my $modulversion = "4.1.99.23";
 my $flowsetversion = "4.1.99.1";
 
 
@@ -120,6 +120,7 @@ sub AMADDevice_Initialize($) {
                 "setAPSSID ".
                 "root:0,1 ".
                 "disable:1 ".
+                "IODev ".
                 "remoteServer:Automagic,Autoremote,TNES,other ".
                 $readingFnAttributes;
     
