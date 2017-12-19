@@ -140,10 +140,10 @@ sub AMADDevice_Define($$) {
     return "Cannot define a AMAD device. Perl modul $missingModul is missing." if ( $missingModul );
     
 
-    my $name                                    = $a[0]
-    my $host                                    = $a[2]
-    my $amad_id                                 = $a[3]
-    my $remoteServer                            = $a[4]
+    my $name                                    = $a[0];
+    my $host                                    = $a[2];
+    my $amad_id                                 = $a[3];
+    my $remoteServer                            = $a[4];
     
     $hash->{HOST}                               = $host;
     $hash->{AMAD_ID}                            = $amad_id;
