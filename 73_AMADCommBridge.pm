@@ -74,7 +74,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.17";
+my $modulversion = "4.1.99.22";
 my $flowsetversion = "4.1.99.1";
 
 

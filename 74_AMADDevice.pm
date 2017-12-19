@@ -58,7 +58,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.17";
+my $modulversion = "4.1.99.22";
 my $flowsetversion = "4.1.99.1";
 
 
@@ -135,28 +135,16 @@ sub AMADDevice_Define($$) {
 
     my ( $hash, $def ) = @_;
     my @a = split( "[ \t]+", $def );
-    splice( @a, 1, 1 );
-    my $iodev;
-    my $i = 0;
-
-    ######## Kann in kommenden Versionen gelöscht werden ###############
-    foreach my $param ( @a ) {
-        if( $param =~ m/IODev=([^\s]*)/ ) {
-        
-            $iodev = $1;
-            splice( @a, $i, 4 );
-            last;
-        }
-        
-        $i++;
-    }
     
     return "too few parameters: define <name> AMADDevice <HOST-IP> <amad_id> <remoteServer>" if( @a != 4 );
     return "Cannot define a AMAD device. Perl modul $missingModul is missing." if ( $missingModul );
     
-    
-    my ($name,$host,$amad_id,$remoteServer)     = @a;
 
+    my $name                                    = $a[0]
+    my $host                                    = $a[2]
+    my $amad_id                                 = $a[3]
+    my $remoteServer                            = $a[4]
+    
     $hash->{HOST}                               = $host;
     $hash->{AMAD_ID}                            = $amad_id;
     $hash->{VERSIONMODUL}                       = $modulversion;
@@ -170,9 +158,12 @@ sub AMADDevice_Define($$) {
     $hash->{helper}{setCmdErrorCounter}         = 0;
     $hash->{helper}{deviceStateErrorCounter}    = 0;
 
+
+
+    CommandAttr(undef,"$name IODev $modules{AMADCommBridge}{defptr}{BRIDGE}->{NAME}") if(AttrVal($name,'IODev','none') eq 'none');
+
+    my $iodev           = AttrVal($name,'IODev','none');
     
-
-
     AssignIoPort($hash,$iodev) if( !$hash->{IODev} );
     
     if(defined($hash->{IODev}->{NAME})) {
@@ -764,7 +755,7 @@ sub AMADDevice_Parse($$) {
             
     } else {
 
-        return "UNDEFINED $fhemDevice AMADDevice $decode_json->{firstrun}{'amaddevice_ip'} $decode_json->{amad}{'amad_id'} $decode_json->{firstrun}{remoteserver} IODev=$name";
+        return "UNDEFINED $fhemDevice AMADDevice $decode_json->{firstrun}{'amaddevice_ip'} $decode_json->{amad}{'amad_id'} $decode_json->{firstrun}{remoteserver}";
     }
 }
 
