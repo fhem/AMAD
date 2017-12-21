@@ -74,7 +74,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.22";
+my $modulversion = "4.1.99.23";
 my $flowsetversion = "4.1.99.3";
 
 
@@ -275,7 +275,11 @@ sub AMADCommBridge_Write($@) {
                     doTrigger => 1, callback => \&AMADCommBridge_ErrorHandling 
                 } if($remoteServer eq 'TNES');
 
-    Log3 $name, 5, "AMADCommBridge ($name) - Send with remoteServer: $remoteServer URL: $param->{url}, HEADER: $param->{header}, METHOD: $method, DATA: $param->{data}";
+                
+    my $logtext = "AMADCommBridge ($name) - Send with remoteServer: $remoteServer URL: $param->{url}, HEADER: $param->{header}, METHOD: $method";
+        $logtext .= ", DATA: $param->{data}" if( $remoteServer ne 'Automagic';
+    Log3 $name, 5, "$logtext";
+    
 
     HttpUtils_NonblockingGet($param) if( defined($param) );
 }
@@ -802,7 +806,8 @@ sub AMADCommBridge_ResponseProcessing($$) {
             return Log3 $bname, 3, "AMADCommBridge ($name) - AMADCommBridge: processing receive no reading values from Device: $fhemDevice"
             unless( (defined($decode_json->{payload}) and ($decode_json->{payload})) or (defined($decode_json->{firstrun}) and ($decode_json->{firstrun})) );
             
-            Log3 $bname, 4, "AMADCommBridge ($bname) - AMADCommBridge: processing receive reading values - Device: $fhemDevice Data: $decode_json->{payload}" unless( defined($decode_json->{payload}) and ($decode_json->{payload}) );
+            Log3 $bname, 4, "AMADCommBridge ($bname) - AMADCommBridge: processing receive reading values - Device: $fhemDevice Data: $decode_json->{payload}"
+            if( defined($decode_json->{payload}) and ($decode_json->{payload}) );
 
             Dispatch($bhash,$json,undef);
             Log3 $bname, 4, "AMADCommBridge ($bname) - call Dispatcher";
