@@ -58,7 +58,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.23";
+my $modulversion = "4.1.99.25";
 my $flowsetversion = "4.1.99.3";
 
 
@@ -154,6 +154,7 @@ sub AMADDevice_Define($$) {
     $hash->{PORT}                               = 8090 if($remoteServer eq 'Automagic');
     $hash->{PORT}                               = 1817 if($remoteServer eq 'Autoremote');
     $hash->{PORT}                               = 8765 if($remoteServer eq 'TNES');
+    $hash->{PORT}                               = 1111 if($remoteServer eq 'other');        # Dummy Port for other
     
     $hash->{helper}{infoErrorCounter}           = 0;
     $hash->{helper}{setCmdErrorCounter}         = 0;
