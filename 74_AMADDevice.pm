@@ -58,7 +58,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.25";
+my $modulversion = "4.1.99.27";
 my $flowsetversion = "4.1.99.3";
 
 
@@ -233,7 +233,28 @@ sub AMADDevice_Attr(@) {
     
     my $orig = $attrVal;
 
-    if( $attrName eq "disable" ) {
+    if( $attrName eq "remoteServer" ) {
+        if( $cmd eq "set" ) {
+            if( $attrVal eq "Automagic" ) {
+                $hash->{PORT}   = 8090;
+                Log3 $name, 3, "AMADDevice ($name) - set remoteServer to Automagic";
+            
+            } elsif( $attrVal eq "Autoremote" ) {
+                $hash->{PORT}   = 1817;
+                Log3 $name, 3, "AMADDevice ($name) - set remoteServer to Autoremote";
+            
+            } elsif( $attrVal eq "TNES" ) {
+                $hash->{PORT}   = 8765;
+                Log3 $name, 3, "AMADDevice ($name) - set remoteServer to TNES";
+            
+            } elsif( $attrVal eq "other" ) {
+                $hash->{PORT}   = 1111;
+                Log3 $name, 3, "AMADDevice ($name) - set remoteServer to other";
+            }
+        }
+    }
+    
+    elsif( $attrName eq "disable" ) {
         if( $cmd eq "set" ) {
             if( $attrVal eq "0" ) {
             

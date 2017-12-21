@@ -74,7 +74,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.23";
+my $modulversion = "4.1.99.24";
 my $flowsetversion = "4.1.99.3";
 
 
@@ -277,7 +277,7 @@ sub AMADCommBridge_Write($@) {
 
                 
     my $logtext = "AMADCommBridge ($name) - Send with remoteServer: $remoteServer URL: $param->{url}, HEADER: $param->{header}, METHOD: $method";
-        $logtext .= ", DATA: $param->{data}" if( $remoteServer ne 'Automagic';
+        $logtext .= ", DATA: $param->{data}" if( $remoteServer ne 'Automagic' );
     Log3 $name, 5, "$logtext";
     
 
