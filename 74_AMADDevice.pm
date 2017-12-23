@@ -58,7 +58,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.28";
+my $modulversion = "4.1.99.29";
 my $flowsetversion = "4.1.99.3";
 
 
@@ -252,7 +252,7 @@ sub AMADDevice_Attr(@) {
                 Log3 $name, 3, "AMADDevice ($name) - set remoteServer to other";
             }
             
-            CommandDefMod(undef,"$name $hash->{TYPE} $hash->{HOST} $hash->{AMAD_ID} $attrVal");
+            $hash->{DEF} = "$name $hash->{TYPE} $hash->{HOST} $hash->{AMAD_ID} $attrVal";
         }
     }
     
