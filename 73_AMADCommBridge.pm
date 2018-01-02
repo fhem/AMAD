@@ -74,7 +74,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.24";
+my $modulversion = "4.1.99.25";
 my $flowsetversion = "4.1.99.3";
 
 
@@ -785,7 +785,7 @@ sub AMADCommBridge_ResponseProcessing($$) {
 
 
 
-    if( !defined($amad_id) ) {
+    if( !defined($amad_id) or !defined($fhemDevice) ) {
         readingsSingleUpdate( $bhash, "transmitterERROR", $hash->{NAME}." has no device name sends", 1 ) if( AttrVal( $bname, "expertMode", 0 ) eq "1" );
         Log3 $bname, 4, "AMADCommBridge ($name) - ERROR - no device name given. please check your global variable in automagic";
         
