@@ -74,7 +74,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.25";
+my $modulversion = "4.1.99.26";
 my $flowsetversion = "4.1.99.3";
 
 
@@ -786,10 +786,10 @@ sub AMADCommBridge_ResponseProcessing($$) {
 
 
     if( !defined($amad_id) or !defined($fhemDevice) ) {
-        readingsSingleUpdate( $bhash, "transmitterERROR", $hash->{NAME}." has no device name sends", 1 ) if( AttrVal( $bname, "expertMode", 0 ) eq "1" );
-        Log3 $bname, 4, "AMADCommBridge ($name) - ERROR - no device name given. please check your global variable in automagic";
+        readingsSingleUpdate( $bhash, "transmitterERROR", $hash->{NAME}." has no correct amad_id", 1 );
+        Log3 $bname, 4, "AMADCommBridge ($name) - ERROR - no device name given. please check your global variable amad_id in automagic";
         
-        $response = "header lines: \r\n AMADCommBridge receive no device name. please check your global variable in automagic\r\n FHEM to do nothing\r\n";
+        $response = "header lines: \r\n AMADCommBridge receive no device name. please check your global variable amad_id in automagic\r\n FHEM to do nothing\r\n";
         $c = $hash->{CD};
         print $c "HTTP/1.1 200 OK\r\n",
             "Content-Type: text/plain\r\n",
