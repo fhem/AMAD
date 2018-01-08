@@ -1075,11 +1075,18 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
     <li>screenLock - Locks screen with request for PIN. <b>attribute setScreenlockPIN - enter PIN here. Only use numbers, 4-16 numbers required.</b></li>
     <li>screenOrientation - Auto,Landscape,Portait, set screen orientation (automatic, horizontal, vertical). <b>attribute setScreenOrientation</b></li>
     <li>system - issue system command (only with rooted Android devices). reboot,shutdown,airplanemodeON (can only be switched ON) <b>attribute root</b>, in Automagic "Preferences" "Root functions" need to be enabled.</li>
+    <li>takePicture - take a camera picture <b>Attribut setTakePictureResolution</b></li>
+  </ul>
+  <br><br>
+  <a name="AMADDeviceattribut"></a>
+  <b>Attribut</b>
+  <ul>
     <li>setAPSSID - set WLAN AccesPoint SSID to prevent WLAN sleeps</li>
     <li>setNotifySndFilePath - set systempath to notifyfile (default /storage/emulated/0/Notifications/</li>
     <li>setTtsMsgSpeed - set speaking speed for TTS (Value between 0.5 - 4.0, 0.5 Step) default is 1.0</li>
     <li>setTtsMsgLang - set speaking language for TTS, de or en (default is de)</li>
     <li>setTtsMsgVol - is set, change automatically the media audio end set it back</li>
+    <li>set setTakePictureResolution - set the camera resolution for takePicture action</li>
     <br>
     To be able to use "openApp" the corresponding attribute "setOpenApp" needs to contain the app package name.
     <br><br>
@@ -1244,12 +1251,17 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
     <li>nfc -  schaltet nfc an oder aus /on/off<b>Attribut root</b></li>
     <li>openApp - &ouml;ffnet eine ausgew&auml;hlte App. <b>Attribut setOpenApp</b></li>
     <li>openURL - &ouml;ffnet eine URL im Standardbrowser, sofern kein anderer Browser &uuml;ber das <b>Attribut setOpenUrlBrowser</b> ausgew&auml;hlt wurde.<b> Bsp:</b><i> attr Tablet setOpenUrlBrowser de.ozerov.fully|de.ozerov.fully.MainActivity, das erste ist der Package Name und das zweite der Class Name</i></li>
-    <li>setAPSSID - setzt die AccessPoint SSID um ein WLAN sleep zu verhindern</li>
     <li>screen - on/off/lock/unlock schaltet den Bildschirm ein/aus oder sperrt/entsperrt ihn, in den Automagic Einstellungen muss "Admin Funktion" gesetzt werden sonst funktioniert "Screen off" nicht. <b>Attribut setScreenOnForTimer</b> &auml;ndert die Zeit wie lange das Display an bleiben soll!</li>
     <li>screenFullscreen - on/off, (aktiviert/deaktiviert) den Vollbildmodus. <b>Attribut setFullscreen</b></li>
     <li>screenLock - Sperrt den Bildschirm mit Pinabfrage. <b>Attribut setScreenlockPIN - hier die Pin daf&uuml;r eingeben. Erlaubt sind nur Zahlen. Es m&uuml;&szlig;en mindestens 4, bis max 16 Zeichen verwendet werden.</b></li>
     <li>screenOrientation - Auto,Landscape,Portait,  aktiviert die Bildschirmausrichtung (Automatisch,Horizontal,Vertikal). <b>Attribut setScreenOrientation</b></li>
     <li>system - setzt Systembefehle ab (nur bei gerootetet Ger&auml;en). reboot,shutdown,airplanemodeON (kann nur aktiviert werden) <b>Attribut root</b>, in den Automagic Einstellungen muss "Root Funktion" gesetzt werden</li>
+    <li>takePicture - löst die Kamera aus für ein Foto <b>Attribut setTakePictureResolution</b></li>
+  </ul>
+  <br><br>
+  <a name="AMADDeviceattribute"></a>
+  <b>Attribute</b>
+  <ul>
     <li>setNotifySndFilePath - setzt den korrekten Systempfad zur Notifydatei (default ist /storage/emulated/0/Notifications/</li>
     <li>setTtsMsgSpeed - setzt die Sprachgeschwindigkeit bei der Sprachausgabe(Werte zwischen 0.5 bis 4.0 in 0.5er Schritten) default ist 1.0</li>
     <li>setTtsMsgLang - setzt die Sprache bei der Sprachausgabe, de oder en (default ist de)</li>
@@ -1258,6 +1270,8 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
     <li>setVolMax - setzt die maximale Volume Gr&uoml;e f&uuml;r den Slider</li>
     <li>setNotifyVolMax - setzt den maximalen Lautst&auml;rkewert für Benachrichtigungslautst&auml;rke f&uuml;r den Slider</li>
     <li>setRingSoundVolMax - setzt den maximalen Lautst&auml;rkewert für Klingellautst&auml;rke f&uuml;r den Slider</li>
+    <li>setAPSSID - setzt die AccessPoint SSID um ein WLAN sleep zu verhindern</li>
+    <li>setTakePictureResolution - welche Kameraauflösung soll verwendet werden?</li>
     <br>
     Um openApp verwenden zu k&ouml;nnen, muss als Attribut der Package Name der App angegeben werden.
     <br><br>
