@@ -74,8 +74,8 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.26";
-my $flowsetversion = "4.1.99.3";
+my $modulversion = "4.1.99.30";
+my $flowsetversion = "4.1.99.5";
 
 
 
@@ -254,19 +254,27 @@ sub AMADCommBridge_Write($@) {
 
 
     Log3 $name, 4, "AMADCommBridge ($name) - AMADCommBridge_Write Path: $path";
+    
+    
+    if($remoteServer ne 'Automagic' and $path =~ /\?/) {
+        $path .= "&amad_id=$amad_id";
+    } elsif($remoteServer ne 'Automagic') {
+        $path .= "?amad_id=$amad_id";
+    }
 
     return readingsSingleUpdate($dhash,'lastSetCommand',$path,1)
     if( $remoteServer eq 'other' );
-    
-    
-    $param = { url => "http://" . $uri . $path, timeout => 15, hash => $hash, amad_id => $amad_id, method => $method, header => $header, doTrigger => 1, callback => \&AMADCommBridge_ErrorHandling } if($remoteServer eq 'Automagic');
-    
+
+    $param = { url => "http://" . $uri . $path, timeout => 15, hash => $hash, amad_id => $amad_id, method => $method, header => $header . "\r\namadid: $amad_id", doTrigger => 1, callback => \&AMADCommBridge_ErrorHandling } if($remoteServer eq 'Automagic');
+
+
     $param =    {   url => "http://" . $uri . "/",
                     data => "{\"message\":\"AMAD=:=$path\", \"sender\":\"AMAD\", \"ttl\":60, \"communication_base_params\":{\"type\":\"Message\", \"fallback\":false, \"via\":\"Wifi\"},\"version\":\"1.62\"}",
                     timeout => 15, hash => $hash, amad_id => $amad_id, method => $method,
                     header => "agent: TeleHeater/2.2.3\r\nUser-Agent: TeleHeater/2.2.3\r\nAccept: application/json",
                     doTrigger => 1, callback => \&AMADCommBridge_ErrorHandling 
                 } if($remoteServer eq 'Autoremote');
+
 
     $param =    {   url => "http://" . $uri . "/",
                     data => "device=AMAD&cmd=".urlEncode($path),
@@ -275,7 +283,8 @@ sub AMADCommBridge_Write($@) {
                     doTrigger => 1, callback => \&AMADCommBridge_ErrorHandling 
                 } if($remoteServer eq 'TNES');
 
-                
+
+
     my $logtext = "AMADCommBridge ($name) - Send with remoteServer: $remoteServer URL: $param->{url}, HEADER: $param->{header}, METHOD: $method";
         $logtext .= ", DATA: $param->{data}" if( $remoteServer ne 'Automagic' );
     Log3 $name, 5, "$logtext";

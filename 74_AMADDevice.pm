@@ -59,7 +59,7 @@ eval "use JSON;1" or $missingModul .= "JSON ";
 
 
 my $modulversion = "4.1.99.30";
-my $flowsetversion = "4.1.99.3";
+my $flowsetversion = "4.1.99.5";
 
 
 
@@ -378,7 +378,7 @@ sub AMADDevice_statusRequest($) {
     my $fhemCtlMode     = AttrVal($hash->{IODev}->{NAME},'fhemControlMode','none' );
     my $bport           = $hash->{IODev}->{PORT};
 
-    $header  .= "\r\nfhemip: $fhemip\r\nfhemdevice: $name\r\nactivetask: $activetask\r\napssid: $apssid\r\nbport: $bport\r\nuserflowstate: $userFlowState\r\namadid: $amad_id\r\nfhemctlmode: $fhemCtlMode";
+    $header  .= "\r\nfhemip: $fhemip\r\nfhemdevice: $name\r\nactivetask: $activetask\r\napssid: $apssid\r\nbport: $bport\r\nuserflowstate: $userFlowState\r\nfhemctlmode: $fhemCtlMode";
     
     $method  = "GET" if( AttrVal($name,'remoteServer','Automagic') eq 'Automagic' );
     $method  = "POST" if (AttrVal($name,'remoteServer','Automagic') ne 'Automagic' );
