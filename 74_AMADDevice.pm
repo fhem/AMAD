@@ -741,8 +741,6 @@ sub AMADDevice_Set($$@) {
 
         return "Unknown argument $cmd, choose one of $list";
     }
-
-    readingsSingleUpdate( $hash, "lastSetCommand", $path, 1 );
     
     
     IOWrite($hash,$amad_id,$uri,$path,$header,$method);
