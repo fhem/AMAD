@@ -671,7 +671,7 @@ sub AMADDevice_Set($$@) {
 
         return "Please set \"setTakePictureResolution\" Attribut first"
         unless(AttrVal($name,'setTakePictureResolution','none') ne 'none');
-        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/takepicture?pictureresolution=" . AttrVal($name,'setTakePictureResolution','none');
+        $path   = "/fhem-amad/setCommands/takepicture?pictureresolution=" . AttrVal($name,'setTakePictureResolution','none');
         $method = "POST";
     }
     
