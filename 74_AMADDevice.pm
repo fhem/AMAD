@@ -386,7 +386,6 @@ sub AMADDevice_statusRequest($) {
     $method  = "POST" if (AttrVal($name,'remoteServer','Automagic') ne 'Automagic' );
     
     $path     ="/fhem-amad/deviceInfo/";       # Pfad muß so im Automagic als http request Trigger drin stehen
-    readingsSingleUpdate( $hash, "lastSetCommand", $path, 1 );
 
 
     IOWrite($hash,$amad_id,$uri,$path,$header,$method);
