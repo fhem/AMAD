@@ -845,6 +845,11 @@ irname=getString("name")</extras>
   </condition>
   <condition type="expression">
     <useDefaultName>true</useDefaultName>
+    <name>Expression: param_picturecamera == "Back"</name>
+    <expression>param_picturecamera == "Back"</expression>
+  </condition>
+  <condition type="expression">
+    <useDefaultName>true</useDefaultName>
     <name>Expression: param_pictureresolution == "1024x768"</name>
     <expression>param_pictureresolution == "1024x768"</expression>
   </condition>
@@ -1897,6 +1902,24 @@ putString("{param_exkey2}", "{param_exval2}");</extras>
   </action>
   <action type="take_picture">
     <useDefaultName>false</useDefaultName>
+    <name>Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 1024x768 Front</name>
+    <useCameraApp>false</useCameraApp>
+    <path>/storage/emulated/0/AMADpicture.jpg</path>
+    <cameraId>1</cameraId>
+    <pictureSize>1024*768</pictureSize>
+    <zoom>100</zoom>
+    <sceneMode>auto</sceneMode>
+    <colorEffect>none</colorEffect>
+    <flashMode></flashMode>
+    <whiteBalance>auto</whiteBalance>
+    <focusMode>fixed</focusMode>
+    <awaitPreviewImages>false</awaitPreviewImages>
+    <blackPictureFix>true</blackPictureFix>
+    <blackPictureFixDuration>2000</blackPictureFixDuration>
+    <addToGallery>true</addToGallery>
+  </action>
+  <action type="take_picture">
+    <useDefaultName>false</useDefaultName>
     <name>Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 1280x720</name>
     <useCameraApp>false</useCameraApp>
     <path>/storage/emulated/0/AMADpicture.jpg</path>
@@ -1908,6 +1931,24 @@ putString("{param_exkey2}", "{param_exval2}");</extras>
     <flashMode></flashMode>
     <whiteBalance>auto</whiteBalance>
     <focusMode>auto</focusMode>
+    <awaitPreviewImages>false</awaitPreviewImages>
+    <blackPictureFix>true</blackPictureFix>
+    <blackPictureFixDuration>2000</blackPictureFixDuration>
+    <addToGallery>true</addToGallery>
+  </action>
+  <action type="take_picture">
+    <useDefaultName>false</useDefaultName>
+    <name>Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 1280x720 Front</name>
+    <useCameraApp>false</useCameraApp>
+    <path>/storage/emulated/0/AMADpicture.jpg</path>
+    <cameraId>1</cameraId>
+    <pictureSize>1280*720</pictureSize>
+    <zoom>100</zoom>
+    <sceneMode>auto</sceneMode>
+    <colorEffect>none</colorEffect>
+    <flashMode></flashMode>
+    <whiteBalance>auto</whiteBalance>
+    <focusMode>fixed</focusMode>
     <awaitPreviewImages>false</awaitPreviewImages>
     <blackPictureFix>true</blackPictureFix>
     <blackPictureFixDuration>2000</blackPictureFixDuration>
@@ -1933,6 +1974,24 @@ putString("{param_exkey2}", "{param_exval2}");</extras>
   </action>
   <action type="take_picture">
     <useDefaultName>false</useDefaultName>
+    <name>Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 1600x1200 Front</name>
+    <useCameraApp>false</useCameraApp>
+    <path>/storage/emulated/0/AMADpicture.jpg</path>
+    <cameraId>1</cameraId>
+    <pictureSize>176*144</pictureSize>
+    <zoom>100</zoom>
+    <sceneMode>auto</sceneMode>
+    <colorEffect>none</colorEffect>
+    <flashMode></flashMode>
+    <whiteBalance>auto</whiteBalance>
+    <focusMode>fixed</focusMode>
+    <awaitPreviewImages>false</awaitPreviewImages>
+    <blackPictureFix>true</blackPictureFix>
+    <blackPictureFixDuration>2000</blackPictureFixDuration>
+    <addToGallery>true</addToGallery>
+  </action>
+  <action type="take_picture">
+    <useDefaultName>false</useDefaultName>
     <name>Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 1920x1080</name>
     <useCameraApp>false</useCameraApp>
     <path>/storage/emulated/0/AMADpicture.jpg</path>
@@ -1951,6 +2010,24 @@ putString("{param_exkey2}", "{param_exval2}");</extras>
   </action>
   <action type="take_picture">
     <useDefaultName>false</useDefaultName>
+    <name>Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 1920x1080 Front</name>
+    <useCameraApp>false</useCameraApp>
+    <path>/storage/emulated/0/AMADpicture.jpg</path>
+    <cameraId>1</cameraId>
+    <pictureSize>176*144</pictureSize>
+    <zoom>100</zoom>
+    <sceneMode>auto</sceneMode>
+    <colorEffect>none</colorEffect>
+    <flashMode></flashMode>
+    <whiteBalance>auto</whiteBalance>
+    <focusMode>fixed</focusMode>
+    <awaitPreviewImages>false</awaitPreviewImages>
+    <blackPictureFix>true</blackPictureFix>
+    <blackPictureFixDuration>2000</blackPictureFixDuration>
+    <addToGallery>true</addToGallery>
+  </action>
+  <action type="take_picture">
+    <useDefaultName>false</useDefaultName>
     <name>Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 800x600</name>
     <useCameraApp>false</useCameraApp>
     <path>/storage/emulated/0/AMADpicture.jpg</path>
@@ -1962,6 +2039,24 @@ putString("{param_exkey2}", "{param_exval2}");</extras>
     <flashMode></flashMode>
     <whiteBalance>auto</whiteBalance>
     <focusMode>auto</focusMode>
+    <awaitPreviewImages>false</awaitPreviewImages>
+    <blackPictureFix>true</blackPictureFix>
+    <blackPictureFixDuration>2000</blackPictureFixDuration>
+    <addToGallery>true</addToGallery>
+  </action>
+  <action type="take_picture">
+    <useDefaultName>false</useDefaultName>
+    <name>Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 800x600 Front</name>
+    <useCameraApp>false</useCameraApp>
+    <path>/storage/emulated/0/AMADpicture.jpg</path>
+    <cameraId>1</cameraId>
+    <pictureSize>800*600</pictureSize>
+    <zoom>100</zoom>
+    <sceneMode>auto</sceneMode>
+    <colorEffect>none</colorEffect>
+    <flashMode></flashMode>
+    <whiteBalance>auto</whiteBalance>
+    <focusMode>fixed</focusMode>
     <awaitPreviewImages>false</awaitPreviewImages>
     <blackPictureFix>true</blackPictureFix>
     <blackPictureFixDuration>2000</blackPictureFixDuration>
@@ -3066,6 +3161,11 @@ fhemcmd = "setreading";</script>
     <useDefaultName>true</useDefaultName>
     <name>Script: notification_text = "not supported from your device"</name>
     <script>notification_text = "not supported from your device"</script>
+  </action>
+  <action type="script">
+    <useDefaultName>true</useDefaultName>
+    <name>Script: notification_text = "Take Picture: can not save camerapicture, path does not exist"</name>
+    <script>notification_text = "Take Picture: can not save camerapicture, path does not exist"</script>
   </action>
   <action type="script">
     <useDefaultName>true</useDefaultName>
@@ -4799,30 +4899,43 @@ Soll der Assistent gelöscht werden?</actioncontainer>
     <conditioncontainer id="t169" x="-6475.0" y="-122.5">Expression: showhomescreen"</conditioncontainer>
     <actioncontainer id="t170" x="-6475.0" y="892.5">Zeige Home Screen</actioncontainer>
     <conditioncontainer id="t171" x="-805.0" y="-2047.5">Expression: trigger == "HTTP Request: /fhem-amad/setCommands/*"</conditioncontainer>
-    <conditioncontainer id="t172" x="-7000.0" y="-122.5">Expression: takepicture</conditioncontainer>
-    <conditioncontainer id="t173" x="-5845.0" y="577.5">Expression: param_button == "stop"</conditioncontainer>
-    <actioncontainer id="t174" x="-7140.0" y="892.5">Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 1024x768</actioncontainer>
-    <actioncontainer id="t175" x="-7000.0" y="892.5">Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 1280x720</actioncontainer>
-    <actioncontainer id="t176" x="-6860.0" y="892.5">Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 1600x1200</actioncontainer>
-    <actioncontainer id="t177" x="-6720.0" y="892.5">Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 1920x1080</actioncontainer>
-    <conditioncontainer id="t178" x="-7280.0" y="367.5">Expression: param_pictureresolution == "800x600"</conditioncontainer>
-    <conditioncontainer id="t179" x="-7140.0" y="367.5">Expression: param_pictureresolution == "1024x768"</conditioncontainer>
-    <conditioncontainer id="t180" x="-7000.0" y="367.5">Expression: param_pictureresolution == "1280x720"</conditioncontainer>
-    <conditioncontainer id="t181" x="-6860.0" y="367.5">Expression: param_pictureresolution == "1600x1200"</conditioncontainer>
-    <conditioncontainer id="t182" x="-6720.0" y="367.5">Expression: param_pictureresolution == "1920x1080"</conditioncontainer>
-    <actioncontainer id="t183" x="-7280.0" y="892.5">Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 800x600</actioncontainer>
-    <actioncontainer id="t184" x="-5215.0" y="892.5">Vibrieren: Pattern 2 (-- --)</actioncontainer>
-    <actioncontainer id="t185" x="-805.0" y="2152.5">Flows ausführen: Send Data to AMADCommBridge</actioncontainer>
-    <actioncontainer id="t186" x="-3115.0" y="892.5">Script: automagicState = "\"automagicState\":" + " \"" + replaceAll({notification_text}, "\\n", " ") + "\""; fhemcmd = "setreading";</actioncontainer>
-    <conditioncontainer id="t187" x="-805.0" y="-2572.5">Host erreichbar: {global_fhemip}:{global_bridgeport}</conditioncontainer>
-    <triggercontainer id="t188" x="-805.0" y="-3062.5">
+    <conditioncontainer id="t172" x="-5845.0" y="577.5">Expression: param_button == "stop"</conditioncontainer>
+    <actioncontainer id="t173" x="-5215.0" y="892.5">Vibrieren: Pattern 2 (-- --)</actioncontainer>
+    <actioncontainer id="t174" x="-805.0" y="2152.5">Flows ausführen: Send Data to AMADCommBridge</actioncontainer>
+    <conditioncontainer id="t175" x="-805.0" y="-2572.5">Host erreichbar: {global_fhemip}:{global_bridgeport}</conditioncontainer>
+    <triggercontainer id="t176" x="-805.0" y="-3062.5">
       <trigger>HTTP Request: /fhem-amad/deviceInfo/</trigger>
       <trigger>Sprachbefehl angefordert</trigger>
       <trigger>HTTP Request: /fhem-amad/setCommands/*</trigger>
       <trigger>Periodischer Timer: alle 120s</trigger>
     </triggercontainer>
-    <conditioncontainer id="t189" x="-805.0" y="-2712.5">Expression: global_fhemip != null or global_bridgeport != null</conditioncontainer>
-    <conditioncontainer id="t190" x="-805.0" y="-2887.5">Expression: header_amadid == {global_amadid}</conditioncontainer>
+    <conditioncontainer id="t177" x="-805.0" y="-2712.5">Expression: global_fhemip != null or global_bridgeport != null</conditioncontainer>
+    <conditioncontainer id="t178" x="-805.0" y="-2887.5">Expression: header_amadid == {global_amadid}</conditioncontainer>
+    <actioncontainer id="t179" x="-7280.0" y="892.5">Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 800x600</actioncontainer>
+    <actioncontainer id="t180" x="-7140.0" y="892.5">Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 1024x768</actioncontainer>
+    <actioncontainer id="t181" x="-7000.0" y="892.5">Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 1280x720</actioncontainer>
+    <actioncontainer id="t182" x="-6860.0" y="892.5">Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 1600x1200</actioncontainer>
+    <actioncontainer id="t183" x="-6720.0" y="892.5">Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 1920x1080</actioncontainer>
+    <actioncontainer id="t184" x="-7455.0" y="892.5">Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 1920x1080 Front</actioncontainer>
+    <actioncontainer id="t185" x="-7595.0" y="892.5">Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 1600x1200 Front</actioncontainer>
+    <actioncontainer id="t186" x="-7875.0" y="892.5">Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 1024x768 Front</actioncontainer>
+    <actioncontainer id="t187" x="-8015.0" y="892.5">Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 800x600 Front</actioncontainer>
+    <actioncontainer id="t188" x="-7735.0" y="892.5">Foto aufnehmen: /storage/emulated/0/AMADpicture.jpg (ohne Benutzeroberfläche) 1280x720 Front</actioncontainer>
+    <conditioncontainer id="t189" x="-7665.0" y="367.5">Expression: param_pictureresolution == "800x600"</conditioncontainer>
+    <conditioncontainer id="t190" x="-7525.0" y="367.5">Expression: param_pictureresolution == "1024x768"</conditioncontainer>
+    <conditioncontainer id="t191" x="-7385.0" y="367.5">Expression: param_pictureresolution == "1280x720"</conditioncontainer>
+    <conditioncontainer id="t192" x="-7245.0" y="367.5">Expression: param_pictureresolution == "1600x1200"</conditioncontainer>
+    <conditioncontainer id="t193" x="-7105.0" y="367.5">Expression: param_pictureresolution == "1920x1080"</conditioncontainer>
+    <conditioncontainer id="t194" x="-7665.0" y="577.49994">Expression: param_picturecamera == "Back"</conditioncontainer>
+    <conditioncontainer id="t195" x="-7525.0" y="577.49994">Expression: param_picturecamera == "Back"</conditioncontainer>
+    <conditioncontainer id="t196" x="-7385.0" y="577.49994">Expression: param_picturecamera == "Back"</conditioncontainer>
+    <conditioncontainer id="t197" x="-7245.0" y="577.49994">Expression: param_picturecamera == "Back"</conditioncontainer>
+    <conditioncontainer id="t198" x="-7105.0" y="577.49994">Expression: param_picturecamera == "Back"</conditioncontainer>
+    <actioncontainer id="t199" x="-3115.0" y="892.5">Script: automagicState = "\"automagicState\":" + " \"" + replaceAll({notification_text}, "\\n", " ") + "\""; fhemcmd = "setreading";</actioncontainer>
+    <conditioncontainer id="t200" x="-7385.0" y="-122.5">Expression: takepicture</conditioncontainer>
+    <conditioncontainer id="t201" x="-7385.0" y="87.5">Gerätespeicherplatz: Freier Speicherplatz &gt; 1kb (/storage/emulated/0)</conditioncontainer>
+    <actioncontainer id="t202" x="-6860.0" y="577.5001">Script: automagicState = "\"automagicState\":" + " \"" + replaceAll({notification_text}, "\\n", " ") + "\""; fhemcmd = "setreading";</actioncontainer>
+    <actioncontainer id="t203" x="-6860.0" y="367.5">Script: notification_text = "Take Picture: can not save camerapicture, path does not exist"</actioncontainer>
     <connection from="t1" to="t33" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t2" to="t57" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t2" to="t13" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -4885,7 +4998,7 @@ Soll der Assistent gelöscht werden?</actioncontainer>
     <connection from="t68" to="t69" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t69" to="t71" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t70" to="t122" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t75" to="t186" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t75" to="t199" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t76" to="t77" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t77" to="t74" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t78" to="t76" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -4918,7 +5031,7 @@ Soll der Assistent gelöscht werden?</actioncontainer>
     <connection from="t104" to="t72" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t105" to="t99" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t105" to="t98" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t106" to="t184" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t106" to="t173" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t108" to="t112" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t109" to="t107" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t113" to="t114" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -4937,8 +5050,8 @@ Soll der Assistent gelöscht werden?</actioncontainer>
     <connection from="t128" to="t83" type="EXCEPTION" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t128" to="t83" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t129" to="t80" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t130" to="t185" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t131" to="t185" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t130" to="t174" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t131" to="t174" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t132" to="t42" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t133" to="t135" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t133" to="t134" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -4961,7 +5074,7 @@ Soll der Assistent gelöscht werden?</actioncontainer>
     <connection from="t154" to="t160" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t155" to="t156" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t156" to="t154" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t157" to="t173" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t157" to="t172" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t157" to="t125" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t157" to="t108" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t157" to="t109" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -5008,27 +5121,41 @@ Soll der Assistent gelöscht werden?</actioncontainer>
     <connection from="t171" to="t148" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t171" to="t169" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t171" to="t166" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t171" to="t172" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t172" to="t178" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t172" to="t179" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t172" to="t180" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t172" to="t181" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t172" to="t182" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t173" to="t139" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t178" to="t183" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t179" to="t174" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t180" to="t175" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t181" to="t176" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t182" to="t177" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t186" to="t185" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t187" to="t133" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t187" to="t137" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t187" to="t137" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t187" to="t133" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t187" to="t37" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t188" to="t190" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t189" to="t187" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t190" to="t189" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t171" to="t200" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t172" to="t139" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t175" to="t133" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t175" to="t137" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t175" to="t137" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t175" to="t133" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t175" to="t37" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t176" to="t178" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t177" to="t175" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t178" to="t177" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t189" to="t194" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t190" to="t195" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t191" to="t196" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t192" to="t197" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t193" to="t198" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t194" to="t187" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t194" to="t179" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t195" to="t186" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t195" to="t180" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t196" to="t188" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t196" to="t181" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t197" to="t185" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t197" to="t182" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t198" to="t184" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t198" to="t183" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t199" to="t174" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t200" to="t201" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t201" to="t190" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t201" to="t191" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t201" to="t192" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t201" to="t193" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t201" to="t189" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t201" to="t203" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t202" to="t174" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t203" to="t202" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
   </flow>
   <flow type="flow">
     <name>Update AMAD Flowset</name>
@@ -5036,63 +5163,63 @@ Soll der Assistent gelöscht werden?</actioncontainer>
     <enabled>true</enabled>
     <executionPolicy>QUEUE</executionPolicy>
     <actioncontainer id="t1" x="630.0" y="787.5">Setze Flow Status: Aktivieren {imported_flow_names,listformat,comma}</actioncontainer>
-    <actioncontainer id="t2" x="875.0" y="367.5">Script: notification_text = "Flowset Update: path for download not exist"</actioncontainer>
-    <actioncontainer id="t3" x="875.0" y="577.5">Script: automagicState = "\"automagicState\":" + " \"" + replaceAll({notification_text}, "\\n", " ") + "\""; fhemcmd = "setreading";</actioncontainer>
-    <actioncontainer id="t4" x="875.0" y="787.5">Flows ausführen: Send Data to AMADCommBridge</actioncontainer>
-    <conditioncontainer id="t5" x="420.0" y="1277.5">Flow Aktiv: First Run Assistant</conditioncontainer>
-    <actioncontainer id="t6" x="420.0" y="1487.5">Setze Flow Status: Deaktivieren First Run Assistant</actioncontainer>
-    <actioncontainer id="t7" x="420.0" y="-367.5">Prüfe und setze Bridgeport Variable</actioncontainer>
-    <conditioncontainer id="t8" x="210.0" y="-52.5">Gerätespeicherplatz: Freier Speicherplatz &gt; 1kb (/storage/emulated/0)</conditioncontainer>
-    <actioncontainer id="t9" x="420.0" y="157.5">Verzeichnisse erstellen: /storage/sdcard0/AMADNG_FlowsetUpdate</actioncontainer>
-    <conditioncontainer id="t10" x="420.0" y="-52.5">Gerätespeicherplatz: Freier Speicherplatz &gt; 1kb (/storage/sdcard0)</conditioncontainer>
-    <actioncontainer id="t11" x="630.0" y="157.5">Verzeichnisse erstellen: /sdcard/AMADNG_FlowsetUpdate</actioncontainer>
-    <conditioncontainer id="t12" x="630.0" y="-52.5">Gerätespeicherplatz: Freier Speicherplatz &gt; 1kb (/sdcard)</conditioncontainer>
-    <actioncontainer id="t13" x="210.0" y="157.5">Verzeichnisse erstellen: /storage/emulated/0/AMADNG_FlowsetUpdate</actioncontainer>
-    <actioncontainer id="t14" x="210.0" y="367.5">Download URL: http://{global_fhemip}:{global_bridgeport}/currentFlowsetUpdate.xml nach /storage/emulated/0/AMADNG_FlowsetUpdate</actioncontainer>
-    <actioncontainer id="t15" x="420.0" y="367.5">Download URL: http://{global_fhemip}:{global_bridgeport}/currentFlowsetUpdate.xml nach /storage/sdcard0/AMADNG_FlowsetUpdate</actioncontainer>
-    <actioncontainer id="t16" x="630.0" y="367.5">Download URL: http://{global_fhemip}:{global_bridgeport}/currentFlowsetUpdate.xml nach /sdcard/AMADNG_FlowsetUpdate</actioncontainer>
-    <actioncontainer id="t17" x="210.0" y="577.5">Flows/Widgets importieren: /storage/emulated/0/AMADNG_FlowsetUpdate/currentFlowsetUpdate.xml</actioncontainer>
-    <actioncontainer id="t18" x="420.0" y="577.5">Flows/Widgets importieren: /storage/sdcard0/AMADNG_FlowsetUpdate/currentFlowsetUpdate.xml</actioncontainer>
-    <actioncontainer id="t19" x="630.0" y="577.5">Flows/Widgets importieren: /sdcard/AMADNG_FlowsetUpdate/currentFlowsetUpdate.xml</actioncontainer>
-    <actioncontainer id="t20" x="210.0" y="787.5">Setze Flow Status: Aktivieren {imported_flow_names,listformat,comma}</actioncontainer>
-    <actioncontainer id="t21" x="420.0" y="787.5">Setze Flow Status: Aktivieren {imported_flow_names,listformat,comma}</actioncontainer>
-    <actioncontainer id="t22" x="210.0" y="997.5">Dateien löschen: /storage/emulated/0/AMADNG_FlowsetUpdate/currentFlowsetUpdate.xml</actioncontainer>
-    <actioncontainer id="t23" x="630.0" y="997.5">Dateien löschen: /sdcard/AMADNG_FlowsetUpdate/currentFlowsetUpdate.xml</actioncontainer>
-    <actioncontainer id="t24" x="420.0" y="997.5">Dateien löschen: /storage/sdcard0/AMADNG_FlowsetUpdate/currentFlowsetUpdate.xml</actioncontainer>
-    <triggercontainer id="t25" x="420.0" y="-752.5">
+    <actioncontainer id="t2" x="875.0" y="787.5">Flows ausführen: Send Data to AMADCommBridge</actioncontainer>
+    <conditioncontainer id="t3" x="420.0" y="1277.5">Flow Aktiv: First Run Assistant</conditioncontainer>
+    <actioncontainer id="t4" x="420.0" y="1487.5">Setze Flow Status: Deaktivieren First Run Assistant</actioncontainer>
+    <actioncontainer id="t5" x="420.0" y="-367.5">Prüfe und setze Bridgeport Variable</actioncontainer>
+    <actioncontainer id="t6" x="420.0" y="157.5">Verzeichnisse erstellen: /storage/sdcard0/AMADNG_FlowsetUpdate</actioncontainer>
+    <conditioncontainer id="t7" x="420.0" y="-52.5">Gerätespeicherplatz: Freier Speicherplatz &gt; 1kb (/storage/sdcard0)</conditioncontainer>
+    <actioncontainer id="t8" x="630.0" y="157.5">Verzeichnisse erstellen: /sdcard/AMADNG_FlowsetUpdate</actioncontainer>
+    <conditioncontainer id="t9" x="630.0" y="-52.5">Gerätespeicherplatz: Freier Speicherplatz &gt; 1kb (/sdcard)</conditioncontainer>
+    <actioncontainer id="t10" x="210.0" y="157.5">Verzeichnisse erstellen: /storage/emulated/0/AMADNG_FlowsetUpdate</actioncontainer>
+    <actioncontainer id="t11" x="210.0" y="367.5">Download URL: http://{global_fhemip}:{global_bridgeport}/currentFlowsetUpdate.xml nach /storage/emulated/0/AMADNG_FlowsetUpdate</actioncontainer>
+    <actioncontainer id="t12" x="420.0" y="367.5">Download URL: http://{global_fhemip}:{global_bridgeport}/currentFlowsetUpdate.xml nach /storage/sdcard0/AMADNG_FlowsetUpdate</actioncontainer>
+    <actioncontainer id="t13" x="630.0" y="367.5">Download URL: http://{global_fhemip}:{global_bridgeport}/currentFlowsetUpdate.xml nach /sdcard/AMADNG_FlowsetUpdate</actioncontainer>
+    <actioncontainer id="t14" x="210.0" y="577.5">Flows/Widgets importieren: /storage/emulated/0/AMADNG_FlowsetUpdate/currentFlowsetUpdate.xml</actioncontainer>
+    <actioncontainer id="t15" x="420.0" y="577.5">Flows/Widgets importieren: /storage/sdcard0/AMADNG_FlowsetUpdate/currentFlowsetUpdate.xml</actioncontainer>
+    <actioncontainer id="t16" x="630.0" y="577.5">Flows/Widgets importieren: /sdcard/AMADNG_FlowsetUpdate/currentFlowsetUpdate.xml</actioncontainer>
+    <actioncontainer id="t17" x="210.0" y="787.5">Setze Flow Status: Aktivieren {imported_flow_names,listformat,comma}</actioncontainer>
+    <actioncontainer id="t18" x="420.0" y="787.5">Setze Flow Status: Aktivieren {imported_flow_names,listformat,comma}</actioncontainer>
+    <actioncontainer id="t19" x="210.0" y="997.5">Dateien löschen: /storage/emulated/0/AMADNG_FlowsetUpdate/currentFlowsetUpdate.xml</actioncontainer>
+    <actioncontainer id="t20" x="630.0" y="997.5">Dateien löschen: /sdcard/AMADNG_FlowsetUpdate/currentFlowsetUpdate.xml</actioncontainer>
+    <actioncontainer id="t21" x="420.0" y="997.5">Dateien löschen: /storage/sdcard0/AMADNG_FlowsetUpdate/currentFlowsetUpdate.xml</actioncontainer>
+    <triggercontainer id="t22" x="420.0" y="-752.5">
       <trigger>HTTP Request: /fhem-amad/currentFlowsetUpdate</trigger>
     </triggercontainer>
-    <conditioncontainer id="t26" x="420.00006" y="-577.5">Expression: header_amadid == {global_amadid}</conditioncontainer>
-    <connection from="t1" to="t23" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t2" to="t3" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t3" to="t4" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t5" to="t6" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t7" to="t8" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t8" to="t10" type="EXCEPTION" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t8" to="t10" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t8" to="t13" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t9" to="t15" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t10" to="t12" type="EXCEPTION" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t10" to="t12" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t10" to="t9" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t11" to="t16" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t12" to="t2" type="EXCEPTION" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t12" to="t2" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t12" to="t11" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t13" to="t14" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <conditioncontainer id="t23" x="420.00006" y="-577.5">Expression: header_amadid == {global_amadid}</conditioncontainer>
+    <conditioncontainer id="t24" x="210.0" y="-52.5">Gerätespeicherplatz: Freier Speicherplatz &gt; 1kb (/storage/emulated/0)</conditioncontainer>
+    <actioncontainer id="t25" x="875.0" y="577.5">Script: automagicState = "\"automagicState\":" + " \"" + replaceAll({notification_text}, "\\n", " ") + "\""; fhemcmd = "setreading";</actioncontainer>
+    <actioncontainer id="t26" x="875.0" y="367.5">Script: notification_text = "Flowset Update: path for download not exist"</actioncontainer>
+    <connection from="t1" to="t20" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t3" to="t4" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t5" to="t24" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t6" to="t12" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t7" to="t9" type="EXCEPTION" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t7" to="t9" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t7" to="t6" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t8" to="t13" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t9" to="t26" type="EXCEPTION" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t9" to="t26" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t9" to="t8" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t10" to="t11" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t11" to="t14" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t12" to="t15" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t13" to="t16" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t14" to="t17" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t15" to="t18" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t16" to="t19" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t17" to="t20" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t16" to="t1" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t17" to="t19" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t18" to="t21" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t19" to="t1" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t20" to="t22" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t21" to="t24" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t22" to="t5" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t23" to="t5" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t24" to="t5" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t25" to="t26" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t26" to="t7" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t19" to="t3" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t20" to="t3" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t21" to="t3" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t22" to="t23" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t23" to="t5" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t24" to="t7" type="EXCEPTION" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t24" to="t7" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t24" to="t10" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t25" to="t2" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t26" to="t25" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
   </flow>
   <flow type="flow">
     <name>VoiceControl</name>

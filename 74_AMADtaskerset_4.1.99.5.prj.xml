@@ -1,9 +1,9 @@
-<TaskerData sr="" dvi="1" tv="5.0u7">
+<TaskerData sr="" dvi="1" tv="5.1">
 	<dmetric>1080.0,1776.0</dmetric>
 	<Profile sr="prof1000" ve="2">
 		<cdate>1513116735261</cdate>
 		<clp>true</clp>
-		<edate>1512761338116</edate>
+		<edate>1514566300708</edate>
 		<id>1000</id>
 		<mid0>923</mid0>
 		<nme>toGoAMAD</nme>
@@ -51,7 +51,7 @@
 	<Profile sr="prof1002" ve="2">
 		<cdate>1513116735262</cdate>
 		<clp>true</clp>
-		<edate>1512684208205</edate>
+		<edate>1514566358989</edate>
 		<id>1002</id>
 		<mid0>938</mid0>
 		<nme>toGoAMAD</nme>
@@ -260,7 +260,7 @@
 	<Profile sr="prof1011" ve="2">
 		<cdate>1513116735275</cdate>
 		<clp>true</clp>
-		<edate>1513424368275</edate>
+		<edate>1514473987581</edate>
 		<id>1011</id>
 		<mid0>982</mid0>
 		<nme>TNES AMAD</nme>
@@ -273,7 +273,7 @@
 					<com.taskerplugin.httpevent.extra.INT_VERSION_CODE-type>java.lang.Integer</com.taskerplugin.httpevent.extra.INT_VERSION_CODE-type>
 					<com.taskerplugin.httpevent.extra.STRINGS_FILTERS>&lt;StringArrayList sr=""&gt;&lt;_arrlst_com.taskerplugin.httpevent.extra.STRINGS_FILTERS0&gt;device==AMAD&lt;/_arrlst_com.taskerplugin.httpevent.extra.STRINGS_FILTERS0&gt;&lt;_arrlst_com.taskerplugin.httpevent.extra.STRINGS_FILTERS1&gt;cmd&lt;/_arrlst_com.taskerplugin.httpevent.extra.STRINGS_FILTERS1&gt;&lt;/StringArrayList&gt;</com.taskerplugin.httpevent.extra.STRINGS_FILTERS>
 					<com.taskerplugin.httpevent.extra.STRINGS_FILTERS-type>java.util.ArrayList</com.taskerplugin.httpevent.extra.STRINGS_FILTERS-type>
-					<com.taskerplugin.httpevent.extra.STRING_HTTP_SERV_ADDR>192.168.5.82</com.taskerplugin.httpevent.extra.STRING_HTTP_SERV_ADDR>
+					<com.taskerplugin.httpevent.extra.STRING_HTTP_SERV_ADDR>192.168.5.81</com.taskerplugin.httpevent.extra.STRING_HTTP_SERV_ADDR>
 					<com.taskerplugin.httpevent.extra.STRING_HTTP_SERV_ADDR-type>java.lang.String</com.taskerplugin.httpevent.extra.STRING_HTTP_SERV_ADDR-type>
 					<com.taskerplugin.httpevent.extra.STRING_HTTP_SERV_PORT>8765</com.taskerplugin.httpevent.extra.STRING_HTTP_SERV_PORT>
 					<com.taskerplugin.httpevent.extra.STRING_HTTP_SERV_PORT-type>java.lang.String</com.taskerplugin.httpevent.extra.STRING_HTTP_SERV_PORT-type>
@@ -487,7 +487,7 @@
 	<Profile sr="prof999" ve="2">
 		<cdate>1513116735259</cdate>
 		<clp>true</clp>
-		<edate>1513422799932</edate>
+		<edate>1513464771034</edate>
 		<id>999</id>
 		<mid0>982</mid0>
 		<nme>AutoRemote AMAD</nme>
@@ -571,9 +571,9 @@ Way the message was sent (BT, Wifi, GCM)
 	<Project sr="proj0" ve="2">
 		<cdate>1502789371413</cdate>
 		<name>AMAD</name>
-		<pids>1006,1007,1003,1000,1011,999,997,1005,995,1001,1004,1014,996,994,1002,1008,1016,1012,998,1010</pids>
+		<pids>1001,1002,994,1005,1011,1014,1012,1000,998,1006,1010,1008,999,1016,995,1004,1007,1003,997,996</pids>
 		<scenes>AMAD_Dialog_Message,AMAD_settings</scenes>
-		<tids>922,984,1050,1048,1023,980,1047,1020,1053,966,1013,1035,949,1041,1032,1033,1022,1038,920,1025,1049,1021,1034,962,970,926,954,1054,972,937,948,1051,1037,1055,979,1056,1030,914,1045,935,1028,1036,1043,983,1015,1057,938,967,982,975,944,927,974,969,1031,989,1024,1026,990,940,1058,968,978,1019,1044,1052,943,1046,939,947,951,1039,963,1029,918,965,934,923,1017,992</tids>
+		<tids>984,944,1057,1019,922,972,938,1035,918,1041,1028,1036,923,975,947,980,1053,1044,1013,954,1054,990,1031,916,1033,914,1058,1038,970,1049,926,968,1046,1055,1050,951,1029,1015,1034,1022,1020,934,1017,949,979,943,967,978,966,939,1021,963,1023,1037,1045,1051,982,1048,962,1052,1026,940,1056,1024,1039,935,1043,1030,965,1032,927,992,937,969,1047,974,948,983,1025,989,920</tids>
 		<Kid sr="Kid">
 			<feat0>android.hardware.bluetooth:y</feat0>
 			<feat1>android.hardware.wifi:y</feat1>
@@ -653,7 +653,7 @@ Way the message was sent (BT, Wifi, GCM)
 	</Scene>
 	<Scene sr="sceneAMAD_settings">
 		<cdate>1512032010150</cdate>
-		<edate>1513454811685</edate>
+		<edate>1515014317697</edate>
 		<heightLand>720</heightLand>
 		<heightPort>1280</heightPort>
 		<nme>AMAD_settings</nme>
@@ -1182,6 +1182,7 @@ SSID:</Str>
 			<clickTask>1055</clickTask>
 			<flags>4</flags>
 			<geom>0,1124,707,53,0,593,1269,49</geom>
+			<longclickTask>916</longclickTask>
 			<Str sr="arg0" ve="3">Text_lastCommand</Str>
 			<Str sr="arg1" ve="3">%AMAD_lastSetCommand</Str>
 			<Int sr="arg2" val="10"/>
@@ -3332,12 +3333,6 @@ Bitten prüfe die eingetragene Daten.</Str>
 		<edate>1512424887005</edate>
 		<id>1055</id>
 		<Action sr="act0" ve="7">
-			<code>105</code>
-			<on>false</on>
-			<Str sr="arg0" ve="3">%AMAD_lastSetCommand</Str>
-			<Int sr="arg1" val="0"/>
-		</Action>
-		<Action sr="act1" ve="7">
 			<code>548</code>
 			<Str sr="arg0" ve="3">letzter empfangener set-Befehl</Str>
 			<Int sr="arg1" val="1"/>
@@ -3577,6 +3572,21 @@ Art der Steuerung von FHEM set Befehlen, welche über die Bridge als Steuerbefeh
 			<Int sr="arg5" val="0"/>
 		</Action>
 	</Task>
+	<Task sr="task916">
+		<cdate>1515014192359</cdate>
+		<edate>1515014192359</edate>
+		<id>916</id>
+		<Action sr="act0" ve="7">
+			<code>105</code>
+			<Str sr="arg0" ve="3">%AMAD_lastSetCommand</Str>
+			<Int sr="arg1" val="0"/>
+		</Action>
+		<Action sr="act1" ve="7">
+			<code>548</code>
+			<Str sr="arg0" ve="3">letzter empfangener set-Befehl in Zwischenablage kopiert</Str>
+			<Int sr="arg1" val="1"/>
+		</Action>
+	</Task>
 	<Task sr="task918">
 		<cdate>1503612697002</cdate>
 		<edate>1512664308181</edate>
@@ -3802,13 +3812,22 @@ Art der Steuerung von FHEM set Befehlen, welche über die Bridge als Steuerbefeh
 	</Task>
 	<Task sr="task923">
 		<cdate>1503691080060</cdate>
-		<edate>1512761338116</edate>
+		<edate>1514566300708</edate>
 		<id>923</id>
 		<pri>100</pri>
 		<Action sr="act0" ve="7">
 			<code>547</code>
 			<label>Enable send Profiles</label>
 			<Str sr="arg0" ve="3">%AMAD_send</Str>
+			<Str sr="arg1" ve="3">on</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+		</Action>
+		<Action sr="act1" ve="7">
+			<code>547</code>
+			<label>Enable set Profile</label>
+			<Str sr="arg0" ve="3">%AMAD_receive</Str>
 			<Str sr="arg1" ve="3">on</Str>
 			<Int sr="arg2" val="0"/>
 			<Int sr="arg3" val="0"/>
@@ -6391,12 +6410,12 @@ TWlKU5rSlKY0pSlNaUpTmtKUpjSlfTWTSP4HD723A9m6n1sAAAAASUVORK5CYII=
 	</Task>
 	<Task sr="task938">
 		<cdate>1503692408945</cdate>
-		<edate>1512684208205</edate>
+		<edate>1514566358989</edate>
 		<id>938</id>
 		<pri>100</pri>
 		<Action sr="act0" ve="7">
 			<code>547</code>
-			<label>disanable send Profiles</label>
+			<label>disable send Profiles</label>
 			<Str sr="arg0" ve="3">%AMAD_send</Str>
 			<Str sr="arg1" ve="3">off</Str>
 			<Int sr="arg2" val="0"/>
@@ -6404,6 +6423,15 @@ TWlKU5rSlKY0pSlNaUpTmtKUpjSlfTWTSP4HD723A9m6n1sAAAAASUVORK5CYII=
 			<Int sr="arg4" val="0"/>
 		</Action>
 		<Action sr="act1" ve="7">
+			<code>547</code>
+			<label>disable set Profile</label>
+			<Str sr="arg0" ve="3">%AMAD_receive</Str>
+			<Str sr="arg1" ve="3">off</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+		</Action>
+		<Action sr="act2" ve="7">
 			<code>137</code>
 			<Int sr="arg0" val="0"/>
 			<Str sr="arg1" ve="3">AMAD_SendData2CommBridge</Str>
@@ -7612,7 +7640,7 @@ Code: %HTTPR</Str>
 	</Task>
 	<Task sr="task970">
 		<cdate>1502789397309</cdate>
-		<edate>1513276239987</edate>
+		<edate>1515620693000</edate>
 		<id>970</id>
 		<nme>AMAD_informations</nme>
 		<pri>100</pri>
@@ -7620,7 +7648,7 @@ Code: %HTTPR</Str>
 			<code>547</code>
 			<label>flowsetVersionAtDevice</label>
 			<Str sr="arg0" ve="3">%setreading</Str>
-			<Str sr="arg1" ve="3">"flowsetVersionAtDevice": "Tasker v0.1"</Str>
+			<Str sr="arg1" ve="3">"flowsetVersionAtDevice": "Tasker v0.2"</Str>
 			<Int sr="arg2" val="0"/>
 			<Int sr="arg3" val="0"/>
 			<Int sr="arg4" val="0"/>
@@ -8346,10 +8374,10 @@ Code: %HTTPR</Str>
 	</Task>
 	<Task sr="task975">
 		<cdate>1503260793343</cdate>
-		<edate>1512176548967</edate>
+		<edate>1515484018445</edate>
 		<id>975</id>
 		<nme>AMAD_VoiceControl</nme>
-		<pri>100</pri>
+		<pri>7</pri>
 		<Action sr="act0" ve="7">
 			<code>903</code>
 			<label>AMAD Voice Control</label>
@@ -8409,6 +8437,7 @@ Code: %HTTPR</Str>
 		</Action>
 		<Action sr="act2" ve="7">
 			<code>548</code>
+			<on>false</on>
 			<Str sr="arg0" ve="3">Antwort: "%value"</Str>
 			<Int sr="arg1" val="0"/>
 		</Action>
@@ -8527,7 +8556,7 @@ Code: %HTTPR</Str>
 	</Task>
 	<Task sr="task982">
 		<cdate>1503693866986</cdate>
-		<edate>1513110531034</edate>
+		<edate>1515619510405</edate>
 		<id>982</id>
 		<nme>AMAD_SetCommands</nme>
 		<pri>100</pri>
@@ -8555,24 +8584,37 @@ Code: %HTTPR</Str>
 			</ConditionList>
 		</Action>
 		<Action sr="act10" ve="7">
-			<code>598</code>
-			<Str sr="arg0" ve="3">%receive4</Str>
-			<Str sr="arg1" ve="3">/%receive2/%receive3/</Str>
+			<code>547</code>
+			<Str sr="arg0" ve="3">%command</Str>
+			<Str sr="arg1" ve="3">%receive41</Str>
 			<Int sr="arg2" val="0"/>
 			<Int sr="arg3" val="0"/>
 			<Int sr="arg4" val="0"/>
+		</Action>
+		<Action sr="act100" ve="7">
+			<code>123</code>
+			<se>false</se>
+			<Str sr="arg0" ve="3">service call notification 1</Str>
+			<Int sr="arg1" val="1"/>
+			<Int sr="arg2" val="1"/>
+			<Str sr="arg3" ve="3"/>
+			<Str sr="arg4" ve="3"/>
 			<Str sr="arg5" ve="3"/>
-			<Int sr="arg6" val="1"/>
-			<Str sr="arg7" ve="3"/>
 			<ConditionList sr="if">
+				<bool0>And</bool0>
 				<Condition sr="c0" ve="3">
-					<lhs>%receive(#)</lhs>
-					<op>7</op>
-					<rhs>4</rhs>
+					<lhs>%tpe_app</lhs>
+					<op>2</op>
+					<rhs>All</rhs>
+				</Condition>
+				<Condition sr="c1" ve="3">
+					<lhs>%ROOT</lhs>
+					<op>2</op>
+					<rhs>yes</rhs>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act100" ve="7">
+		<Action sr="act101" ve="7">
 			<code>548</code>
 			<label>no root</label>
 			<Str sr="arg0" ve="3">AMAD: "set clearNotificationBar all" benötigt Root rechte</Str>
@@ -8591,7 +8633,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act101" ve="7">
+		<Action sr="act102" ve="7">
 			<code>130</code>
 			<label>no root</label>
 			<Str sr="arg0" ve="3">AMAD_SendData2CommBridge</Str>
@@ -8616,7 +8658,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act102" ve="7">
+		<Action sr="act103" ve="7">
 			<code>43</code>
 			<ConditionList sr="if">
 				<Condition sr="c0" ve="3">
@@ -8626,11 +8668,11 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act103" ve="7">
+		<Action sr="act104" ve="7">
 			<code>62</code>
 			<Str sr="arg0" ve="3">0,500,500,500</Str>
 		</Action>
-		<Action sr="act104" ve="7">
+		<Action sr="act105" ve="7">
 			<code>43</code>
 			<ConditionList sr="if">
 				<Condition sr="c0" ve="3">
@@ -8640,11 +8682,11 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act105" ve="7">
+		<Action sr="act106" ve="7">
 			<code>25</code>
 			<Int sr="arg0" val="0"/>
 		</Action>
-		<Action sr="act106" ve="7">
+		<Action sr="act107" ve="7">
 			<code>43</code>
 			<ConditionList sr="if">
 				<Condition sr="c0" ve="3">
@@ -8654,7 +8696,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act107" ve="7">
+		<Action sr="act108" ve="7">
 			<code>877</code>
 			<Str sr="arg0" ve="3">%tpe_action</Str>
 			<Int sr="arg1" val="1"/>
@@ -8667,7 +8709,7 @@ Code: %HTTPR</Str>
 			<Str sr="arg8" ve="3"/>
 			<Int sr="arg9" val="1"/>
 		</Action>
-		<Action sr="act108" ve="7">
+		<Action sr="act109" ve="7">
 			<code>43</code>
 			<ConditionList sr="if">
 				<Condition sr="c0" ve="3">
@@ -8677,18 +8719,23 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act109" ve="7">
+		<Action sr="act11" ve="7">
+			<code>37</code>
+			<label>Parameter extrahieren</label>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%receive4(#)</lhs>
+					<op>7</op>
+					<rhs>1</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act110" ve="7">
 			<code>548</code>
 			<Str sr="arg0" ve="3">AMAD: "Flow install: not supported by Tasker"</Str>
 			<Int sr="arg1" val="1"/>
 		</Action>
-		<Action sr="act11" ve="7">
-			<code>590</code>
-			<Str sr="arg0" ve="3">%receive4</Str>
-			<Str sr="arg1" ve="3">?</Str>
-			<Int sr="arg2" val="0"/>
-		</Action>
-		<Action sr="act110" ve="7">
+		<Action sr="act111" ve="7">
 			<code>130</code>
 			<Str sr="arg0" ve="3">AMAD_SendData2CommBridge</Str>
 			<Int sr="arg1">
@@ -8699,7 +8746,7 @@ Code: %HTTPR</Str>
 			<Str sr="arg4" ve="3"/>
 			<Int sr="arg5" val="0"/>
 		</Action>
-		<Action sr="act111" ve="7">
+		<Action sr="act112" ve="7">
 			<code>43</code>
 			<ConditionList sr="if">
 				<Condition sr="c0" ve="3">
@@ -8709,12 +8756,12 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act112" ve="7">
+		<Action sr="act113" ve="7">
 			<code>90</code>
 			<Str sr="arg0" ve="3">%tpe_callnumber</Str>
 			<Int sr="arg1" val="1"/>
 		</Action>
-		<Action sr="act113" ve="7">
+		<Action sr="act114" ve="7">
 			<code>30</code>
 			<Int sr="arg0" val="0"/>
 			<Int sr="arg1">
@@ -8731,7 +8778,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act114" ve="7">
+		<Action sr="act115" ve="7">
 			<code>733</code>
 			<ConditionList sr="if">
 				<Condition sr="c0" ve="3">
@@ -8741,7 +8788,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act115" ve="7">
+		<Action sr="act116" ve="7">
 			<code>43</code>
 			<ConditionList sr="if">
 				<Condition sr="c0" ve="3">
@@ -8751,10 +8798,10 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act116" ve="7">
+		<Action sr="act117" ve="7">
 			<code>733</code>
 		</Action>
-		<Action sr="act117" ve="7">
+		<Action sr="act118" ve="7">
 			<code>43</code>
 			<ConditionList sr="if">
 				<Condition sr="c0" ve="3">
@@ -8764,7 +8811,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act118" ve="7">
+		<Action sr="act119" ve="7">
 			<code>20</code>
 			<App sr="arg0">
 				<appClass>com.android.systemui.Somnambulator</appClass>
@@ -8775,7 +8822,15 @@ Code: %HTTPR</Str>
 			<Int sr="arg2" val="0"/>
 			<Int sr="arg3" val="0"/>
 		</Action>
-		<Action sr="act119" ve="7">
+		<Action sr="act12" ve="7">
+			<code>547</code>
+			<Str sr="arg0" ve="3">%valueall</Str>
+			<Str sr="arg1" ve="3">%receive42</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+		</Action>
+		<Action sr="act120" ve="7">
 			<code>43</code>
 			<ConditionList sr="if">
 				<Condition sr="c0" ve="3">
@@ -8785,21 +8840,13 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act12" ve="7">
-			<code>547</code>
-			<Str sr="arg0" ve="3">%command</Str>
-			<Str sr="arg1" ve="3">%receive41</Str>
-			<Int sr="arg2" val="0"/>
-			<Int sr="arg3" val="0"/>
-			<Int sr="arg4" val="0"/>
-		</Action>
-		<Action sr="act120" ve="7">
+		<Action sr="act121" ve="7">
 			<code>41</code>
 			<Str sr="arg0" ve="3">%tpe_smsnumber</Str>
 			<Str sr="arg1" ve="3">%tpe_smsmessage</Str>
 			<Int sr="arg2" val="1"/>
 		</Action>
-		<Action sr="act121" ve="7">
+		<Action sr="act122" ve="7">
 			<code>43</code>
 			<ConditionList sr="if">
 				<Condition sr="c0" ve="3">
@@ -8809,7 +8856,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act122" ve="7">
+		<Action sr="act123" ve="7">
 			<code>548</code>
 			<label>Baustelle</label>
 			<Str sr="arg0" ve="3">AMAD: "set screen lock|unlock" wird noch nicht unterstützt</Str>
@@ -8822,7 +8869,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act123" ve="7">
+		<Action sr="act124" ve="7">
 			<code>130</code>
 			<label>Baustelle</label>
 			<Str sr="arg0" ve="3">AMAD_SendData2CommBridge</Str>
@@ -8841,7 +8888,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act124" ve="7">
+		<Action sr="act125" ve="7">
 			<code>43</code>
 			<ConditionList sr="if">
 				<Condition sr="c0" ve="3">
@@ -8851,7 +8898,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act125" ve="7">
+		<Action sr="act126" ve="7">
 			<code>548</code>
 			<label>Baustelle</label>
 			<Str sr="arg0" ve="3">AMAD: "set screen on" wird noch nicht unterstützt</Str>
@@ -8864,7 +8911,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act126" ve="7">
+		<Action sr="act127" ve="7">
 			<code>130</code>
 			<label>Baustelle</label>
 			<Str sr="arg0" ve="3">AMAD_SendData2CommBridge</Str>
@@ -8883,7 +8930,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act127" ve="7">
+		<Action sr="act128" ve="7">
 			<code>16</code>
 			<ConditionList sr="if">
 				<Condition sr="c0" ve="3">
@@ -8893,49 +8940,42 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act128" ve="7">
-			<code>38</code>
-		</Action>
 		<Action sr="act129" ve="7">
 			<code>38</code>
 		</Action>
 		<Action sr="act13" ve="7">
-			<code>37</code>
-			<label>Parameter extrahieren</label>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%receive4(#)</lhs>
-					<op>7</op>
-					<rhs>1</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act14" ve="7">
-			<code>547</code>
-			<Str sr="arg0" ve="3">%valueall</Str>
-			<Str sr="arg1" ve="3">%receive42</Str>
-			<Int sr="arg2" val="0"/>
-			<Int sr="arg3" val="0"/>
-			<Int sr="arg4" val="0"/>
-		</Action>
-		<Action sr="act15" ve="7">
 			<code>590</code>
 			<Str sr="arg0" ve="3">%valueall</Str>
 			<Str sr="arg1" ve="3">&amp;</Str>
 			<Int sr="arg2" val="0"/>
 		</Action>
-		<Action sr="act16" ve="7">
+		<Action sr="act130" ve="7">
+			<code>38</code>
+		</Action>
+		<Action sr="act131" ve="7">
+			<code>43</code>
+			<label>wrong ID</label>
+		</Action>
+		<Action sr="act132" ve="7">
+			<code>548</code>
+			<Str sr="arg0" ve="3">AMAD: Befehl mit falscher AMAD_ID empfangen</Str>
+			<Int sr="arg1" val="1"/>
+		</Action>
+		<Action sr="act133" ve="7">
+			<code>38</code>
+		</Action>
+		<Action sr="act14" ve="7">
 			<code>39</code>
 			<Str sr="arg0" ve="3">%cmdpair</Str>
 			<Str sr="arg1" ve="3">%valueall()</Str>
 		</Action>
-		<Action sr="act17" ve="7">
+		<Action sr="act15" ve="7">
 			<code>590</code>
 			<Str sr="arg0" ve="3">%cmdpair</Str>
 			<Str sr="arg1" ve="3">=</Str>
 			<Int sr="arg2" val="0"/>
 		</Action>
-		<Action sr="act18" ve="7">
+		<Action sr="act16" ve="7">
 			<code>547</code>
 			<Str sr="arg0" ve="3">%name</Str>
 			<Str sr="arg1" ve="3">%cmdpair1</Str>
@@ -8943,11 +8983,25 @@ Code: %HTTPR</Str>
 			<Int sr="arg3" val="0"/>
 			<Int sr="arg4" val="0"/>
 		</Action>
-		<Action sr="act19" ve="7">
+		<Action sr="act17" ve="7">
 			<code>590</code>
 			<Str sr="arg0" ve="3">%cmdpair</Str>
 			<Str sr="arg1" ve="3">%name=</Str>
 			<Int sr="arg2" val="0"/>
+		</Action>
+		<Action sr="act18" ve="7">
+			<code>596</code>
+			<Str sr="arg0" ve="3">%name</Str>
+			<Int sr="arg1" val="28"/>
+			<Str sr="arg2" ve="3"/>
+		</Action>
+		<Action sr="act19" ve="7">
+			<code>547</code>
+			<Str sr="arg0" ve="3">%name</Str>
+			<Str sr="arg1" ve="3">tpe_%name</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
 		</Action>
 		<Action sr="act2" ve="7">
 			<code>547</code>
@@ -8966,20 +9020,6 @@ Code: %HTTPR</Str>
 		</Action>
 		<Action sr="act20" ve="7">
 			<code>596</code>
-			<Str sr="arg0" ve="3">%name</Str>
-			<Int sr="arg1" val="28"/>
-			<Str sr="arg2" ve="3"/>
-		</Action>
-		<Action sr="act21" ve="7">
-			<code>547</code>
-			<Str sr="arg0" ve="3">%name</Str>
-			<Str sr="arg1" ve="3">tpe_%name</Str>
-			<Int sr="arg2" val="0"/>
-			<Int sr="arg3" val="0"/>
-			<Int sr="arg4" val="0"/>
-		</Action>
-		<Action sr="act22" ve="7">
-			<code>596</code>
 			<Str sr="arg0" ve="3">%cmdpair2</Str>
 			<Int sr="arg1" val="18"/>
 			<Str sr="arg2" ve="3"/>
@@ -8991,7 +9031,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act23" ve="7">
+		<Action sr="act21" ve="7">
 			<code>547</code>
 			<Str sr="arg0" ve="3">%%name</Str>
 			<Str sr="arg1" ve="3">%cmdpair2</Str>
@@ -9006,523 +9046,24 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act24" ve="7">
+		<Action sr="act22" ve="7">
 			<code>40</code>
 		</Action>
-		<Action sr="act25" ve="7">
+		<Action sr="act23" ve="7">
 			<code>38</code>
 		</Action>
-		<Action sr="act26" ve="7">
+		<Action sr="act24" ve="7">
 			<code>37</code>
+			<label>check ID</label>
 			<ConditionList sr="if">
 				<Condition sr="c0" ve="3">
-					<lhs>%type</lhs>
+					<lhs>%tpe_amad_id</lhs>
 					<op>2</op>
-					<rhs>setCommands</rhs>
+					<rhs>%AMAD_amadid</rhs>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act27" ve="7">
-			<code>37</code>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%command</lhs>
-					<op>2</op>
-					<rhs>screenMsg</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act28" ve="7">
-			<code>548</code>
-			<Str sr="arg0" ve="3">%tpe_message</Str>
-			<Int sr="arg1" val="1"/>
-		</Action>
-		<Action sr="act29" ve="7">
-			<code>43</code>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%command</lhs>
-					<op>2</op>
-					<rhs>ttsMsg</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act3" ve="7">
-			<code>547</code>
-			<Str sr="arg0" ve="3">%AMAD_lastSetCommand</Str>
-			<Str sr="arg1" ve="3">%receive</Str>
-			<Int sr="arg2" val="0"/>
-			<Int sr="arg3" val="0"/>
-			<Int sr="arg4" val="0"/>
-		</Action>
-		<Action sr="act30" ve="7">
-			<code>547</code>
-			<Str sr="arg0" ve="3">%tpe_msglang</Str>
-			<Str sr="arg1" ve="3">deu-deu</Str>
-			<Int sr="arg2" val="0"/>
-			<Int sr="arg3" val="0"/>
-			<Int sr="arg4" val="0"/>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%tpe_msglang</lhs>
-					<op>4</op>
-					<rhs>en</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act31" ve="7">
-			<code>547</code>
-			<Str sr="arg0" ve="3">%tpe_msglang</Str>
-			<Str sr="arg1" ve="3">eng-usa</Str>
-			<Int sr="arg2" val="0"/>
-			<Int sr="arg3" val="0"/>
-			<Int sr="arg4" val="0"/>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%tpe_msglang</lhs>
-					<op>2</op>
-					<rhs>en</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act32" ve="7">
-			<code>547</code>
-			<Str sr="arg0" ve="3">%volume</Str>
-			<Str sr="arg1" ve="3">%VOLM</Str>
-			<Int sr="arg2" val="0"/>
-			<Int sr="arg3" val="0"/>
-			<Int sr="arg4" val="0"/>
-		</Action>
-		<Action sr="act33" ve="7">
-			<code>307</code>
-			<Int sr="arg0">
-				<var>%tpe_msgvol</var>
-			</Int>
-			<Int sr="arg1" val="0"/>
-			<Int sr="arg2" val="0"/>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%tpe_msgvol</lhs>
-					<op>7</op>
-					<rhs>1</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act34" ve="7">
-			<code>559</code>
-			<Str sr="arg0" ve="3">%tpe_message</Str>
-			<Str sr="arg1" ve="3">com.google.android.tts:%tpe_msglang</Str>
-			<Int sr="arg2" val="3"/>
-			<Int sr="arg3" val="5"/>
-			<Int sr="arg4">
-				<var>%tpe_msgspeed</var>
-			</Int>
-			<Int sr="arg5" val="1"/>
-			<Int sr="arg6" val="0"/>
-			<Int sr="arg7" val="0"/>
-		</Action>
-		<Action sr="act35" ve="7">
-			<code>307</code>
-			<Int sr="arg0">
-				<var>%volume</var>
-			</Int>
-			<Int sr="arg1" val="0"/>
-			<Int sr="arg2" val="0"/>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%tpe_msgvol</lhs>
-					<op>7</op>
-					<rhs>1</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act36" ve="7">
-			<code>43</code>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%command</lhs>
-					<op>2</op>
-					<rhs>flowState</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act37" ve="7">
-			<code>159</code>
-			<Str sr="arg0" ve="3">%tpe_flowname</Str>
-			<Int sr="arg1" val="1"/>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%tpe_flowstate</lhs>
-					<op>2</op>
-					<rhs>active</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act38" ve="7">
-			<code>159</code>
-			<Str sr="arg0" ve="3">%tpe_flowname</Str>
-			<Int sr="arg1" val="0"/>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%tpe_flowstate</lhs>
-					<op>2</op>
-					<rhs>inactive</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act39" ve="7">
-			<code>130</code>
-			<Str sr="arg0" ve="3">AMAD_SendData2CommBridge</Str>
-			<Int sr="arg1">
-				<var>%priority+1</var>
-			</Int>
-			<Str sr="arg2" ve="3">setreading</Str>
-			<Str sr="arg3" ve="3">"automagicState": "Flow %tpe_flowname has been set %tpe_flowstate"</Str>
-			<Str sr="arg4" ve="3"/>
-			<Int sr="arg5" val="0"/>
-		</Action>
-		<Action sr="act4" ve="7">
-			<code>547</code>
-			<label>debug</label>
-			<on>false</on>
-			<Str sr="arg0" ve="3">%receive</Str>
-			<Str sr="arg1" ve="3">%AMAD_lastSetCommand</Str>
-			<Int sr="arg2" val="0"/>
-			<Int sr="arg3" val="0"/>
-			<Int sr="arg4" val="0"/>
-		</Action>
-		<Action sr="act40" ve="7">
-			<code>43</code>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%command</lhs>
-					<op>2</op>
-					<rhs>flowRun</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act41" ve="7">
-			<code>130</code>
-			<Str sr="arg0" ve="3">%tpe_flowname</Str>
-			<Int sr="arg1">
-				<var>%priority</var>
-			</Int>
-			<Str sr="arg2" ve="3"/>
-			<Str sr="arg3" ve="3"/>
-			<Str sr="arg4" ve="3"/>
-			<Int sr="arg5" val="0"/>
-		</Action>
-		<Action sr="act42" ve="7">
-			<code>43</code>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%command</lhs>
-					<op>2</op>
-					<rhs>setVolume</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act43" ve="7">
-			<code>307</code>
-			<Int sr="arg0">
-				<var>%tpe_volume</var>
-			</Int>
-			<Int sr="arg1" val="1"/>
-			<Int sr="arg2" val="0"/>
-		</Action>
-		<Action sr="act44" ve="7">
-			<code>43</code>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%command</lhs>
-					<op>2</op>
-					<rhs>setNotifiVolume</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act45" ve="7">
-			<code>305</code>
-			<Int sr="arg0">
-				<var>%tpe_notifivolume</var>
-			</Int>
-			<Int sr="arg1" val="1"/>
-			<Int sr="arg2" val="0"/>
-		</Action>
-		<Action sr="act46" ve="7">
-			<code>43</code>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%command</lhs>
-					<op>2</op>
-					<rhs>setRingSoundVolume</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act47" ve="7">
-			<code>304</code>
-			<Int sr="arg0">
-				<var>%tpe_ringsoundvolume</var>
-			</Int>
-			<Int sr="arg1" val="1"/>
-			<Int sr="arg2" val="0"/>
-		</Action>
-		<Action sr="act48" ve="7">
-			<code>43</code>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%command</lhs>
-					<op>2</op>
-					<rhs>setBrightness</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act49" ve="7">
-			<code>810</code>
-			<Int sr="arg0">
-				<var>%tpe_brightness</var>
-			</Int>
-			<Int sr="arg1" val="0"/>
-			<Int sr="arg2" val="0"/>
-			<Int sr="arg3" val="0"/>
-		</Action>
-		<Action sr="act5" ve="7">
-			<code>590</code>
-			<Str sr="arg0" ve="3">%receive</Str>
-			<Str sr="arg1" ve="3">/</Str>
-			<Int sr="arg2" val="0"/>
-		</Action>
-		<Action sr="act50" ve="7">
-			<code>43</code>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%command</lhs>
-					<op>2</op>
-					<rhs>multimediaControl</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act51" ve="7">
-			<code>130</code>
-			<label>multimediaControl</label>
-			<Str sr="arg0" ve="3">AMAD_multimediaControl</Str>
-			<Int sr="arg1">
-				<var>%priority</var>
-			</Int>
-			<Str sr="arg2" ve="3">%tpe_mplayer</Str>
-			<Str sr="arg3" ve="3">%tpe_button</Str>
-			<Str sr="arg4" ve="3"/>
-			<Int sr="arg5" val="1"/>
-		</Action>
-		<Action sr="act52" ve="7">
-			<code>43</code>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%command</lhs>
-					<op>2</op>
-					<rhs>setvoicecmd</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act53" ve="7">
-			<code>130</code>
-			<Str sr="arg0" ve="3">AMAD_VoiceControl</Str>
-			<Int sr="arg1">
-				<var>%priority+1</var>
-			</Int>
-			<Str sr="arg2" ve="3"/>
-			<Str sr="arg3" ve="3"/>
-			<Str sr="arg4" ve="3"/>
-			<Int sr="arg5" val="0"/>
-		</Action>
-		<Action sr="act54" ve="7">
-			<code>43</code>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%command</lhs>
-					<op>2</op>
-					<rhs>setScreenOrientation</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act55" ve="7">
-			<code>822</code>
-			<Int sr="arg0" val="1"/>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%tpe_orientation</lhs>
-					<op>2</op>
-					<rhs>auto</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act56" ve="7">
-			<code>822</code>
-			<label>Baustelle</label>
-			<Int sr="arg0" val="0"/>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%tpe_orientation</lhs>
-					<op>3</op>
-					<rhs>auto</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act57" ve="7">
-			<code>548</code>
-			<label>Baustelle</label>
-			<Str sr="arg0" ve="3">AMAD: "set screenOrientation landscape|portrait" wird noch nicht unterstützt</Str>
-			<Int sr="arg1" val="1"/>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%tpe_orientation</lhs>
-					<op>4</op>
-					<rhs>landscape|portrait</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act58" ve="7">
-			<code>130</code>
-			<label>Baustelle</label>
-			<Str sr="arg0" ve="3">AMAD_SendData2CommBridge</Str>
-			<Int sr="arg1">
-				<var>%priority+1</var>
-			</Int>
-			<Str sr="arg2" ve="3">setreading</Str>
-			<Str sr="arg3" ve="3">"automagicState": "set screenOrientation landscape|portrait: not supported by Tasker"</Str>
-			<Str sr="arg4" ve="3"/>
-			<Int sr="arg5" val="0"/>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%tpe_orientation</lhs>
-					<op>4</op>
-					<rhs>landscape|portrait</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act59" ve="7">
-			<code>43</code>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%command</lhs>
-					<op>2</op>
-					<rhs>setScreenFullscreen</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act6" ve="7">
-			<code>547</code>
-			<Str sr="arg0" ve="3">%type</Str>
-			<Str sr="arg1" ve="3">%receive3</Str>
-			<Int sr="arg2" val="0"/>
-			<Int sr="arg3" val="0"/>
-			<Int sr="arg4" val="0"/>
-		</Action>
-		<Action sr="act60" ve="7">
-			<code>548</code>
-			<label>Baustelle</label>
-			<Str sr="arg0" ve="3">AMAD: "set screenFullscreen on|off" wird noch nicht unterstützt</Str>
-			<Int sr="arg1" val="1"/>
-		</Action>
-		<Action sr="act61" ve="7">
-			<code>130</code>
-			<label>Baustelle</label>
-			<Str sr="arg0" ve="3">AMAD_SendData2CommBridge</Str>
-			<Int sr="arg1">
-				<var>%priority+1</var>
-			</Int>
-			<Str sr="arg2" ve="3">setreading</Str>
-			<Str sr="arg3" ve="3">"automagicState": "set screenFullscreen on|off: not supported by Tasker"</Str>
-			<Str sr="arg4" ve="3"/>
-			<Int sr="arg5" val="0"/>
-		</Action>
-		<Action sr="act62" ve="7">
-			<code>43</code>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%command</lhs>
-					<op>2</op>
-					<rhs>openURL</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act63" ve="7">
-			<code>547</code>
-			<Str sr="arg0" ve="3">%tpe_url</Str>
-			<Str sr="arg1" ve="3">http://%tpe_url</Str>
-			<Int sr="arg2" val="0"/>
-			<Int sr="arg3" val="0"/>
-			<Int sr="arg4" val="0"/>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%tpe_url</lhs>
-					<op>5</op>
-					<rhs>^http*</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act64" ve="7">
-			<code>877</code>
-			<Str sr="arg0" ve="3">android.intent.action.VIEW</Str>
-			<Int sr="arg1" val="1"/>
-			<Str sr="arg2" ve="3"/>
-			<Str sr="arg3" ve="3">%tpe_url</Str>
-			<Str sr="arg4" ve="3"/>
-			<Str sr="arg5" ve="3"/>
-			<Str sr="arg6" ve="3"/>
-			<Str sr="arg7" ve="3">%tpe_browserapp</Str>
-			<Str sr="arg8" ve="3">%tpe_browserappclass</Str>
-			<Int sr="arg9" val="1"/>
-		</Action>
-		<Action sr="act65" ve="7">
-			<code>43</code>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%command</lhs>
-					<op>2</op>
-					<rhs>setAlarm</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act66" ve="7">
-			<code>566</code>
-			<Int sr="arg0">
-				<var>%tpe_hour</var>
-			</Int>
-			<Int sr="arg1">
-				<var>%tpe_minute</var>
-			</Int>
-			<Str sr="arg2" ve="3">AMAD Wecker</Str>
-			<Str sr="arg3" ve="3"/>
-			<Int sr="arg4" val="0"/>
-			<Int sr="arg5" val="0"/>
-		</Action>
-		<Action sr="act67" ve="7">
-			<code>43</code>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%command</lhs>
-					<op>2</op>
-					<rhs>setTimer</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act68" ve="7">
-			<code>547</code>
-			<Str sr="arg0" ve="3">%tpe_seconds</Str>
-			<Str sr="arg1" ve="3">%tpe_minute*60</Str>
-			<Int sr="arg2" val="0"/>
-			<Int sr="arg3" val="1"/>
-			<Int sr="arg4" val="0"/>
-		</Action>
-		<Action sr="act69" ve="7">
-			<code>543</code>
-			<Int sr="arg0">
-				<var>%tpe_seconds</var>
-			</Int>
-			<Str sr="arg1" ve="3">AMAD Timer</Str>
-			<Int sr="arg2" val="0"/>
-		</Action>
-		<Action sr="act7" ve="7">
+		<Action sr="act25" ve="7">
 			<code>130</code>
 			<label>statusRequest</label>
 			<Str sr="arg0" ve="3">AMAD_informations</Str>
@@ -9541,7 +9082,551 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
+		<Action sr="act26" ve="7">
+			<code>130</code>
+			<label>currentFlowsetUpdate</label>
+			<Str sr="arg0" ve="3">AMAD_UpdateFlowset</Str>
+			<Int sr="arg1">
+				<var>%priority+1</var>
+			</Int>
+			<Str sr="arg2" ve="3"/>
+			<Str sr="arg3" ve="3"/>
+			<Str sr="arg4" ve="3"/>
+			<Int sr="arg5" val="1"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%type</lhs>
+					<op>2</op>
+					<rhs>currentFlowsetUpdate</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act27" ve="7">
+			<code>37</code>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%type</lhs>
+					<op>2</op>
+					<rhs>setCommands</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act28" ve="7">
+			<code>37</code>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%command</lhs>
+					<op>2</op>
+					<rhs>screenMsg</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act29" ve="7">
+			<code>548</code>
+			<Str sr="arg0" ve="3">%tpe_message</Str>
+			<Int sr="arg1" val="1"/>
+		</Action>
+		<Action sr="act3" ve="7">
+			<code>547</code>
+			<Str sr="arg0" ve="3">%AMAD_lastSetCommand</Str>
+			<Str sr="arg1" ve="3">%receive</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+		</Action>
+		<Action sr="act30" ve="7">
+			<code>43</code>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%command</lhs>
+					<op>2</op>
+					<rhs>ttsMsg</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act31" ve="7">
+			<code>547</code>
+			<Str sr="arg0" ve="3">%tpe_msglang</Str>
+			<Str sr="arg1" ve="3">deu-deu</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%tpe_msglang</lhs>
+					<op>4</op>
+					<rhs>en</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act32" ve="7">
+			<code>547</code>
+			<Str sr="arg0" ve="3">%tpe_msglang</Str>
+			<Str sr="arg1" ve="3">eng-usa</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%tpe_msglang</lhs>
+					<op>2</op>
+					<rhs>en</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act33" ve="7">
+			<code>547</code>
+			<Str sr="arg0" ve="3">%volume</Str>
+			<Str sr="arg1" ve="3">%VOLM</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+		</Action>
+		<Action sr="act34" ve="7">
+			<code>307</code>
+			<Int sr="arg0">
+				<var>%tpe_msgvol</var>
+			</Int>
+			<Int sr="arg1" val="0"/>
+			<Int sr="arg2" val="0"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%tpe_msgvol</lhs>
+					<op>7</op>
+					<rhs>1</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act35" ve="7">
+			<code>559</code>
+			<Str sr="arg0" ve="3">%tpe_message</Str>
+			<Str sr="arg1" ve="3">com.google.android.tts:%tpe_msglang</Str>
+			<Int sr="arg2" val="3"/>
+			<Int sr="arg3" val="5"/>
+			<Int sr="arg4">
+				<var>%tpe_msgspeed</var>
+			</Int>
+			<Int sr="arg5" val="1"/>
+			<Int sr="arg6" val="0"/>
+			<Int sr="arg7" val="0"/>
+		</Action>
+		<Action sr="act36" ve="7">
+			<code>307</code>
+			<Int sr="arg0">
+				<var>%volume</var>
+			</Int>
+			<Int sr="arg1" val="0"/>
+			<Int sr="arg2" val="0"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%tpe_msgvol</lhs>
+					<op>7</op>
+					<rhs>1</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act37" ve="7">
+			<code>43</code>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%command</lhs>
+					<op>2</op>
+					<rhs>flowState</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act38" ve="7">
+			<code>159</code>
+			<Str sr="arg0" ve="3">%tpe_flowname</Str>
+			<Int sr="arg1" val="1"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%tpe_flowstate</lhs>
+					<op>2</op>
+					<rhs>active</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act39" ve="7">
+			<code>159</code>
+			<Str sr="arg0" ve="3">%tpe_flowname</Str>
+			<Int sr="arg1" val="0"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%tpe_flowstate</lhs>
+					<op>2</op>
+					<rhs>inactive</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act4" ve="7">
+			<code>547</code>
+			<label>debug</label>
+			<on>false</on>
+			<Str sr="arg0" ve="3">%receive</Str>
+			<Str sr="arg1" ve="3">%AMAD_lastSetCommand</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+		</Action>
+		<Action sr="act40" ve="7">
+			<code>130</code>
+			<Str sr="arg0" ve="3">AMAD_SendData2CommBridge</Str>
+			<Int sr="arg1">
+				<var>%priority+1</var>
+			</Int>
+			<Str sr="arg2" ve="3">setreading</Str>
+			<Str sr="arg3" ve="3">"automagicState": "Flow %tpe_flowname has been set %tpe_flowstate"</Str>
+			<Str sr="arg4" ve="3"/>
+			<Int sr="arg5" val="0"/>
+		</Action>
+		<Action sr="act41" ve="7">
+			<code>43</code>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%command</lhs>
+					<op>2</op>
+					<rhs>flowRun</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act42" ve="7">
+			<code>130</code>
+			<Str sr="arg0" ve="3">%tpe_flowname</Str>
+			<Int sr="arg1">
+				<var>%priority</var>
+			</Int>
+			<Str sr="arg2" ve="3"/>
+			<Str sr="arg3" ve="3"/>
+			<Str sr="arg4" ve="3"/>
+			<Int sr="arg5" val="0"/>
+		</Action>
+		<Action sr="act43" ve="7">
+			<code>43</code>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%command</lhs>
+					<op>2</op>
+					<rhs>setVolume</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act44" ve="7">
+			<code>307</code>
+			<Int sr="arg0">
+				<var>%tpe_volume</var>
+			</Int>
+			<Int sr="arg1" val="1"/>
+			<Int sr="arg2" val="0"/>
+		</Action>
+		<Action sr="act45" ve="7">
+			<code>43</code>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%command</lhs>
+					<op>2</op>
+					<rhs>setNotifiVolume</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act46" ve="7">
+			<code>305</code>
+			<Int sr="arg0">
+				<var>%tpe_notifivolume</var>
+			</Int>
+			<Int sr="arg1" val="1"/>
+			<Int sr="arg2" val="0"/>
+		</Action>
+		<Action sr="act47" ve="7">
+			<code>43</code>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%command</lhs>
+					<op>2</op>
+					<rhs>setRingSoundVolume</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act48" ve="7">
+			<code>304</code>
+			<Int sr="arg0">
+				<var>%tpe_ringsoundvolume</var>
+			</Int>
+			<Int sr="arg1" val="1"/>
+			<Int sr="arg2" val="0"/>
+		</Action>
+		<Action sr="act49" ve="7">
+			<code>43</code>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%command</lhs>
+					<op>2</op>
+					<rhs>setBrightness</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act5" ve="7">
+			<code>590</code>
+			<Str sr="arg0" ve="3">%receive</Str>
+			<Str sr="arg1" ve="3">/</Str>
+			<Int sr="arg2" val="0"/>
+		</Action>
+		<Action sr="act50" ve="7">
+			<code>810</code>
+			<Int sr="arg0">
+				<var>%tpe_brightness</var>
+			</Int>
+			<Int sr="arg1" val="0"/>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+		</Action>
+		<Action sr="act51" ve="7">
+			<code>43</code>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%command</lhs>
+					<op>2</op>
+					<rhs>multimediaControl</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act52" ve="7">
+			<code>130</code>
+			<label>multimediaControl</label>
+			<Str sr="arg0" ve="3">AMAD_multimediaControl</Str>
+			<Int sr="arg1">
+				<var>%priority</var>
+			</Int>
+			<Str sr="arg2" ve="3">%tpe_mplayer</Str>
+			<Str sr="arg3" ve="3">%tpe_button</Str>
+			<Str sr="arg4" ve="3"/>
+			<Int sr="arg5" val="1"/>
+		</Action>
+		<Action sr="act53" ve="7">
+			<code>43</code>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%command</lhs>
+					<op>2</op>
+					<rhs>setvoicecmd</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act54" ve="7">
+			<code>130</code>
+			<Str sr="arg0" ve="3">AMAD_VoiceControl</Str>
+			<Int sr="arg1">
+				<var>%priority+1</var>
+			</Int>
+			<Str sr="arg2" ve="3"/>
+			<Str sr="arg3" ve="3"/>
+			<Str sr="arg4" ve="3"/>
+			<Int sr="arg5" val="0"/>
+		</Action>
+		<Action sr="act55" ve="7">
+			<code>43</code>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%command</lhs>
+					<op>2</op>
+					<rhs>setScreenOrientation</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act56" ve="7">
+			<code>822</code>
+			<Int sr="arg0" val="1"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%tpe_orientation</lhs>
+					<op>2</op>
+					<rhs>auto</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act57" ve="7">
+			<code>822</code>
+			<label>Baustelle</label>
+			<Int sr="arg0" val="0"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%tpe_orientation</lhs>
+					<op>3</op>
+					<rhs>auto</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act58" ve="7">
+			<code>548</code>
+			<label>Baustelle</label>
+			<Str sr="arg0" ve="3">AMAD: "set screenOrientation landscape|portrait" wird noch nicht unterstützt</Str>
+			<Int sr="arg1" val="1"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%tpe_orientation</lhs>
+					<op>4</op>
+					<rhs>landscape|portrait</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act59" ve="7">
+			<code>130</code>
+			<label>Baustelle</label>
+			<Str sr="arg0" ve="3">AMAD_SendData2CommBridge</Str>
+			<Int sr="arg1">
+				<var>%priority+1</var>
+			</Int>
+			<Str sr="arg2" ve="3">setreading</Str>
+			<Str sr="arg3" ve="3">"automagicState": "set screenOrientation landscape|portrait: not supported by Tasker"</Str>
+			<Str sr="arg4" ve="3"/>
+			<Int sr="arg5" val="0"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%tpe_orientation</lhs>
+					<op>4</op>
+					<rhs>landscape|portrait</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act6" ve="7">
+			<code>547</code>
+			<Str sr="arg0" ve="3">%type</Str>
+			<Str sr="arg1" ve="3">%receive3</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+		</Action>
+		<Action sr="act60" ve="7">
+			<code>43</code>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%command</lhs>
+					<op>2</op>
+					<rhs>setScreenFullscreen</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act61" ve="7">
+			<code>548</code>
+			<label>Baustelle</label>
+			<Str sr="arg0" ve="3">AMAD: "set screenFullscreen on|off" wird noch nicht unterstützt</Str>
+			<Int sr="arg1" val="1"/>
+		</Action>
+		<Action sr="act62" ve="7">
+			<code>130</code>
+			<label>Baustelle</label>
+			<Str sr="arg0" ve="3">AMAD_SendData2CommBridge</Str>
+			<Int sr="arg1">
+				<var>%priority+1</var>
+			</Int>
+			<Str sr="arg2" ve="3">setreading</Str>
+			<Str sr="arg3" ve="3">"automagicState": "set screenFullscreen on|off: not supported by Tasker"</Str>
+			<Str sr="arg4" ve="3"/>
+			<Int sr="arg5" val="0"/>
+		</Action>
+		<Action sr="act63" ve="7">
+			<code>43</code>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%command</lhs>
+					<op>2</op>
+					<rhs>openURL</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act64" ve="7">
+			<code>547</code>
+			<Str sr="arg0" ve="3">%tpe_url</Str>
+			<Str sr="arg1" ve="3">http://%tpe_url</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%tpe_url</lhs>
+					<op>5</op>
+					<rhs>^http*</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act65" ve="7">
+			<code>877</code>
+			<Str sr="arg0" ve="3">android.intent.action.VIEW</Str>
+			<Int sr="arg1" val="1"/>
+			<Str sr="arg2" ve="3"/>
+			<Str sr="arg3" ve="3">%tpe_url</Str>
+			<Str sr="arg4" ve="3"/>
+			<Str sr="arg5" ve="3"/>
+			<Str sr="arg6" ve="3"/>
+			<Str sr="arg7" ve="3">%tpe_browserapp</Str>
+			<Str sr="arg8" ve="3">%tpe_browserappclass</Str>
+			<Int sr="arg9" val="1"/>
+		</Action>
+		<Action sr="act66" ve="7">
+			<code>43</code>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%command</lhs>
+					<op>2</op>
+					<rhs>setAlarm</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act67" ve="7">
+			<code>566</code>
+			<Int sr="arg0">
+				<var>%tpe_hour</var>
+			</Int>
+			<Int sr="arg1">
+				<var>%tpe_minute</var>
+			</Int>
+			<Str sr="arg2" ve="3">AMAD Wecker</Str>
+			<Str sr="arg3" ve="3"/>
+			<Int sr="arg4" val="0"/>
+			<Int sr="arg5" val="0"/>
+		</Action>
+		<Action sr="act68" ve="7">
+			<code>43</code>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%command</lhs>
+					<op>2</op>
+					<rhs>setTimer</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act69" ve="7">
+			<code>547</code>
+			<Str sr="arg0" ve="3">%tpe_seconds</Str>
+			<Str sr="arg1" ve="3">%tpe_minute*60</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="1"/>
+			<Int sr="arg4" val="0"/>
+		</Action>
+		<Action sr="act7" ve="7">
+			<code>547</code>
+			<Str sr="arg0" ve="3">%receive4</Str>
+			<Str sr="arg1" ve="3">%receive</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%receive(#)</lhs>
+					<op>7</op>
+					<rhs>4</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
 		<Action sr="act70" ve="7">
+			<code>543</code>
+			<Int sr="arg0">
+				<var>%tpe_seconds</var>
+			</Int>
+			<Str sr="arg1" ve="3">AMAD Timer</Str>
+			<Int sr="arg2" val="0"/>
+		</Action>
+		<Action sr="act71" ve="7">
 			<code>43</code>
 			<ConditionList sr="if">
 				<Condition sr="c0" ve="3">
@@ -9551,7 +9636,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act71" ve="7">
+		<Action sr="act72" ve="7">
 			<code>664</code>
 			<Str sr="arg0" ve="3">pacman</Str>
 			<Str sr="arg1" ve="3">CONTEXT</Str>
@@ -9564,7 +9649,7 @@ Code: %HTTPR</Str>
 			<Str sr="arg8" ve="3"/>
 			<Str sr="arg9" ve="3"/>
 		</Action>
-		<Action sr="act72" ve="7">
+		<Action sr="act73" ve="7">
 			<code>664</code>
 			<Str sr="arg0" ve="3">intent</Str>
 			<Str sr="arg1" ve="3">pacman</Str>
@@ -9577,7 +9662,7 @@ Code: %HTTPR</Str>
 			<Str sr="arg8" ve="3"/>
 			<Str sr="arg9" ve="3"/>
 		</Action>
-		<Action sr="act73" ve="7">
+		<Action sr="act74" ve="7">
 			<code>664</code>
 			<Str sr="arg0" ve="3"/>
 			<Str sr="arg1" ve="3">CONTEXT</Str>
@@ -9591,7 +9676,7 @@ Code: %HTTPR</Str>
 			<Str sr="arg8" ve="3"/>
 			<Str sr="arg9" ve="3"/>
 		</Action>
-		<Action sr="act74" ve="7">
+		<Action sr="act75" ve="7">
 			<code>43</code>
 			<ConditionList sr="if">
 				<Condition sr="c0" ve="3">
@@ -9601,7 +9686,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act75" ve="7">
+		<Action sr="act76" ve="7">
 			<code>123</code>
 			<Str sr="arg0" ve="3">svc nfc enable</Str>
 			<Int sr="arg1" val="0"/>
@@ -9623,7 +9708,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act76" ve="7">
+		<Action sr="act77" ve="7">
 			<code>123</code>
 			<Str sr="arg0" ve="3">svc nfc disable</Str>
 			<Int sr="arg1" val="0"/>
@@ -9645,7 +9730,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act77" ve="7">
+		<Action sr="act78" ve="7">
 			<code>548</code>
 			<label>no root</label>
 			<Str sr="arg0" ve="3">AMAD: "set nfc on|off" benötigt Root rechte</Str>
@@ -9658,7 +9743,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act78" ve="7">
+		<Action sr="act79" ve="7">
 			<code>130</code>
 			<label>no root</label>
 			<Str sr="arg0" ve="3">AMAD_SendData2CommBridge</Str>
@@ -9677,7 +9762,25 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act79" ve="7">
+		<Action sr="act8" ve="7">
+			<code>598</code>
+			<Str sr="arg0" ve="3">%receive4</Str>
+			<Str sr="arg1" ve="3">/%receive2/%receive3/</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<Str sr="arg5" ve="3"/>
+			<Int sr="arg6" val="1"/>
+			<Str sr="arg7" ve="3"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%receive(#)</lhs>
+					<op>7</op>
+					<rhs>4</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act80" ve="7">
 			<code>43</code>
 			<ConditionList sr="if">
 				<Condition sr="c0" ve="3">
@@ -9687,26 +9790,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act8" ve="7">
-			<code>130</code>
-			<label>currentFlowsetUpdate</label>
-			<Str sr="arg0" ve="3">AMAD_UpdateFlowset</Str>
-			<Int sr="arg1">
-				<var>%priority+1</var>
-			</Int>
-			<Str sr="arg2" ve="3"/>
-			<Str sr="arg3" ve="3"/>
-			<Str sr="arg4" ve="3"/>
-			<Int sr="arg5" val="1"/>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%type</lhs>
-					<op>2</op>
-					<rhs>currentFlowsetUpdate</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act80" ve="7">
+		<Action sr="act81" ve="7">
 			<code>130</code>
 			<Str sr="arg0" ve="3">AMAD_SendData2CommBridge</Str>
 			<Int sr="arg1">
@@ -9724,7 +9808,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act81" ve="7">
+		<Action sr="act82" ve="7">
 			<code>333</code>
 			<Int sr="arg0" val="1"/>
 			<ConditionList sr="if">
@@ -9735,7 +9819,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act82" ve="7">
+		<Action sr="act83" ve="7">
 			<code>59</code>
 			<Int sr="arg0" val="3"/>
 			<ConditionList sr="if">
@@ -9746,7 +9830,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act83" ve="7">
+		<Action sr="act84" ve="7">
 			<code>59</code>
 			<Int sr="arg0" val="0"/>
 			<ConditionList sr="if">
@@ -9757,7 +9841,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act84" ve="7">
+		<Action sr="act85" ve="7">
 			<code>43</code>
 			<ConditionList sr="if">
 				<Condition sr="c0" ve="3">
@@ -9767,7 +9851,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act85" ve="7">
+		<Action sr="act86" ve="7">
 			<code>312</code>
 			<Int sr="arg0" val="2"/>
 			<ConditionList sr="if">
@@ -9778,7 +9862,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act86" ve="7">
+		<Action sr="act87" ve="7">
 			<code>312</code>
 			<Int sr="arg0" val="1"/>
 			<ConditionList sr="if">
@@ -9789,7 +9873,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act87" ve="7">
+		<Action sr="act88" ve="7">
 			<code>312</code>
 			<Int sr="arg0" val="0"/>
 			<ConditionList sr="if">
@@ -9800,7 +9884,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act88" ve="7">
+		<Action sr="act89" ve="7">
 			<code>312</code>
 			<Int sr="arg0" val="3"/>
 			<ConditionList sr="if">
@@ -9811,7 +9895,13 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act89" ve="7">
+		<Action sr="act9" ve="7">
+			<code>590</code>
+			<Str sr="arg0" ve="3">%receive4</Str>
+			<Str sr="arg1" ve="3">?</Str>
+			<Int sr="arg2" val="0"/>
+		</Action>
+		<Action sr="act90" ve="7">
 			<code>43</code>
 			<ConditionList sr="if">
 				<Condition sr="c0" ve="3">
@@ -9821,22 +9911,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act9" ve="7">
-			<code>547</code>
-			<Str sr="arg0" ve="3">%receive4</Str>
-			<Str sr="arg1" ve="3">%receive</Str>
-			<Int sr="arg2" val="0"/>
-			<Int sr="arg3" val="0"/>
-			<Int sr="arg4" val="0"/>
-			<ConditionList sr="if">
-				<Condition sr="c0" ve="3">
-					<lhs>%receive(#)</lhs>
-					<op>7</op>
-					<rhs>4</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act90" ve="7">
+		<Action sr="act91" ve="7">
 			<code>294</code>
 			<Int sr="arg0" val="1"/>
 			<ConditionList sr="if">
@@ -9847,7 +9922,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act91" ve="7">
+		<Action sr="act92" ve="7">
 			<code>294</code>
 			<Int sr="arg0" val="0"/>
 			<ConditionList sr="if">
@@ -9858,7 +9933,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act92" ve="7">
+		<Action sr="act93" ve="7">
 			<code>43</code>
 			<ConditionList sr="if">
 				<Condition sr="c0" ve="3">
@@ -9868,7 +9943,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act93" ve="7">
+		<Action sr="act94" ve="7">
 			<code>445</code>
 			<Str sr="arg0" ve="3">%tpe_notifypath%tpe_notifyfile</Str>
 			<Int sr="arg1" val="0"/>
@@ -9876,7 +9951,7 @@ Code: %HTTPR</Str>
 			<Int sr="arg3" val="5"/>
 			<Int sr="arg4" val="1"/>
 		</Action>
-		<Action sr="act94" ve="7">
+		<Action sr="act95" ve="7">
 			<code>43</code>
 			<ConditionList sr="if">
 				<Condition sr="c0" ve="3">
@@ -9886,13 +9961,13 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act95" ve="7">
+		<Action sr="act96" ve="7">
 			<code>548</code>
 			<label>Baustelle</label>
 			<Str sr="arg0" ve="3">AMAD: "set changetoBtDevice" wird noch nicht unterstützt</Str>
 			<Int sr="arg1" val="1"/>
 		</Action>
-		<Action sr="act96" ve="7">
+		<Action sr="act97" ve="7">
 			<code>130</code>
 			<label>Baustelle</label>
 			<Str sr="arg0" ve="3">AMAD_SendData2CommBridge</Str>
@@ -9904,7 +9979,7 @@ Code: %HTTPR</Str>
 			<Str sr="arg4" ve="3"/>
 			<Int sr="arg5" val="0"/>
 		</Action>
-		<Action sr="act97" ve="7">
+		<Action sr="act98" ve="7">
 			<code>43</code>
 			<ConditionList sr="if">
 				<Condition sr="c0" ve="3">
@@ -9914,7 +9989,7 @@ Code: %HTTPR</Str>
 				</Condition>
 			</ConditionList>
 		</Action>
-		<Action sr="act98" ve="7">
+		<Action sr="act99" ve="7">
 			<code>779</code>
 			<Str sr="arg0" ve="3"/>
 			<Int sr="arg1" val="0"/>
@@ -9923,29 +9998,6 @@ Code: %HTTPR</Str>
 					<lhs>%tpe_app</lhs>
 					<op>2</op>
 					<rhs>Automagic</rhs>
-				</Condition>
-			</ConditionList>
-		</Action>
-		<Action sr="act99" ve="7">
-			<code>123</code>
-			<se>false</se>
-			<Str sr="arg0" ve="3">service call notification 1</Str>
-			<Int sr="arg1" val="1"/>
-			<Int sr="arg2" val="1"/>
-			<Str sr="arg3" ve="3"/>
-			<Str sr="arg4" ve="3"/>
-			<Str sr="arg5" ve="3"/>
-			<ConditionList sr="if">
-				<bool0>And</bool0>
-				<Condition sr="c0" ve="3">
-					<lhs>%tpe_app</lhs>
-					<op>2</op>
-					<rhs>All</rhs>
-				</Condition>
-				<Condition sr="c1" ve="3">
-					<lhs>%ROOT</lhs>
-					<op>2</op>
-					<rhs>yes</rhs>
 				</Condition>
 			</ConditionList>
 		</Action>
