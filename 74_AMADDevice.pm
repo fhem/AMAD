@@ -58,8 +58,8 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.33";
-my $flowsetversion = "4.1.99.5";
+my $modulversion = "4.1.99.37";
+my $flowsetversion = "4.1.99.6";
 
 
 
@@ -507,16 +507,16 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif( lc $cmd eq 'volumenotification' ) {
-        my $vol = join( " ", @args );
+        my $volnote = join( " ", @args );
 
-        $path   = "/fhem-amad/setCommands/setNotifiVolume?notifivolume=$vol";
+        $path   = "/fhem-amad/setCommands/setNotifiVolume?notifivolume=$volnote";
         $method = "POST";
     }
     
     elsif( lc $cmd eq 'volumeringsound' ) {
-        my $vol = join( " ", @args );
+        my $volring = join( " ", @args );
 
-        $path   = "/fhem-amad/setCommands/setRingSoundVolume?ringsoundvolume=$vol";
+        $path   = "/fhem-amad/setCommands/setRingSoundVolume?ringsoundvolume=$volring";
         $method = "POST";
     }
     
@@ -721,7 +721,7 @@ sub AMADDevice_Set($$@) {
     
     elsif( lc $cmd eq 'currentflowsetupdate' ) {
 
-        $path   = "/fhem-amad/currentFlowsetUpdate";
+        $path   = "/fhem-amad/setCommands/currentFlowsetUpdate";
         $method = "POST";
     }
     
