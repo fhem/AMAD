@@ -721,7 +721,12 @@ sub AMADDevice_Set($$@) {
     
     elsif( lc $cmd eq 'currentflowsetupdate' ) {
 
-        $path   = "/fhem-amad/setCommands/currentFlowsetUpdate";
+        if( ReadingsVal($name,'flowsetVersionAtDevice','') lt '4.1.99.6' ) {
+            $path   = "/fhem-amad/currentFlowsetUpdate";
+        } else {
+            $path   = "/fhem-amad/setCommands/currentFlowsetUpdate";
+        }
+        
         $method = "POST";
     }
     
