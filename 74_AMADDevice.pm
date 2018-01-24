@@ -2,7 +2,7 @@
 # 
 # Developed with Kate
 #
-#  (c) 2015-2017 Copyright: Marko Oldenburg (leongaultier at gmail dot com)
+#  (c) 2015-2018 Copyright: Marko Oldenburg (leongaultier at gmail dot com)
 #  All rights reserved
 #
 #   Special thanks goes to comitters:
@@ -58,7 +58,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.37";
+my $modulversion = "4.1.99.38";
 my $flowsetversion = "4.1.99.6";
 
 
@@ -909,11 +909,18 @@ sub AMADDevice_CreateTtsMsgValue($@) {
     
     my $name        = $hash->{NAME};
     my $msg;
-    my $speed       = AttrVal( $name, "setTtsMsgSpeed", "1.0" );
+    my $speed;
+
     my $lang        = AttrVal( $name, "setTtsMsgLang","de" );
     my $ttsmsgvol   = AttrVal( $name, "setTtsMsgVol","none");
     
-    
+    if( AttrVal($name,"remoteServer","Automagic") ne 'Automagic') {
+        $speed = AttrVal( $name, "setTtsMsgSpeed", "5.0" );
+    } else {
+        $speed = AttrVal( $name, "setTtsMsgSpeed", "1.0" );
+    }
+
+
     $msg    = join( " ", @args );
     
     unless($args[0] ne '&en;' and $args[0] ne '&de;') {
