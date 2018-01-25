@@ -290,7 +290,7 @@ irname=getString("name")</extras>
     <useDefaultName>false</useDefaultName>
     <name>Medien Session verändert</name>
     <enabled>true</enabled>
-    <packageNameFilter>com.amazon.mp3,com.audible.application,com.rhapsody.alditalk,com.sec.android.app.music,com.spotify.music,de.maxdome.app.android,com.google.android.videos,com.google.android.music,org.smblott.intentradioio,com.amazon.avod.thirdpartyclient,tunein.player,org.videolan.vlc,com.google.android.youtube,com.google.android.apps.youtube.kids</packageNameFilter>
+    <packageNameFilter>com.amazon.mp3,com.audible.application,com.rhapsody.alditalk,com.sec.android.app.music,com.spotify.music,de.maxdome.app.android,com.google.android.videos,com.google.android.music,org.smblott.intentradioio,com.amazon.avod.thirdpartyclient,tunein.player,org.videolan.vlc,com.google.android.youtube,com.google.android.apps.youtube.kids,deezer.android.app</packageNameFilter>
   </trigger>
   <trigger type="nfc_state">
     <useDefaultName>false</useDefaultName>
@@ -2821,7 +2821,7 @@ else if(index == 1)
   </action>
   <action type="script">
     <useDefaultName>true</useDefaultName>
-    <name>Script: if(package_name == "com.google.android.music") { musicapp = "Google Musik" } else if(package_name == "com.amazon.mp3") { musicapp = "Amazon Musik" } else if(package_name == "com.google.android.videos") { musicapp = "Google Video" } else if(package_name == "com.spotify.music") { musicapp = "Spotify Musik" } else if(package_name == "com.google.android.youtube") { musicapp = "YouTube" } else if(package_name == "com.google.android.apps.youtube.kids") { musicapp = "YouTube Kids" } else if(package_name == "tunein.player") { musicapp = "TuneIn Player" } else if(package_name == "com.rhapsody.alditalk") { musicapp = "Aldi Life Musik" } else if(package_name == "org.videolan.vlc") { musicapp = "VLC Player" } else if(package_name == "com.sec.android.app.music") { musicapp = "Samsung Music Player" }</name>
+    <name>Script: if(package_name == "com.google.android.music") { musicapp = "Google Musik" } else if(package_name == "com.amazon.mp3") { musicapp = "Amazon Musik" } else if(package_name == "com.google.android.videos") { musicapp = "Google Video" } else if(package_name == "com.spotify.music") { musicapp = "Spotify Musik" } else if(package_name == "com.google.android.youtube") { musicapp = "YouTube" } else if(package_name == "com.google.android.apps.youtube.kids") { musicapp = "YouTube Kids" } else if(package_name == "tunein.player") { musicapp = "TuneIn Player" } else if(package_name == "com.rhapsody.alditalk") { musicapp = "Aldi Life Musik" } else if(package_name == "org.videolan.vlc") { musicapp = "VLC Player" } else if(package_name == "com.sec.android.app.music") { musicapp = "Samsung Music Player" } else if(package_name == "deezer.android.app") { musicapp = "Deezer" }</name>
     <script>if(package_name == "com.google.android.music") {
     musicapp = "Google Musik"
 }
@@ -2860,33 +2860,37 @@ else if(package_name == "org.videolan.vlc") {
 
 else if(package_name == "com.sec.android.app.music") {
     musicapp = "Samsung Music Player"
+}
+
+else if(package_name == "deezer.android.app") {
+    musicapp = "Deezer"
 }</script>
   </action>
   <action type="script">
     <useDefaultName>true</useDefaultName>
-    <name>Script: if(playback_state == 0) { playback_state = "keiner" } else if(playback_state == 1) { playback_state = "gestoppt" } else if(playback_state == 2) { playback_state = "pausiert" } else if(playback_state == 3) { playback_state = "spielt ab" } else if(playback_state == 4) { playback_state = "spult vorwärts" } else if(playback_state == 5) { playback_state = "spült rückwärts" } else if(playback_state == 6) { playback_state = "buffert" } else if(playback_state == 7) { playback_state = "Fehler" } else if(playback_state == 8) { playback_state = "verbindet" } else if(playback_state == 9) { playback_state = "springt zum vorherigen" } else if(playback_state == 10) { playback_state = "springt zum nächsten" } else if(playback_state == 11) { playback_state = "springt zu Position in Wiedergabeliste" }</name>
+    <name>Script: if(playback_state == 0) { playback_state = "none" } else if(playback_state == 1) { playback_state = "stopped" } else if(playback_state == 2) { playback_state = "pause" } else if(playback_state == 3) { playback_state = "play" } else if(playback_state == 4) { playback_state = "fast forward" } else if(playback_state == 5) { playback_state = "fast backward" } else if(playback_state == 6) { playback_state = "buffert" } else if(playback_state == 7) { playback_state = "error" } else if(playback_state == 8) { playback_state = "connect" } else if(playback_state == 9) { playback_state = "skip backward" } else if(playback_state == 10) { playback_state = "skip forward" } else if(playback_state == 11) { playback_state = "jumps to position in playlist" }</name>
     <script>if(playback_state == 0) {
-playback_state = "keiner"
+playback_state = "none"
 }
 
 else if(playback_state == 1) {
-playback_state = "gestoppt"
+playback_state = "stopped"
 }
 
 else if(playback_state == 2) {
-playback_state = "pausiert"
+playback_state = "pause"
 }
 
 else if(playback_state == 3) {
-playback_state = "spielt ab"
+playback_state = "play"
 }
 
 else if(playback_state == 4) {
-playback_state = "spult vorwärts"
+playback_state = "fast forward"
 }
 
 else if(playback_state == 5) {
-playback_state = "spült rückwärts"
+playback_state = "fast backward"
 }
 
 else if(playback_state == 6) {
@@ -2894,23 +2898,23 @@ playback_state = "buffert"
 }
 
 else if(playback_state == 7) {
-playback_state = "Fehler"
+playback_state = "error"
 }
 
 else if(playback_state == 8) {
-playback_state = "verbindet"
+playback_state = "connect"
 }
 
 else if(playback_state == 9) {
-playback_state = "springt zum vorherigen"
+playback_state = "skip backward"
 }
 
 else if(playback_state == 10) {
-playback_state = "springt zum nächsten"
+playback_state = "skip forward"
 }
 
 else if(playback_state == 11) {
-playback_state = "springt zu Position in Wiedergabeliste"
+playback_state = "jumps to position in playlist"
 }</script>
   </action>
   <action type="script">
@@ -2971,13 +2975,13 @@ fhemcmd = "setreading";</script>
   </action>
   <action type="script">
     <useDefaultName>true</useDefaultName>
-    <name>Script: informationFlow_state = "aktiv"</name>
-    <script>informationFlow_state = "aktiv"</script>
+    <name>Script: informationFlow_state = "active"</name>
+    <script>informationFlow_state = "active"</script>
   </action>
   <action type="script">
     <useDefaultName>true</useDefaultName>
-    <name>Script: informationFlow_state = "inaktiv"</name>
-    <script>informationFlow_state = "inaktiv"</script>
+    <name>Script: informationFlow_state = "inactive"</name>
+    <script>informationFlow_state = "inactive"</script>
   </action>
   <action type="script">
     <useDefaultName>true</useDefaultName>
@@ -3305,13 +3309,13 @@ fhemdata = "\{\"amad\": \{\"amad_id\": \"" + {global_amadid} + "\",\"fhemcmd\": 
   </action>
   <action type="script">
     <useDefaultName>true</useDefaultName>
-    <name>Script: setCommandFlow_state = "aktiv"</name>
-    <script>setCommandFlow_state = "aktiv"</script>
+    <name>Script: setCommandFlow_state = "active"</name>
+    <script>setCommandFlow_state = "active"</script>
   </action>
   <action type="script">
     <useDefaultName>true</useDefaultName>
-    <name>Script: setCommandFlow_state = "inaktiv"</name>
-    <script>setCommandFlow_state = "inaktiv"</script>
+    <name>Script: setCommandFlow_state = "inactive"</name>
+    <script>setCommandFlow_state = "inactive"</script>
   </action>
   <action type="script">
     <useDefaultName>true</useDefaultName>
@@ -3434,6 +3438,12 @@ else if(param_mplayer == "mediaSamsungMusic")
 {
     pname = "com.sec.android.app.music";
     kname = "com.samsung.android.app.music.service.receiver.MediaButtonReceiver";
+}
+
+else if(param_mplayer == "mediaDeezer")
+{
+    pname = "deezer.android.app";
+    kname = "com.deezer.core.jukebox.receivers.JukeboxMediaButtonReceiver";
 }</script>
   </action>
   <action type="set_alarm">
@@ -4209,8 +4219,8 @@ Soll der Assistent gelöscht werden?</actioncontainer>
     <conditioncontainer id="t100" x="-420.0" y="-2782.5">Expression: trigger == "Bluetooth Status: Schaltet aus, Aus" or trigger == "Bluetooth Gerät verbunden: Alle Geräte" or trigger == "Bluetooth Gerät getrennt: Alle Geräte" or trigger == "Bluetooth Status: Schaltet ein, Ein" or trigger == "HTTP Request: /fhem-amad/deviceInfo/"</conditioncontainer>
     <actioncontainer id="t101" x="-1120.0" y="-2327.5">Script: flow_SetCommands = "\"flow_SetCommands\":" + " \"" + {setCommandFlow_state} + "\""; fhemcmd = "setreading";</actioncontainer>
     <actioncontainer id="t102" x="-1120.0" y="-2152.5">Setze Flow Status: Aktivieren SetCommands</actioncontainer>
-    <actioncontainer id="t103" x="-1015.0" y="-1977.5">Script: setCommandFlow_state = "aktiv"</actioncontainer>
-    <actioncontainer id="t104" x="-1225.0" y="-1977.5">Script: setCommandFlow_state = "inaktiv"</actioncontainer>
+    <actioncontainer id="t103" x="-1015.0" y="-1977.5">Script: setCommandFlow_state = "active"</actioncontainer>
+    <actioncontainer id="t104" x="-1225.0" y="-1977.5">Script: setCommandFlow_state = "inactive"</actioncontainer>
     <conditioncontainer id="t105" x="-1120.0" y="-1802.5">Flow Aktiv: SetCommands</conditioncontainer>
     <conditioncontainer id="t106" x="-1120.0" y="-1557.5">Expression: trigger == "Periodischer Timer: alle 120s"</conditioncontainer>
     <conditioncontainer id="t107" x="-1855.0" y="-1802.5">Expression: global_userflowstate != "none"</conditioncontainer>
@@ -4254,8 +4264,8 @@ Soll der Assistent gelöscht werden?</actioncontainer>
     <actioncontainer id="t145" x="5390.0" y="-3482.5">Script: headsetValue = 0</actioncontainer>
     <actioncontainer id="t146" x="-665.0" y="997.5">Initialisiere Variable Systemeinstellung: volumeRingSound</actioncontainer>
     <actioncontainer id="t147" x="-770.0" y="-3517.5">Script: subtitle = "no player active"; title = "no player active"; description = "no player active"; musicapp = "no player active"; icon = "no player active"</actioncontainer>
-    <actioncontainer id="t148" x="-770.0" y="-3657.5">Script: if(playback_state == 0) { playback_state = "keiner" } else if(playback_state == 1) { playback_state = "gestoppt" } else if(playback_state == 2) { playback_state = "pausiert" } else if(playback_state == 3) { playback_state = "spielt ab" } else if(playback_state == 4) { playback_state = "spult vorwärts" } else if(playback_state == 5) { playback_state = "spült rückwärts" } else if(playback_state == 6) { playback_state = "buffert" } else if(playback_state == 7) { playback_state = "Fehler" } else if(playback_state == 8) { playback_state = "verbindet" } else if(playback_state == 9) { playback_state = "springt zum vorherigen" } else if(playback_state == 10) { playback_state = "springt zum nächsten" } else if(playback_state == 11) { playback_state = "springt zu Position in Wiedergabeliste" }</actioncontainer>
-    <actioncontainer id="t149" x="-770.0" y="-2992.5">Script: if(package_name == "com.google.android.music") { musicapp = "Google Musik" } else if(package_name == "com.amazon.mp3") { musicapp = "Amazon Musik" } else if(package_name == "com.google.android.videos") { musicapp = "Google Video" } else if(package_name == "com.spotify.music") { musicapp = "Spotify Musik" } else if(package_name == "com.google.android.youtube") { musicapp = "YouTube" } else if(package_name == "com.google.android.apps.youtube.kids") { musicapp = "YouTube Kids" } else if(package_name == "tunein.player") { musicapp = "TuneIn Player" } else if(package_name == "com.rhapsody.alditalk") { musicapp = "Aldi Life Musik" } else if(package_name == "org.videolan.vlc") { musicapp = "VLC Player" } else if(package_name == "com.sec.android.app.music") { musicapp = "Samsung Music Player" }</actioncontainer>
+    <actioncontainer id="t148" x="-770.0" y="-3657.5">Script: if(playback_state == 0) { playback_state = "none" } else if(playback_state == 1) { playback_state = "stopped" } else if(playback_state == 2) { playback_state = "pause" } else if(playback_state == 3) { playback_state = "play" } else if(playback_state == 4) { playback_state = "fast forward" } else if(playback_state == 5) { playback_state = "fast backward" } else if(playback_state == 6) { playback_state = "buffert" } else if(playback_state == 7) { playback_state = "error" } else if(playback_state == 8) { playback_state = "connect" } else if(playback_state == 9) { playback_state = "skip backward" } else if(playback_state == 10) { playback_state = "skip forward" } else if(playback_state == 11) { playback_state = "jumps to position in playlist" }</actioncontainer>
+    <actioncontainer id="t149" x="-770.0" y="-2992.5">Script: if(package_name == "com.google.android.music") { musicapp = "Google Musik" } else if(package_name == "com.amazon.mp3") { musicapp = "Amazon Musik" } else if(package_name == "com.google.android.videos") { musicapp = "Google Video" } else if(package_name == "com.spotify.music") { musicapp = "Spotify Musik" } else if(package_name == "com.google.android.youtube") { musicapp = "YouTube" } else if(package_name == "com.google.android.apps.youtube.kids") { musicapp = "YouTube Kids" } else if(package_name == "tunein.player") { musicapp = "TuneIn Player" } else if(package_name == "com.rhapsody.alditalk") { musicapp = "Aldi Life Musik" } else if(package_name == "org.videolan.vlc") { musicapp = "VLC Player" } else if(package_name == "com.sec.android.app.music") { musicapp = "Samsung Music Player" } else if(package_name == "deezer.android.app") { musicapp = "Deezer" }</actioncontainer>
     <actioncontainer id="t150" x="4410.0" y="-3832.5">Script: incommingTelegramMessage = "\"incommingTelegramMessageFrom\":" + " \"" + replaceAll({notification_text}, "\\n", " ") + "\""; fhemcmd = "setreading";</actioncontainer>
     <actioncontainer id="t151" x="4270.0" y="-3482.5">Script: notification_text = "Aktiviere Automagic unter Einstellungen -&gt; Benachrichtigungen -&gt; Benachrichtigungszugriff"</actioncontainer>
     <conditioncontainer id="t152" x="4410.0" y="-3482.5">Benachrichtigung in Statusbar angezeigt: Telegram Messenger</conditioncontainer>
@@ -4768,8 +4778,8 @@ Soll der Assistent gelöscht werden?</actioncontainer>
     <actioncontainer id="t135" x="-805.0" y="2152.5">Flows ausführen: Send Data to AMADCommBridge</actioncontainer>
     <actioncontainer id="t136" x="2870.0" y="892.5">Flows ausführen: udef_trigger setLockPin</actioncontainer>
     <conditioncontainer id="t137" x="-1225.0" y="-2012.5">Flow Aktiv: Informations</conditioncontainer>
-    <actioncontainer id="t138" x="-1120.0" y="-1802.5">Script: informationFlow_state = "aktiv"</actioncontainer>
-    <actioncontainer id="t139" x="-1330.0" y="-1802.5">Script: informationFlow_state = "inaktiv"</actioncontainer>
+    <actioncontainer id="t138" x="-1120.0" y="-1802.5">Script: informationFlow_state = "active"</actioncontainer>
+    <actioncontainer id="t139" x="-1330.0" y="-1802.5">Script: informationFlow_state = "inactive"</actioncontainer>
     <actioncontainer id="t140" x="-1470.0" y="-1557.5">Setze Flow Status: Aktivieren Informations</actioncontainer>
     <conditioncontainer id="t141" x="-805.0" y="-2572.5">Host erreichbar: {global_fhemip}:{global_bridgeport}</conditioncontainer>
     <conditioncontainer id="t142" x="-1820.0" y="-2012.5">Flow Aktiv: Send Data to AMADCommBridge</conditioncontainer>
