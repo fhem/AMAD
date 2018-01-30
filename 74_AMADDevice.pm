@@ -58,8 +58,8 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.38";
-my $flowsetversion = "4.1.99.6";
+my $modulversion = "4.1.99.40";
+my $flowsetversion = "4.1.99.7";
 
 
 
@@ -421,14 +421,20 @@ sub AMADDevice_WriteReadings($$) {
         readingsBulkUpdateIfChanged($hash, $t, $v, 1)   if( defined( $v ) and ($t ne 'deviceState'
                                                             or $t ne 'incomingCallerName'
                                                             or $t ne 'incomingCallerNumber'
+                                                            or $t ne 'incommingTelegramMessageFrom'
+                                                            or $t ne 'incommingSmsText'
+                                                            or $t ne 'incommingWhatsAppMessageFrom'
                                                             or $t ne 'nfcLastTagID')
                                                         );
 
         readingsBulkUpdateIfChanged( $hash, $t, ($v / AttrVal($name,'setVolFactor',1)) ) if( $t eq 'volume' and AttrVal($name,'setVolFactor',1) > 1 );
         readingsBulkUpdate( $hash, '.'.$t, $v ) if( $t eq 'deviceState' );
-        readingsBulkUpdate( $hash, $t, $v ) if( $t eq 'incomingCallerName'
+        readingsBulkUpdate( $hash, $t, $v ) if( defined( $v ) and ($t eq 'incomingCallerName'
                                                     or $t eq 'incomingCallerNumber'
-                                                    or $t eq 'nfcLastTagID'
+                                                    or $t eq 'incommingTelegramMessageFrom'
+                                                    or $t eq 'incommingSmsText'
+                                                    or $t eq 'incommingWhatsAppMessageFrom'
+                                                    or $t eq 'nfcLastTagID')
                                             );
     }
     
@@ -464,6 +470,9 @@ sub AMADDevice_Set($$@) {
     my $uri                 = $hash->{HOST} . ":" . $hash->{PORT};
     my $path;
     my $method;
+    
+    my @playerList          = ('GoogleMusic','SamsungMusic','AmazonMusic','SpotifyMusic','TuneinRadio','AldiMusic','YouTube','YouTubeKids','VlcPlayer','Audible','Deezer');
+    my @playerCmd           = ('mediaPlay','mediaStop','mediaNext','mediaBack');
     
     my $volMax              = AttrVal($name,'setVolMax',15);
     my $notifyVolMax        = AttrVal($name,'setNotifyVolMax',7);
@@ -521,9 +530,9 @@ sub AMADDevice_Set($$@) {
     }
     
     elsif( lc $cmd =~ /^media/ ) {
-        my $btn = join( " ", @args );
+        my $mplayer = join( " ", @args );
 
-        $path   = "/fhem-amad/setCommands/multimediaControl?mplayer=".$cmd."&button=".$btn;
+        $path   = "/fhem-amad/setCommands/multimediaControl?button=".$cmd."&mplayer=".$mplayer;
         $method = "POST";
     }
     
@@ -743,7 +752,12 @@ sub AMADDevice_Set($$@) {
         my $btdev = AttrVal( $name, "setBluetoothDevice", "none" );
         
         
-        my $list = "screenMsg ttsMsg mediaGoogleMusic:play/pause,stop,next,back mediaSamsungMusic:play/pause,stop,next,back mediaAmazonMusic:play/pause,stop,next,back mediaSpotifyMusic:play/pause,stop,next,back mediaTuneinRadio:play/pause,stop,next,back mediaAldiMusic:play/pause,stop,next,back mediaYouTube:play/pause,stop,next,back mediaYouTubeKids:play/pause,stop,next,back mediaVlcPlayer:play/pause,stop,next,back mediaAudible:play/pause,stop,next,back screenBrightness:slider,0,1,255 screen:on,off,lock,unlock openURL nextAlarmTime:time timer:slider,1,1,60 statusRequest:noArg bluetooth:on,off notifySndFile clearNotificationBar:All,Automagic activateVoiceInput:noArg vibrate:noArg sendIntent openCall closeCall:noArg currentFlowsetUpdate:noArg installFlowSource doNotDisturb:never,always,alarmClockOnly,onlyImportant userFlowState userFlowRun sendSMS startDaydream:noArg volumeUp:noArg volumeDown:noArg mute:on,off showHomeScreen:noArg takePicture:noArg";
+        my $list = '';
+        foreach(@playerCmd) {
+            $list .= $_ . ':' . join(',',@playerList) . ' ';
+        }
+        
+        $list .= "screenMsg ttsMsg screenBrightness:slider,0,1,255 screen:on,off,lock,unlock openURL nextAlarmTime:time timer:slider,1,1,60 statusRequest:noArg bluetooth:on,off notifySndFile clearNotificationBar:All,Automagic activateVoiceInput:noArg vibrate:noArg sendIntent openCall closeCall:noArg currentFlowsetUpdate:noArg installFlowSource doNotDisturb:never,always,alarmClockOnly,onlyImportant userFlowState userFlowRun sendSMS startDaydream:noArg volumeUp:noArg volumeDown:noArg mute:on,off showHomeScreen:noArg takePicture:noArg";
 
         $list .= " screenOrientation:auto,landscape,portrait"   if( AttrVal( $name, "setScreenOrientation", "0" ) eq "1" );
         $list .= " screenFullscreen:on,off"                     if( AttrVal( $name, "setFullscreen", "0" ) eq "1" );
@@ -915,7 +929,7 @@ sub AMADDevice_CreateTtsMsgValue($@) {
     my $ttsmsgvol   = AttrVal( $name, "setTtsMsgVol","none");
     
     if( AttrVal($name,"remoteServer","Automagic") ne 'Automagic') {
-        $speed = AttrVal( $name, "setTtsMsgSpeed", "5.0" );
+        $speed = AttrVal( $name, "setTtsMsgSpeed", "5" );
     } else {
         $speed = AttrVal( $name, "setTtsMsgSpeed", "1.0" );
     }
@@ -1087,14 +1101,10 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
     <li>currentFlowsetUpdate - start flowset update on Android device</li>
     <li>installFlowSource - install a Automagic flow on device, <u>XML file must be stored in /tmp/ with extension xml</u>. <b>Example:</b> <i>set TabletWohnzimmer installFlowSource WlanUebwerwachen.xml</i></li>
     <li>doNotDisturb - sets the do not Disturb Mode, always Disturb, never Disturb, alarmClockOnly alarm Clock only, onlyImportant only important Disturbs</li>
-    <li>mediaAmazonMusic - play/stop/next/back , controlling the amazon music media player</li>
-    <li>mediaGoogleMusic - play/stop/next/back , controlling the google play music media player</li>
-    <li>mediaSpotifyMusic - play/stop/next/back , controlling the spotify media player</li>
-    <li>mediaTuneinRadio - play/stop/next/back , controlling the TuneinRadio media player</li>
-    <li>mediaAldiMusic - play/stop/next/back , controlling the Aldi music media player</li>
-    <li>mediaAudible - play/stop/next/back , controlling the Audible media player</li>
-    <li>mediaYouTube - play/stop/next/back , controlling the YouTube media player</li>
-    <li>mediaVlcPlayer - play/stop/next/back , controlling the VLC media player</li>
+    <li>mediaPlay - play command to media App</li>
+    <li>mediaStop - stop command to media App</li>
+    <li>mediaNext - skip Forward command to media App</li>
+    <li>mediaBack - skip Backward to media App</li>
     <li>nextAlarmTime - sets the alarm time. Only valid for the next 24 hours.</li>
     <li>notifySndFile - plays a media-file <b>which by default needs to be stored in the folder "/storage/emulated/0/Notifications/" of the Android device. You may use the attribute setNotifySndFilePath for defining a different folder.</b></li>
     <li>openCall - initial a call and hang up after optional time / set DEVICE openCall 0176354 10 call this number and hang up after 10s</li>
@@ -1267,14 +1277,10 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
     <li>currentFlowsetUpdate - f&uuml;rt ein Flowsetupdate auf dem Device durch</li>
     <li>doNotDisturb - schaltet den nicht st&ouml;ren Modus, always immer st&ouml;ren, never niemals st&ouml;ren, alarmClockOnly nur Wecker darf st&ouml;ren, onlyImportant nur wichtige St&ouml;rungen</li>
     <li>installFlowSource - installiert einen Flow auf dem Device, <u>das XML File muss unter /tmp/ liegen und die Endung xml haben</u>. <b>Bsp:</b> <i>set TabletWohnzimmer installFlowSource WlanUebwerwachen.xml</i></li>
-    <li>mediaAmazonMusic - play, stop, next, back  ,steuert den Amazon Musik Mediaplayer</li>
-    <li>mediaGoogleMusic - play, stop, next, back  ,steuert den Google Play Musik Mediaplayer</li>
-    <li>mediaSpotifyMusic - play, stop, next, back  ,steuert den Spotify Mediaplayer</li>
-    <li>mediaTuneinRadio - play, stop, next, back  ,steuert den TuneIn Radio Mediaplayer</li>
-    <li>mediaAldiMusic - play, stop, next, back  ,steuert den Aldi Musik Mediaplayer</li>
-    <li>mediaAudible - play, stop, next, back  ,steuert den Audible Mediaplayer</li>
-    <li>mediaYouTube - play, stop, next, back  ,steuert den YouTube Mediaplayer</li>
-    <li>mediaVlcPlayer - play, stop, next, back  ,steuert den VLC Mediaplayer</li>
+    <li>mediaPlay - play Befehl zur Media App</li>
+    <li>mediaStop - stop Befehl zur Media App</li>
+    <li>mediaNext - nächster Titel Befehl zur Media App</li>
+    <li>mediaBack - vorheriger Titel zur Media App</li>
     <li>nextAlarmTime - setzt die Alarmzeit. gilt aber nur innerhalb der n&auml;chsten 24Std.</li>
     <li>openCall - ruft eine Nummer an und legt optional nach X Sekunden auf / set DEVICE openCall 01736458 10 / ruft die Nummer an und beendet den Anruf nach 10s</li>
     <li>screenBrightness - setzt die Bildschirmhelligkeit, von 0-255.</li>
