@@ -74,8 +74,8 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.30";
-my $flowsetversion = "4.1.99.8";
+my $modulversion = "4.1.99.31";
+my $flowsetversion = "4.1.99.9";
 
 
 
@@ -664,9 +664,10 @@ sub AMADCommBridge_ProcessRead($$) {
     my $response;
     my $c;
     
+    my $fhempath = $attr{global}{modpath};
+    
     if ( $data =~ /currentFlowsetUpdate.xml/ ) {
 
-        my $fhempath = $attr{global}{modpath};
         $response = qx(cat $fhempath/FHEM/lib/74_AMADautomagicFlowset_$flowsetversion.xml);
         $c = $hash->{CD};
         print $c "HTTP/1.1 200 OK\r\n",
@@ -676,9 +677,20 @@ sub AMADCommBridge_ProcessRead($$) {
             $response;
 
         return;
-    }
+        
+    } elsif( $data =~ /currentTaskersetUpdate.prj.xml/ ) {
     
-    elsif ( $data =~ /installFlow_([^.]*.xml)/ ) {
+        $response = qx(cat $fhempath/FHEM/lib/74_AMADtaskerset_$flowsetversion.prj.xml);
+        $c = $hash->{CD};
+        print $c "HTTP/1.1 200 OK\r\n",
+            "Content-Type: text/plain\r\n",
+            "Connection: close\r\n",
+            "Content-Length: ".length($response)."\r\n\r\n",
+            $response;
+
+        return;
+    
+    } elsif ( $data =~ /installFlow_([^.]*.xml)/ ) {
 
         if( defined($1) ){
             $response = qx(cat /tmp/$1);

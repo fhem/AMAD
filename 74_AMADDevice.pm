@@ -58,8 +58,8 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.40";
-my $flowsetversion = "4.1.99.8";
+my $modulversion = "4.1.99.41";
+my $flowsetversion = "4.1.99.9";
 
 
 
@@ -1059,8 +1059,9 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
     <li>flowsetVersionAtDevice - currently installed version of the flowsets on the Android device</li>
     <li>incomingCallerName - Callername from last Call</li>
     <li>incomingCallerNumber - Callernumber from last Call</li>
-    <li>incommingWhatsAppMessageFrom - last WhatsApp message</li>
-    <li>incommingWhatsTelegramMessageFrom - last telegram message</li>
+    <li>incomingWhatsAppMessage - last WhatsApp message</li>
+    <li>incomingWhatsTelegramMessage - last telegram message</li>
+    <li>incomingSmsMessage - last SMS message</li>
     <li>intentRadioName - name of the most-recent streamed intent radio</li>
     <li>intentRadioState - state of intent radio player</li>
     <li>keyguardSet - 0/1 keyguard set, 0=no 1=yes, does not indicate whether it is currently active</li>
@@ -1235,8 +1236,9 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
     <li>flowsetVersionAtDevice - aktuell installierte Flowsetversion auf dem Device</li>
     <li>incomingCallerName - Anrufername des eingehenden Anrufes</li>
     <li>incomingCallerNumber - Anrufernummer des eingehenden Anrufes</li>
-    <li>incommingWhatsAppMessageFrom - letzte WhatsApp Nachricht</li>
-    <li>incommingWhatsTelegramMessageFrom - letzte Telegram Nachricht</li>
+    <li>incomingWhatsAppMessage - letzte WhatsApp Nachricht</li>
+    <li>incomingWhatsTelegramMessage - letzte Telegram Nachricht</li>
+    <li>incomingWhatsSmsMessage - letzte SMS Nachricht</li>
     <li>intentRadioName - zuletzt gesrreamter Intent Radio Name</li>
     <li>intentRadioState - Status des IntentRadio Players</li>
     <li>keyguardSet - 0/1 Displaysperre gesetzt 0=nein 1=ja, bedeutet nicht das sie gerade aktiv ist</li>
