@@ -58,7 +58,7 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.41";
+my $modulversion = "4.1.99.42";
 my $flowsetversion = "4.1.99.9";
 
 
@@ -421,9 +421,9 @@ sub AMADDevice_WriteReadings($$) {
         readingsBulkUpdateIfChanged($hash, $t, $v, 1)   if( defined( $v ) and ($t ne 'deviceState'
                                                             or $t ne 'incomingCallerName'
                                                             or $t ne 'incomingCallerNumber'
-                                                            or $t ne 'incommingTelegramMessageFrom'
-                                                            or $t ne 'incommingSmsText'
-                                                            or $t ne 'incommingWhatsAppMessageFrom'
+                                                            or $t ne 'incomingTelegramMessage'
+                                                            or $t ne 'incomingSmsMessage'
+                                                            or $t ne 'incomingWhatsAppMessage'
                                                             or $t ne 'nfcLastTagID')
                                                         );
 
@@ -431,9 +431,9 @@ sub AMADDevice_WriteReadings($$) {
         readingsBulkUpdate( $hash, '.'.$t, $v ) if( $t eq 'deviceState' );
         readingsBulkUpdate( $hash, $t, $v ) if( defined( $v ) and ($t eq 'incomingCallerName'
                                                     or $t eq 'incomingCallerNumber'
-                                                    or $t eq 'incommingTelegramMessageFrom'
-                                                    or $t eq 'incommingSmsText'
-                                                    or $t eq 'incommingWhatsAppMessageFrom'
+                                                    or $t eq 'incomingTelegramMessage'
+                                                    or $t eq 'incomingSmsMessage'
+                                                    or $t eq 'incomingWhatsAppMessage'
                                                     or $t eq 'nfcLastTagID')
                                             );
     }
@@ -1060,7 +1060,7 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
     <li>incomingCallerName - Callername from last Call</li>
     <li>incomingCallerNumber - Callernumber from last Call</li>
     <li>incomingWhatsAppMessage - last WhatsApp message</li>
-    <li>incomingWhatsTelegramMessage - last telegram message</li>
+    <li>incomingTelegramMessage - last telegram message</li>
     <li>incomingSmsMessage - last SMS message</li>
     <li>intentRadioName - name of the most-recent streamed intent radio</li>
     <li>intentRadioState - state of intent radio player</li>
@@ -1237,8 +1237,8 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
     <li>incomingCallerName - Anrufername des eingehenden Anrufes</li>
     <li>incomingCallerNumber - Anrufernummer des eingehenden Anrufes</li>
     <li>incomingWhatsAppMessage - letzte WhatsApp Nachricht</li>
-    <li>incomingWhatsTelegramMessage - letzte Telegram Nachricht</li>
-    <li>incomingWhatsSmsMessage - letzte SMS Nachricht</li>
+    <li>incomingTelegramMessage - letzte Telegram Nachricht</li>
+    <li>incomingSmsMessage - letzte SMS Nachricht</li>
     <li>intentRadioName - zuletzt gesrreamter Intent Radio Name</li>
     <li>intentRadioState - Status des IntentRadio Players</li>
     <li>keyguardSet - 0/1 Displaysperre gesetzt 0=nein 1=ja, bedeutet nicht das sie gerade aktiv ist</li>
