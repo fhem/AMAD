@@ -74,8 +74,8 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.31";
-my $flowsetversion = "4.1.99.9";
+my $modulversion = "4.2.0";
+my $flowsetversion = "4.2.0";
 
 
 
@@ -1044,8 +1044,21 @@ sub AMADCommBridge_ParseMsg($$) {
     <br>
     This statement creates a new AMADCommBridge device named AMADBridge.
   </ul></br>
+  The APP Automagic or Tasker can be used on the Android device.</br>
+  <br>
+  <b>For Autoremote:</b><br>
   In the following, only the Flowset has to be installed on the Android device and the Flow 'First Run Assistant' run. (Simply press the Homebutton)</br>
-  The wizard then guides you through the setup of your AMAD device and ensures that at the end of the installation process the Android device is created as an AMAD device in FHEM.
+  The wizard then guides you through the setup of your AMAD device and ensures that at the end of the installation process the Android device is created as an AMAD device in FHEM.</br>
+  <br>
+  <b>For Tasker:</b><br>
+  When using Tasker, the Tasker-project must be loaded onto the Android device and imported into Tasker via the import function.<br>
+  For the initial setup on the Android device there is an Tasker input mask (Scene), in which the required parameters (device name, device IP, bridgeport etc.)</br>
+  can be entered, these fields are filled (if possible) automatically, but can also be adjusted manually.</br>
+  To do this, run the "AMAD" task.</br>
+  For quick access, a Tasker shortcut can also be created on the home screen for this task.</br>
+  Information on the individual settings can be obtained by touching the respective text field.</br>
+  If all entries are complete, the AMAD Device can be created via the button "create Device".</br>
+  For control commands from FHEM to Tasker, the APP "Autoremote" or "Tasker Network Event Server (TNES)" is additionally required.
   </ul>
   <br><br>
   <a name="AMADCommBridgereadings"></a>
@@ -1105,8 +1118,21 @@ sub AMADCommBridge_ParseMsg($$) {
     <br>
     Diese Anweisung erstellt ein neues AMADCommBridge Device Namens AMADBridge. 
   </ul></br>
+  Es kann wahlweise die APP Automagic oder Tasker auf dem Android Ger&auml;t verwendet werden.
+  <br>
+  <b>F&uuml;r Autoremote:</b><br>
   Im folgenden mu&szlig; lediglich das Flowset auf dem Android Ger&auml;t installiert werden und der Flow 'First Run Assistent' ausgef&uuml;hrt werden. (einfach den Homebutton drücken)</br>
-  Der Assistent geleitet Dich dann durch die Einrichtung Deines AMAD Ger&auml;tes und sorgt daf&uuml;r das am Ende des Installationsprozess das Androidger&auml;t als AMAD Device in FHEM angelegt wird.
+  Der Assistent geleitet Dich dann durch die Einrichtung Deines AMAD Ger&auml;tes und sorgt daf&uuml;r das am Ende des Installationsprozess das Androidger&auml;t als AMAD Device in FHEM angelegt wird.</br>
+  <br>
+  <b>F&uuml;r Tasker:</b><br>
+  Bei Verwendung von Tasker muss das Tasker-Projekt auf das Android Ger&auml;t geladen und in Tasker &uuml;ber die Import Funktion importiert werden.<br>
+  F&uuml;r die Ersteinrichtung auf dem Android Ger&auml;t gibt es eine Eingabemaske (Scene), in der die ben&ouml;tigten Parameter (Device Name, Device IP, Bridgeport usw.)</br>
+  eingegeben werden k&ouml;nnen, diese Felder werden (soweit m&ouml;glich) automatisch bef&uuml;llt, k&ouml;nnen aber auch manuell angepasst werden.</br>
+  Hierf&uuml;r den Task &quot;AMAD&quot; ausf&uuml;hren.</br>
+  F&uuml;r schnellen Zugriff kann f&uuml;r diesen Task auch ein Tasker-Shortcut auf dem Homescreen angelegt werden.</br>
+  Infos zu den einzelnen Einstellungen erh&auml;lt man durch einen Touch auf das jeweiligen Textfeld.</br>
+  Sind alle Eingaben vollst&auml;ndig, kann das AMAD Device &uuml;ber die Schaltfl&auml;che &quot;create Device&quot; erstellt werden.</br>
+  Damit Steuerbefehle von FHEM zu Tasker funktionieren wird zus&auml;tzlich noch die APP "Autoremote" oder "Tasker Network Event Server (TNES)" ben&ouml;tigt.
   </ul>
   <br><br>
   <a name="AMADCommBridgereadings"></a>

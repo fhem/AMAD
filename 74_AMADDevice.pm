@@ -58,14 +58,15 @@ eval "use Encode qw(encode encode_utf8);1" or $missingModul .= "Encode ";
 eval "use JSON;1" or $missingModul .= "JSON ";
 
 
-my $modulversion = "4.1.99.42";
-my $flowsetversion = "4.1.99.9";
+my $modulversion = "4.2.0";
+my $flowsetversion = "4.2.0";
 
 
 
 
 # Declare functions
 sub AMADDevice_Attr(@);
+sub AMADDevice_Notify($$);
 sub AMADDevice_checkDeviceState($);
 sub AMADDevice_decrypt($);
 sub AMADDevice_Define($$);
@@ -96,6 +97,7 @@ sub AMADDevice_Initialize($) {
     $hash->{DefFn}      = "AMADDevice_Define";
     $hash->{UndefFn}    = "AMADDevice_Undef";
     $hash->{AttrFn}     = "AMADDevice_Attr";
+    $hash->{NotifyFn}   = "AMADDevice_Notify";
     $hash->{ParseFn}    = "AMADDevice_Parse";
     
     $hash->{AttrList}   = "setOpenApp ".
@@ -152,6 +154,7 @@ sub AMADDevice_Define($$) {
     $hash->{AMAD_ID}                            = $amad_id;
     $hash->{VERSIONMODUL}                       = $modulversion;
     $hash->{VERSIONFLOWSET}                     = $flowsetversion;
+    $hash->{NOTIFYDEV}                          = "global,$name";
     
     $hash->{PORT}                               = 8090 if($remoteServer eq 'Automagic');
     $hash->{PORT}                               = 1817 if($remoteServer eq 'Autoremote');
@@ -304,7 +307,7 @@ sub AMADDevice_Attr(@) {
     }
     
     elsif( $attrName eq "setAPSSID" ) {
-        if( $cmd eq "set" && $attrVal ) {
+        if( $cmd eq "set" and $attrVal ) {
         
             AMADDevice_statusRequest($hash);
             
@@ -336,6 +339,25 @@ sub AMADDevice_Attr(@) {
     }
     
     return undef;
+}
+
+sub AMADDevice_Notify($$) {
+
+    my ($hash,$dev) = @_;
+    my $name = $hash->{NAME};
+    return if (IsDisabled($name));
+    
+    my $devname = $dev->{NAME};
+    my $devtype = $dev->{TYPE};
+    my $events = deviceEvents($dev,1);
+    return if (!$events);
+
+
+    AMADDevice_statusRequest($hash) if( (grep /^DELETEATTR.$name.setAPSSID$/,@{$events}
+                                                    or grep /^ATTR.$name.setAPSSID.*/,@{$events} )
+                                                    and $init_done and $devname eq 'global' );
+
+    return;
 }
 
 sub AMADDevice_GetUpdate($) {
@@ -1001,19 +1023,28 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
 <ul>
   <u><b>AMAD - Automagic Android Device</b></u>
   <br>
-  This module integrates Android devices into FHEM and displays several settings <b><u>using the Android app "Automagic"</u></b>.
+  This module integrates Android devices into FHEM and displays several settings <b><u>using the Android app "Automagic" or "Tasker"</u></b>.
   Automagic is comparable to the "Tasker" app for automating tasks and configuration settings. But Automagic is more user-friendly. The "Automagic Premium" app currently costs EUR 2.90.
   <br>
-  Any information retrievable by Automagic can be displayed in FHEM by this module. Just define your own Automagic-"flow" and send the data to the AMADCommBridge. One even can control several actions on Android devices.
+  Any information retrievable by Automagic/Tasker can be displayed in FHEM by this module. Just define your own Automagic-"flow" or Tasker-"task" and send the data to the AMADCommBridge. One even can control several actions on Android devices.
   <br>
-  To be able to make use of all these functions the Automagic app and additional flows need to be installed on the Android device. The flows can be retrieved from the FHEM directory, the app can be bought in Google Play Store.
+  To be able to make use of all these functions the Automagic/Tasker app and additional flows/Tasker-project need to be installed on the Android device. The flows/Tasker-project can be retrieved from the FHEM directory, the app can be bought in Google Play Store.
   <br><br>
   <b>How to use AMADDevice?</b>
   <ul>
     <li>first, make sure that the AMADCommBridge in FHEM was defined</li>
-    <li>install the "Automagic Premium" app from the PlayStore</li>
-    <li>install the flowset 74_AMADDeviceautomagicFlowset$VERSION.xml file from the $INSTALLFHEM/FHEM/lib/ directory on the Android device</li>
-    <li>activate the "installation assistant" Flow in Automagic. If one now sends Automagic into the background, e.g. Homebutton, the assistant starts and creates automatically a FHEM device for the android device</li>
+    <li><b>Using Autoremote</b></li>
+        <ul>
+        <li>install the "Automagic Premium" app from the PlayStore</li>
+        <li>install the flowset 74_AMADDeviceautomagicFlowset$VERSION.xml file from the $INSTALLFHEM/FHEM/lib/ directory on the Android device</li>
+        <li>activate the "installation assistant" Flow in Automagic. If one now sends Automagic into the background, e.g. Homebutton, the assistant starts and creates automatically a FHEM device for the android device</li>
+        </ul>
+    <li><b>Using Tasker</b></li>
+        <ul>
+        <li>install the "Tasker" app from the PlayStore</li>
+        <li>install the Tasker-project 74_AMADtaskerset_$VERSION.prj.xml file from the $INSTALLFHEM/FHEM/lib/ directory on the Android device</li>
+        <li>run the "AMAD" task in Tasker and make your initial setup, by pressing the "create Device" button it will automatically create the device in FHEM</li>
+        </ul>
   </ul>
   <br><br>
   <u><b>Define a AMADDevice device by hand.</b></u>
@@ -1029,7 +1060,7 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
       <code>define WandTabletWohnzimmer AMADDevice 192.168.0.23 123456 IODev=NAME_des_AMADCommBridge_Devices</code><br>
     </ul>
     <br>
-    In this case, an AMADDevice is created by hand. The AMAD_ID, here 123456, must also be entered exactly as a global variable in Automagic.
+    In this case, an AMADDevice is created by hand. The AMAD_ID, here 123456, must also be entered exactly as a global variable in Automagic/Tasker.
   </ul>
   <br><br><br>
   <a name="AMADDevicereadings"></a>
@@ -1037,19 +1068,19 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
   <ul>
     <li>airplanemode - on/off, state of the aeroplane mode</li>
     <li>androidVersion - currently installed version of Android</li>
-    <li>automagicState - state of the Automagic App <b>(prerequisite Android >4.3). In case you have Android >4.3 and the reading says "not supported", you need to enable Automagic inside Android / Settings / Sound & notification / Notification access</b></li>
-    <li>batteryHealth - the health of the battery (1=unknown, 2=good, 3=overheat, 4=dead, 5=over voltage, 6=unspecified failure, 7=cold)</li>
-    <li>batterytemperature - the temperature of the battery</li>
+    <li>automagicState - state of the Automagic or Tasker App <b>(prerequisite Android >4.3). In case you have Android >4.3 and the reading says "not supported", you need to enable Automagic/Tasker inside Android / Settings / Sound & notification / Notification access</b></li>
+    <li>batteryHealth - the health of the battery (1=unknown, 2=good, 3=overheat, 4=dead, 5=over voltage, 6=unspecified failure, 7=cold) (Automagic only)</li>
+    <li>batterytemperature - the temperature of the battery (Automagic only)</li>
     <li>bluetooth - on/off, bluetooth state</li>
-    <li>checkActiveTask - state of an app (needs to be defined beforehand). 0=not active or not active in foreground, 1=active in foreground, <b>see note below</b></li>
-    <li>connectedBTdevices - list of all devices connected via bluetooth</li>
-    <li>connectedBTdevicesMAC - list of MAC addresses of all devices connected via bluetooth</li>
-    <li>currentMusicAlbum - currently playing album of mediaplayer</li>
-    <li>currentMusicApp - currently playing player app (Amazon Music, Google Play Music, Google Play Video, Spotify, YouTube, TuneIn Player, Aldi Life Music)</li>
-    <li>currentMusicArtist - currently playing artist of mediaplayer</li>
-    <li>currentMusicIcon - cover of currently play album<b>Noch nicht fertig implementiert</b></li>
-    <li>currentMusicState - state of currently/last used mediaplayer</li>
-    <li>currentMusicTrack - currently playing song title of mediaplayer</li>
+    <li>checkActiveTask - state of an app (needs to be defined beforehand). 0=not active or not active in foreground, 1=active in foreground, <b>see note below</b> (Automagic only)</li>
+    <li>connectedBTdevices - list of all devices connected via bluetooth (Automagic only)</li>
+    <li>connectedBTdevicesMAC - list of MAC addresses of all devices connected via bluetooth (Automagic only)</li>
+    <li>currentMusicAlbum - currently playing album of mediaplayer (Automagic only)</li>
+    <li>currentMusicApp - currently playing player app (Amazon Music, Google Play Music, Google Play Video, Spotify, YouTube, TuneIn Player, Aldi Life Music) (Automagic only)</li>
+    <li>currentMusicArtist - currently playing artist of mediaplayer (Automagic only)</li>
+    <li>currentMusicIcon - cover of currently play album <b>Not yet fully implemented</b> (Automagic only)</li>
+    <li>currentMusicState - state of currently/last used mediaplayer (Automagic only)</li>
+    <li>currentMusicTrack - currently playing song title of mediaplayer (Automagic only)</li>
     <li>daydream - on/off, daydream currently active</li>
     <li>deviceState - state of Android devices. unknown, online, offline.</li>
     <li>doNotDisturb - state of do not Disturb Mode</li>
@@ -1073,16 +1104,16 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
     <li>nextAlarmState - alert/done, current state of "Clock" stock-app</li>
     <li>nextAlarmTime - currently set time of alarm</li>
     <li>nfc - state of nfc service on/off</li>
-    <li>nfcLastTagID - nfc_id of last scan nfc Tag / In order for the ID to be recognized correctly, the trigger NFC TagIDs must be processed in Flow NFC Tag Support and the TagId's Commase-separated must be entered.</li>
+    <li>nfcLastTagID - nfc_id of last scan nfc Tag / In order for the ID to be recognized correctly, the trigger NFC TagIDs must be processed in Flow NFC Tag Support and the TagId's Commase-separated must be entered. (Automagic only)</li>
     <li>powerLevel - state of battery in %</li>
     <li>powerPlugged - 0=no/1,2=yes, power supply connected</li>
     <li>screen - on locked,unlocked/off locked,unlocked, state of display</li>
     <li>screenBrightness - 0-255, level of screen-brightness</li>
-    <li>screenFullscreen - on/off, full screen mode</li>
+    <li>screenFullscreen - on/off, full screen mode (Automagic only)</li>
     <li>screenOrientation - Landscape/Portrait, screen orientation (horizontal,vertical)</li>
     <li>screenOrientationMode - auto/manual, mode for screen orientation</li>
     <li>state - current state of AMAD device</li>
-    <li>userFlowState - current state of a Flow, established under setUserFlowState Attribut</li>
+    <li>userFlowState - current state of a Flow, established under setUserFlowState Attribut (Automagic only)</li>
     <li>volume - media volume setting</li>
     <li>volumeNotification - notification volume setting</li>
     <li>wiredHeadsetPlugged - 0/1 headset plugged out or in</li>
@@ -1097,10 +1128,10 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
   <ul>
     <li>activateVoiceInput - start voice input on Android device</li>
     <li>bluetooth - on/off, switch bluetooth on/off</li>
-    <li>clearNotificationBar - All/Automagic, deletes all or only Automagic notifications in status bar</li>
+    <li>clearNotificationBar - All/Automagic, deletes all or only Automagic/Tasker notifications in status bar</li>
     <li>closeCall - hang up a running call</li>
-    <li>currentFlowsetUpdate - start flowset update on Android device</li>
-    <li>installFlowSource - install a Automagic flow on device, <u>XML file must be stored in /tmp/ with extension xml</u>. <b>Example:</b> <i>set TabletWohnzimmer installFlowSource WlanUebwerwachen.xml</i></li>
+    <li>currentFlowsetUpdate - start flowset/Tasker-project update on Android device</li>
+    <li>installFlowSource - install a Automagic flow on device, <u>XML file must be stored in /tmp/ with extension xml</u>. <b>Example:</b> <i>set TabletWohnzimmer installFlowSource WlanUebwerwachen.xml</i> (Automagic only)</li>
     <li>doNotDisturb - sets the do not Disturb Mode, always Disturb, never Disturb, alarmClockOnly alarm Clock only, onlyImportant only important Disturbs</li>
     <li>mediaPlay - play command to media App</li>
     <li>mediaStop - stop command to media App</li>
@@ -1117,8 +1148,8 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
     <li>statusRequest - Get a new status report of Android device. Not all readings can be updated using a statusRequest as some readings are only updated if the value of the reading changes.</li>
     <li>timer - set a countdown timer in the "Clock" stock app. Only minutes are allowed as parameter.</li>
     <li>ttsMsg - send a message which will be played as voice message (to change laguage temporary set first character &en; or &de;)</li>
-    <li>userFlowState - set Flow/s active or inactive,<b><i>set Nexus7Wohnzimmer Badezimmer:inactive vorheizen</i> or <i>set Nexus7Wohnzimmer Badezimmer vorheizen,Nachtlicht Steven:inactive</i></b></li>
-    <li>userFlowRun - executes the specified flow</li>
+    <li>userFlowState - set Flow/Tasker-profile active or inactive,<b><i>set Nexus7Wohnzimmer Badezimmer:inactive vorheizen</i> or <i>set Nexus7Wohnzimmer Badezimmer vorheizen,Nachtlicht Steven:inactive</i></b></li>
+    <li>userFlowRun - executes the specified flow/task</li>
     <li>vibrate - vibrate Android device</li>
     <li>volume - set media volume. Works on internal speaker or, if connected, bluetooth speaker or speaker connected via stereo jack</li>
     <li>volumeNotification - set notifications volume</li>
@@ -1126,13 +1157,13 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
   <br>
   <b>Set (depending on attribute values)</b>
   <ul>
-    <li>changetoBtDevice - switch to another bluetooth device. <b>Attribute setBluetoothDevice needs to be set. See note below!</b></li>
+    <li>changetoBtDevice - switch to another bluetooth device. <b>Attribute setBluetoothDevice needs to be set. See note below!</b> (Automagic only)</li>
     <li>nfc - activate or deactivate the nfc Modul on/off. <b>attribute root</b></li>
     <li>openApp - start an app. <b>attribute setOpenApp</b></li>
     <li>openURL - opens a URLS in the standard browser as long as no other browser is set by the <b>attribute setOpenUrlBrowser</b>.<b>Example:</b><i> attr Tablet setOpenUrlBrowser de.ozerov.fully|de.ozerov.fully.MainActivity, first parameter: package name, second parameter: Class Name</i></li>
-    <li>screen - on/off/lock/unlock, switch screen on/off or lock/unlock screen. In Automagic "Preferences" the "Device admin functions" need to be enabled, otherwise "Screen off" does not work. <b>attribute setScreenOnForTimer</b> changes the time the display remains switched on!</li>
-    <li>screenFullscreen - on/off, activates/deactivates full screen mode. <b>attribute setFullscreen</b></li>
-    <li>screenLock - Locks screen with request for PIN. <b>attribute setScreenlockPIN - enter PIN here. Only use numbers, 4-16 numbers required.</b></li>
+    <li>screen - on/off/lock/unlock, switch screen on/off or lock/unlock screen. In Automagic "Preferences" the "Device admin functions" need to be enabled, otherwise "Screen off" does not work. <b>attribute setScreenOnForTimer</b> changes the time the display remains switched on! (Tasker supports only "off" command)</li>
+    <li>screenFullscreen - on/off, activates/deactivates full screen mode. <b>attribute setFullscreen</b> (Automagic only)</li>
+    <li>screenLock - Locks screen with request for PIN. <b>attribute setScreenlockPIN - enter PIN here. Only use numbers, 4-16 numbers required.</b> (Automagic only)</li>
     <li>screenOrientation - Auto,Landscape,Portait, set screen orientation (automatic, horizontal, vertical). <b>attribute setScreenOrientation</b></li>
     <li>system - issue system command (only with rooted Android devices). reboot,shutdown,airplanemodeON (can only be switched ON) <b>attribute root</b>, in Automagic "Preferences" "Root functions" need to be enabled.</li>
     <li>takePicture - take a camera picture <b>Attribut setTakePictureResolution</b></li>
@@ -1141,9 +1172,9 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
   <a name="AMADDeviceattribut"></a>
   <b>Attribut</b>
   <ul>
-    <li>setAPSSID - set WLAN AccesPoint SSID to prevent WLAN sleeps</li>
+    <li>setAPSSID - set WLAN AccesPoint SSID to prevent WLAN sleeps (Automagic only)</li>
     <li>setNotifySndFilePath - set systempath to notifyfile (default /storage/emulated/0/Notifications/</li>
-    <li>setTtsMsgSpeed - set speaking speed for TTS (Value between 0.5 - 4.0, 0.5 Step) default is 1.0</li>
+    <li>setTtsMsgSpeed - set speaking speed for TTS (For Automagic: Value between 0.5 - 4.0, 0.5 Step, default: 1.0)(For Tasker: Value between 1 - 10, 1 Step, default: 5)</li>
     <li>setTtsMsgLang - set speaking language for TTS, de or en (default is de)</li>
     <li>setTtsMsgVol - is set, change automatically the media audio end set it back</li>
     <li>set setTakePictureResolution - set the camera resolution for takePicture action (800x600,1024x768,1280x720,1600x1200,1920x1080)</li>
@@ -1178,19 +1209,28 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
 <ul>
   <u><b>AMADDevice - Automagic Android Device</b></u>
   <br>
-  Dieses Modul liefert, <b><u>in Verbindung mit der Android APP Automagic</u></b>, diverse Informationen von Android Ger&auml;ten.
-  Die AndroidAPP Automagic (welche nicht von mir stammt und 2.90 Euro kostet) funktioniert wie Tasker, ist aber bei weitem User freundlicher.
+  Dieses Modul liefert, <b><u>in Verbindung mit der Android APP Automagic oder Tasker</u></b>, diverse Informationen von Android Ger&auml;ten.
+  Die Android APP Automagic (welche nicht von mir stammt und 2.90 Euro kostet) funktioniert wie Tasker, ist aber bei weitem User freundlicher.
   <br>
-  Mit etwas Einarbeitung k&ouml;nnen jegliche Informationen welche Automagic bereit stellt in FHEM angezeigt werden. Hierzu bedarf es lediglich eines eigenen Flows welcher seine Daten an die AMADDeviceCommBridge sendet. Das Modul gibt auch die M&ouml;glichkeit Androidger&auml;te zu steuern.
+  Mit etwas Einarbeitung k&ouml;nnen jegliche Informationen welche Automagic/Tasker bereit stellt in FHEM angezeigt werden. Hierzu bedarf es lediglich eines eigenen Flows/Task welcher seine Daten an die AMADDeviceCommBridge sendet. Das Modul gibt auch die M&ouml;glichkeit Androidger&auml;te zu steuern.
   <br>
-  F&uuml;r all diese Aktionen und Informationen wird auf dem Androidger&auml;t "Automagic" und ein so genannter Flow ben&ouml;tigt. Die App ist &uuml;ber den Google PlayStore zu beziehen. Das ben&ouml;tigte Flowset bekommt man aus dem FHEM Verzeichnis.
+  F&uuml;r all diese Aktionen und Informationen wird auf dem Androidger&auml;t "Automagic/Tasker" und ein so genannter Flow/Task ben&ouml;tigt. Die App ist &uuml;ber den Google PlayStore zu beziehen. Das ben&ouml;tigte Flowset/Tasker-Projekt bekommt man aus dem FHEM Verzeichnis.
   <br><br>
   <b>Wie genau verwendet man nun AMADDevice?</b>
   <ul>
     <li>stelle sicher das als aller erstes die AMADCommBridge in FHEM definiert wurde</li>
-    <li>installiere die App "Automagic Premium" aus dem PlayStore.</li>
-    <li>installiere das Flowset 74_AMADDeviceautomagicFlowset$VERSION.xml aus dem Ordner $INSTALLFHEM/FHEM/lib/ auf dem Androidger&auml;t</li>
-    <li>aktiviere den Installationsassistanten Flow in Automagic. Wenn man nun Automagic in den Hintergrund schickt, z.B. Hometaste dr&uuml;cken, startet der Assistant und legt automatisch ein Device für das Androidger&auml;t an.</li>
+    <li><b>Bei verwendung von Autoremote</b></li>
+        <ul>
+        <li>installiere die App "Automagic Premium" aus dem PlayStore.</li>
+        <li>installiere das Flowset 74_AMADDeviceautomagicFlowset$VERSION.xml aus dem Ordner $INSTALLFHEM/FHEM/lib/ auf dem Androidger&auml;t</li>
+        <li>aktiviere den Installationsassistanten Flow in Automagic. Wenn man nun Automagic in den Hintergrund schickt, z.B. Hometaste dr&uuml;cken, startet der Assistant und legt automatisch ein Device für das Androidger&auml;t an.</li>
+        </ul>
+    <li><b>Bei verwendung von Tasker</b></li>
+        <ul>
+        <li>installiere die App "Tasker" aus dem PlayStore.</li>
+        <li>installiere das Tasker Projekt 74_AMADtaskerset_$VERSION.prj.xml aus dem Ordner $INSTALLFHEM/FHEM/lib/ auf dem Androidger&auml;t</li>
+        <li>Starte den Task "AMAD", es erscheint eine Eingabemaske in der alle Einstellungen vorgenommen werden k&ouml;nnen, durch einen Klick auf "create Device" wird das Ger&auml;t in FHEM erstellt.</li>
+        </ul>
   </ul>
   <br><br>
   <u><b>Ein AMADDevice Ger&auml;t von Hand anlegen.</b></u>
@@ -1206,7 +1246,7 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
       <code>define WandTabletWohnzimmer AMADDevice 192.168.0.23 123456 IODev=NAME_des_AMADCommBridge_Devices</code><br>
     </ul>
     <br>
-    In diesem Fall wird ein AMADDevice von Hand angelegt. Die AMAD_ID, hier 123456, mu&szlig; auch exakt so als globale Variable in Automagic eingetragen sein.
+    In diesem Fall wird ein AMADDevice von Hand angelegt. Die AMAD_ID, hier 123456, mu&szlig; auch exakt so als globale Variable in Automagic/Tasker eingetragen sein.
   </ul>
   <br><br><br>
   <a name="AMADDevicereadings"></a>
@@ -1214,19 +1254,19 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
   <ul>
     <li>airplanemode - Status des Flugmodus</li>
     <li>androidVersion - aktuell installierte Androidversion</li>
-    <li>automagicState - Statusmeldungen von der AutomagicApp <b>(Voraussetzung Android >4.3). Ist Android gr&ouml;&szlig;er 4.3 vorhanden und im Reading steht "wird nicht unterst&uuml;tzt", mu&szlig; in den Androideinstellungen unter Ton und Benachrichtigungen -> Benachrichtigungszugriff ein Haken f&uuml;r Automagic gesetzt werden</b></li>
-    <li>batteryHealth - Zustand der Battery (1=unbekannt, 2=gut, 3=&Uuml;berhitzt, 4=tot, 5=&Uumlberspannung, 6=unbekannter Fehler, 7=kalt)</li>
-    <li>batterytemperature - Temperatur der Batterie</li>
+    <li>automagicState - Statusmeldungen von der Automagic oder Tasker App <b>(Voraussetzung Android >4.3). Ist Android gr&ouml;&szlig;er 4.3 vorhanden und im Reading steht "wird nicht unterst&uuml;tzt", mu&szlig; in den Androideinstellungen unter Ton und Benachrichtigungen -> Benachrichtigungszugriff ein Haken f&uuml;r Automagic/Tasker gesetzt werden</b></li>
+    <li>batteryHealth - Zustand der Battery (1=unbekannt, 2=gut, 3=&Uuml;berhitzt, 4=tot, 5=&Uumlberspannung, 6=unbekannter Fehler, 7=kalt) (nur Automagic)</li>
+    <li>batterytemperature - Temperatur der Batterie (nur Automagic)</li>
     <li>bluetooth - on/off, Bluetooth Status an oder aus</li>
-    <li>checkActiveTask - Zustand einer zuvor definierten APP. 0=nicht aktiv oder nicht aktiv im Vordergrund, 1=aktiv im Vordergrund, <b>siehe Hinweis unten</b></li>
-    <li>connectedBTdevices - eine Liste der verbundenen Ger&auml;t</li>
-    <li>connectedBTdevicesMAC - eine Liste der MAC Adressen aller verbundender BT Ger&auml;te</li>
-    <li>currentMusicAlbum - aktuell abgespieltes Musikalbum des verwendeten Mediaplayers</li>
-    <li>currentMusicApp - aktuell verwendeter Mediaplayer (Amazon Music, Google Play Music, Google Play Video, Spotify, YouTube, TuneIn Player, Aldi Life Music)</li>
-    <li>currentMusicArtist - aktuell abgespielter Musikinterpret des verwendeten Mediaplayers</li>
-    <li>currentMusicIcon - Cover vom aktuell abgespielten Album <b>Noch nicht fertig implementiert</b></li>
-    <li>currentMusicState - Status des aktuellen/zuletzt verwendeten Mediaplayers</li>
-    <li>currentMusicTrack - aktuell abgespielter Musiktitel des verwendeten Mediaplayers</li>
+    <li>checkActiveTask - Zustand einer zuvor definierten APP. 0=nicht aktiv oder nicht aktiv im Vordergrund, 1=aktiv im Vordergrund, <b>siehe Hinweis unten</b> (nur Automagic)</li>
+    <li>connectedBTdevices - eine Liste der verbundenen Ger&auml;t (nur Automagic)</li>
+    <li>connectedBTdevicesMAC - eine Liste der MAC Adressen aller verbundender BT Ger&auml;te (nur Automagic)</li>
+    <li>currentMusicAlbum - aktuell abgespieltes Musikalbum des verwendeten Mediaplayers (nur Automagic)</li>
+    <li>currentMusicApp - aktuell verwendeter Mediaplayer (Amazon Music, Google Play Music, Google Play Video, Spotify, YouTube, TuneIn Player, Aldi Life Music) (nur Automagic)</li>
+    <li>currentMusicArtist - aktuell abgespielter Musikinterpret des verwendeten Mediaplayers (nur Automagic)</li>
+    <li>currentMusicIcon - Cover vom aktuell abgespielten Album <b>Noch nicht fertig implementiert</b> (nur Automagic)</li>
+    <li>currentMusicState - Status des aktuellen/zuletzt verwendeten Mediaplayers (nur Automagic)</li>
+    <li>currentMusicTrack - aktuell abgespielter Musiktitel des verwendeten Mediaplayers (nur Automagic)</li>
     <li>daydream - on/off, Daydream gestartet oder nicht</li>
     <li>deviceState - Status des Androidger&auml;tes. unknown, online, offline.</li>
     <li>doNotDisturb - aktueller Status des nicht st&ouml;ren Modus</li>
@@ -1250,16 +1290,16 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
     <li>nextAlarmState - aktueller Status des <i>"Androidinternen"</i> Weckers</li>
     <li>nextAlarmTime - aktive Alarmzeit</li>
     <li>nfc - Status des NFC on/off</li>
-    <li>nfcLastTagID - nfc_id des zu letzt gescannten Tag's / Damit die ID korrekt erkannt wird muss im Flow NFC Tag Support der Trigger NFC TagIDs bearbeitet werden und die TagId's Kommasepariert eingetragen werden.</li>
+    <li>nfcLastTagID - nfc_id des zu letzt gescannten Tag's / Damit die ID korrekt erkannt wird muss im Flow NFC Tag Support der Trigger NFC TagIDs bearbeitet werden und die TagId's Kommasepariert eingetragen werden. (nur Automagic)</li>
     <li>powerLevel - Status der Batterie in %</li>
     <li>powerPlugged - Netzteil angeschlossen? 0=NEIN, 1|2=JA</li>
     <li>screen - on locked/unlocked, off locked/unlocked gibt an ob der Bildschirm an oder aus ist und gleichzeitig gesperrt oder nicht gesperrt</li>
     <li>screenBrightness - Bildschirmhelligkeit von 0-255</li>
-    <li>screenFullscreen - on/off, Vollbildmodus (An,Aus)</li>
+    <li>screenFullscreen - on/off, Vollbildmodus (An,Aus) (nur Automagic)</li>
     <li>screenOrientation - Landscape,Portrait, Bildschirmausrichtung (Horizontal,Vertikal)</li>
     <li>screenOrientationMode - auto/manual, Modus f&uuml;r die Ausrichtung (Automatisch, Manuell)</li>
     <li>state - aktueller Status</li>
-    <li>userFlowState - aktueller Status eines Flows, festgelegt unter dem setUserFlowState Attribut</li>
+    <li>userFlowState - aktueller Status eines Flows, festgelegt unter dem setUserFlowState Attribut (nur Automagic)</li>
     <li>volume - Media Lautst&auml;rkewert</li>
     <li>volumeNotification - Benachrichtigungs Lautst&auml;rke</li>
     <li>wiredHeadsetPlugged - 0/1 gibt an ob ein Headset eingesteckt ist oder nicht</li>
@@ -1274,11 +1314,11 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
   <ul>
     <li>activateVoiceInput - aktiviert die Spracheingabe</li>
     <li>bluetooth - on/off, aktiviert/deaktiviert Bluetooth</li>
-    <li>clearNotificationBar - All,Automagic, l&ouml;scht alle Meldungen oder nur die Automagic Meldungen in der Statusleiste</li>
+    <li>clearNotificationBar - All,Automagic, l&ouml;scht alle Meldungen oder nur die Automagic/Tasker Meldungen in der Statusleiste</li>
     <li>closeCall - beendet einen laufenden Anruf</li>
-    <li>currentFlowsetUpdate - f&uuml;rt ein Flowsetupdate auf dem Device durch</li>
+    <li>currentFlowsetUpdate - f&uuml;rt ein Flowset/Tasker-Projekt update auf dem Device durch</li>
     <li>doNotDisturb - schaltet den nicht st&ouml;ren Modus, always immer st&ouml;ren, never niemals st&ouml;ren, alarmClockOnly nur Wecker darf st&ouml;ren, onlyImportant nur wichtige St&ouml;rungen</li>
-    <li>installFlowSource - installiert einen Flow auf dem Device, <u>das XML File muss unter /tmp/ liegen und die Endung xml haben</u>. <b>Bsp:</b> <i>set TabletWohnzimmer installFlowSource WlanUebwerwachen.xml</i></li>
+    <li>installFlowSource - installiert einen Flow auf dem Device, <u>das XML File muss unter /tmp/ liegen und die Endung xml haben</u>. <b>Bsp:</b> <i>set TabletWohnzimmer installFlowSource WlanUebwerwachen.xml</i> (nur Automagic)</li>
     <li>mediaPlay - play Befehl zur Media App</li>
     <li>mediaStop - stop Befehl zur Media App</li>
     <li>mediaNext - nächster Titel Befehl zur Media App</li>
@@ -1293,26 +1333,26 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
     <li>statusRequest - Fordert einen neuen Statusreport beim Device an. Es k&ouml;nnen nicht von allen Readings per statusRequest die Daten geholt werden. Einige wenige geben nur bei Status&auml;nderung ihren Status wieder.</li>
     <li>timer - setzt einen Timer innerhalb der als Standard definierten ClockAPP auf dem Device. Es k&ouml;nnen nur Minuten angegeben werden.</li>
     <li>ttsMsg - versendet eine Nachricht welche als Sprachnachricht ausgegeben wird (um die Sprache für diese eine Durchsage zu ändern setze vor Deinem eigentlichen Text &en; oder &de;)</li>
-    <li>userFlowState - aktiviert oder deaktiviert einen oder mehrere Flows,<b><i>set Nexus7Wohnzimmer Badezimmer vorheizen:inactive</i> oder <i>set Nexus7Wohnzimmer Badezimmer vorheizen,Nachtlicht Steven:inactive</i></b></li>
-    <li>userFlowRun - führt den angegebenen Flow aus</li>
+    <li>userFlowState - aktiviert oder deaktiviert einen oder mehrere Flows/Tasker-Profile,<b><i>set Nexus7Wohnzimmer Badezimmer vorheizen:inactive</i> oder <i>set Nexus7Wohnzimmer Badezimmer vorheizen,Nachtlicht Steven:inactive</i></b></li>
+    <li>userFlowRun - führt den angegebenen Flow/Task aus</li>
     <li>vibrate - l&auml;sst das Androidger&auml;t vibrieren</li>
     <li>volume - setzt die Medialautst&auml;rke. Entweder die internen Lautsprecher oder sofern angeschlossen die Bluetoothlautsprecher und per Klinkenstecker angeschlossene Lautsprecher, + oder - vor dem Wert reduziert die aktuelle Lautst&auml;rke um den Wert. Der maximale Sliderwert kann &uuml;ber das Attribut setVolMax geregelt werden.</li>
-    <li>volumeUp - erh&oumlh;t die Lautst&auml;rke um den angegeben Wert im entsprechenden Attribut. Ist kein Attribut angegeben wird per default 2 genommen.</li>
+    <li>volumeUp - erh&ouml;ht die Lautst&auml;rke um den angegeben Wert im entsprechenden Attribut. Ist kein Attribut angegeben wird per default 2 genommen.</li>
     <li>volumeDown - reduziert die Lautst&auml;rke um den angegeben Wert im entsprechenden Attribut. Ist kein Attribut angegeben wird per default 2 genommen.</li>
     <li>volumeNotification - setzt die Benachrichtigungslautst&auml;rke.</li>
   </ul>
   <br>
   <b>Set abh&auml;ngig von gesetzten Attributen</b>
   <ul>
-    <li>changetoBtDevice - wechselt zu einem anderen Bluetooth Ger&auml;t. <b>Attribut setBluetoothDevice mu&szlig; gesetzt sein. Siehe Hinweis unten!</b></li>
+    <li>changetoBtDevice - wechselt zu einem anderen Bluetooth Ger&auml;t. <b>Attribut setBluetoothDevice mu&szlig; gesetzt sein. Siehe Hinweis unten!</b> (nur Automagic)</li>
     <li>notifySndFile - spielt die angegebene Mediadatei auf dem Androidger&auml;t ab. <b>Die aufzurufende Mediadatei sollte sich im Ordner /storage/emulated/0/Notifications/ befinden. Ist dies nicht der Fall kann man &uuml;ber das Attribut setNotifySndFilePath einen Pfad vorgeben.</b></li>
     <li>nfc -  schaltet nfc an oder aus /on/off<b>Attribut root</b></li>
     <li>openApp - &ouml;ffnet eine ausgew&auml;hlte App. <b>Attribut setOpenApp</b></li>
     <li>openURL - &ouml;ffnet eine URL im Standardbrowser, sofern kein anderer Browser &uuml;ber das <b>Attribut setOpenUrlBrowser</b> ausgew&auml;hlt wurde.<b> Bsp:</b><i> attr Tablet setOpenUrlBrowser de.ozerov.fully|de.ozerov.fully.MainActivity, das erste ist der Package Name und das zweite der Class Name</i></li>
-    <li>screen - on/off/lock/unlock schaltet den Bildschirm ein/aus oder sperrt/entsperrt ihn, in den Automagic Einstellungen muss "Admin Funktion" gesetzt werden sonst funktioniert "Screen off" nicht. <b>Attribut setScreenOnForTimer</b> &auml;ndert die Zeit wie lange das Display an bleiben soll!</li>
+    <li>screen - on/off/lock/unlock schaltet den Bildschirm ein/aus oder sperrt/entsperrt ihn, in den Automagic Einstellungen muss "Admin Funktion" gesetzt werden sonst funktioniert "Screen off" nicht. <b>Attribut setScreenOnForTimer</b> &auml;ndert die Zeit wie lange das Display an bleiben soll! (Tasker unterst&uuml;tzt nur "screen off")</li>
     <li>screenFullscreen - on/off, (aktiviert/deaktiviert) den Vollbildmodus. <b>Attribut setFullscreen</b></li>
     <li>screenLock - Sperrt den Bildschirm mit Pinabfrage. <b>Attribut setScreenlockPIN - hier die Pin daf&uuml;r eingeben. Erlaubt sind nur Zahlen. Es m&uuml;&szlig;en mindestens 4, bis max 16 Zeichen verwendet werden.</b></li>
-    <li>screenOrientation - Auto,Landscape,Portait,  aktiviert die Bildschirmausrichtung (Automatisch,Horizontal,Vertikal). <b>Attribut setScreenOrientation</b></li>
+    <li>screenOrientation - Auto,Landscape,Portait, aktiviert die Bildschirmausrichtung (Automatisch,Horizontal,Vertikal). <b>Attribut setScreenOrientation</b> (Tasker unterst&uuml;tzt nur Auto on/off)</li>
     <li>system - setzt Systembefehle ab (nur bei gerootetet Ger&auml;en). reboot,shutdown,airplanemodeON (kann nur aktiviert werden) <b>Attribut root</b>, in den Automagic Einstellungen muss "Root Funktion" gesetzt werden</li>
     <li>takePicture - löst die Kamera aus für ein Foto <b>Attribut setTakePictureResolution</b></li>
   </ul>
@@ -1321,14 +1361,14 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
   <b>Attribute</b>
   <ul>
     <li>setNotifySndFilePath - setzt den korrekten Systempfad zur Notifydatei (default ist /storage/emulated/0/Notifications/</li>
-    <li>setTtsMsgSpeed - setzt die Sprachgeschwindigkeit bei der Sprachausgabe(Werte zwischen 0.5 bis 4.0 in 0.5er Schritten) default ist 1.0</li>
+    <li>setTtsMsgSpeed - setzt die Sprachgeschwindigkeit bei der Sprachausgabe(Für Automagic: Werte zwischen 0.5 bis 4.0 in 0.5er Schritten, default:1.0)(Für Tasker: Werte zwischen 1 bis 10 in 1er Schritten, default:5)</li>
     <li>setTtsMsgLang - setzt die Sprache bei der Sprachausgabe, de oder en (default ist de)</li>
     <li>setTtsMsgVol - wenn gesetzt wird der Wert als neues Media Volume f&uuml; die Sprachansage verwendet und danach wieder der alte Wert eingestellt</li>
     <li>setVolUpDownStep - setzt den Step f&uuml;r volumeUp und volumeDown</li>
     <li>setVolMax - setzt die maximale Volume Gr&uoml;e f&uuml;r den Slider</li>
     <li>setNotifyVolMax - setzt den maximalen Lautst&auml;rkewert für Benachrichtigungslautst&auml;rke f&uuml;r den Slider</li>
     <li>setRingSoundVolMax - setzt den maximalen Lautst&auml;rkewert für Klingellautst&auml;rke f&uuml;r den Slider</li>
-    <li>setAPSSID - setzt die AccessPoint SSID um ein WLAN sleep zu verhindern</li>
+    <li>setAPSSID - setzt die AccessPoint SSID um ein WLAN sleep zu verhindern (nur Automagic)</li>
     <li>setTakePictureResolution - welche Kameraauflösung soll verwendet werden? (800x600,1024x768,1280x720,1600x1200,1920x1080)</li>
     <li>setTakePictureCamera - welche Kamera soll verwendet werden (Back,Front).</li>
     <br>
