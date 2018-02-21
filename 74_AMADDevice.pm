@@ -304,17 +304,6 @@ sub AMADDevice_Attr(@) {
         }
     }
     
-    elsif( $attrName eq "setAPSSID" ) {
-        if( $cmd eq "set" and $attrVal ) {
-        
-            AMADDevice_statusRequest($hash);
-            
-        } else {
-        
-            AMADDevice_statusRequest($hash);
-        }
-    }
-    
     elsif( $attrName eq "setUserFlowState" ) {
         if( $cmd eq "del" ) {
         
