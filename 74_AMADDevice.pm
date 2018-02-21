@@ -708,14 +708,6 @@ sub AMADDevice_Set($$@) {
         $method = "POST";
     }
     
-    elsif( lc $cmd eq 'takepicture' ) {
-
-        return "Please set \"setTakePictureResolution\" Attribut first"
-        unless(AttrVal($name,'setTakePictureResolution','none') ne 'none');
-        $uri    = $host . ":" . $port . "/fhem-amad/setCommands/takepicture?pictureresolution=" . AttrVal($name,'setTakePictureResolution','none');
-        $method = "POST";
-    }
-    
     elsif( lc $cmd eq 'sendintent' ) {
         my $intentstring = join( " ", @args );
         my ( $action, $exkey1, $exval1, $exkey2, $exval2 ) = split( "[ \t][ \t]*", $intentstring );
