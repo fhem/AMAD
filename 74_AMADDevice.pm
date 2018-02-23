@@ -7,6 +7,7 @@
 #
 #   Special thanks goes to comitters:
 #       - Jens Wohlgemuth       Thanks for Commandref
+#       - Schlimbo              Tasker integration and Tasker Commandref
 #
 #
 #  This script is free software; you can redistribute it and/or modify
