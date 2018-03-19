@@ -1021,7 +1021,7 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
   <b>How to use AMADDevice?</b>
   <ul>
     <li>first, make sure that the AMADCommBridge in FHEM was defined</li>
-    <li><b>Using Autoremote</b></li>
+    <li><b>Using Automagic</b></li>
         <ul>
         <li>install the "Automagic Premium" app from the PlayStore</li>
         <li>install the flowset 74_AMADDeviceautomagicFlowset$VERSION.xml file from the $INSTALLFHEM/FHEM/lib/ directory on the Android device</li>
@@ -1207,7 +1207,7 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
   <b>Wie genau verwendet man nun AMADDevice?</b>
   <ul>
     <li>stelle sicher das als aller erstes die AMADCommBridge in FHEM definiert wurde</li>
-    <li><b>Bei verwendung von Autoremote</b></li>
+    <li><b>Bei verwendung von Automagic</b></li>
         <ul>
         <li>installiere die App "Automagic Premium" aus dem PlayStore.</li>
         <li>installiere das Flowset 74_AMADDeviceautomagicFlowset$VERSION.xml aus dem Ordner $INSTALLFHEM/FHEM/lib/ auf dem Androidger&auml;t</li>
@@ -1227,11 +1227,11 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
   <b>Define</b>
   <ul><br>
   10.6.9.10 1496497380000 IODev=AMADBridge
-    <code>define &lt;name&gt; AMADDevice &lt;IP-ADRESSE&gt; &lt;AMAD_ID&gt; IODev=&lt;IODEVICE&gt;</code>
+    <code>define &lt;name&gt; AMADDevice &lt;IP-ADRESSE&gt; &lt;AMAD_ID&gt; &lt;REMOTESERVER&gt;</code>
     <br><br>
     Beispiel:
     <ul><br>
-      <code>define WandTabletWohnzimmer AMADDevice 192.168.0.23 123456 IODev=NAME_des_AMADCommBridge_Devices</code><br>
+      <code>define WandTabletWohnzimmer AMADDevice 192.168.0.23 123456 Automagic</code><br>
     </ul>
     <br>
     In diesem Fall wird ein AMADDevice von Hand angelegt. Die AMAD_ID, hier 123456, mu&szlig; auch exakt so als globale Variable in Automagic/Tasker eingetragen sein.
