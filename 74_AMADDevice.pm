@@ -113,7 +113,7 @@ sub AMADDevice_Initialize($) {
                 "setOpenUrlBrowser ".
                 "setNotifySndFilePath ".
                 "setTtsMsgSpeed ".
-                "setTtsMsgLang:de,en ".
+                "setTtsMsgLang:de_DE,en_US,fr_FR ".
                 "setTtsMsgVol ".
                 "setUserFlowState ".
                 "setVolUpDownStep:1,2,4,5 ".
@@ -948,7 +948,7 @@ sub AMADDevice_CreateTtsMsgValue($@) {
     my $msg;
     my $speed;
 
-    my $lang        = AttrVal( $name, "setTtsMsgLang","de" );
+    my $lang        = AttrVal( $name, "setTtsMsgLang","de_DE" );
     my $ttsmsgvol   = AttrVal( $name, "setTtsMsgVol","none");
     
     if( AttrVal($name,"remoteServer","Automagic") ne 'Automagic') {
@@ -960,7 +960,7 @@ sub AMADDevice_CreateTtsMsgValue($@) {
 
     $msg    = join( " ", @args );
     
-    unless($args[0] ne '&en;' and $args[0] ne '&de;') {
+    unless($args[0] ne '&en_US;' and $args[0] ne '&de_DE;' and $args[0] ne '&fr_FR;') {
         $lang   = substr(splice(@args,0,1),1,2);
         $msg    = join( " ", @args );
     }
@@ -1150,7 +1150,7 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
     <li>startDaydream - start Daydream</li>
     <li>statusRequest - Get a new status report of Android device. Not all readings can be updated using a statusRequest as some readings are only updated if the value of the reading changes.</li>
     <li>timer - set a countdown timer in the "Clock" stock app. Only minutes are allowed as parameter.</li>
-    <li>ttsMsg - send a message which will be played as voice message (to change laguage temporary set first character &en; or &de;)</li>
+    <li>ttsMsg - send a message which will be played as voice message (to change laguage temporary set first character &en_US; or &de_DE; or &fr_FR;)</li>
     <li>userFlowState - set Flow/Tasker-profile active or inactive,<b><i>set Nexus7Wohnzimmer Badezimmer:inactive vorheizen</i> or <i>set Nexus7Wohnzimmer Badezimmer vorheizen,Nachtlicht Steven:inactive</i></b></li>
     <li>userFlowRun - executes the specified flow/task</li>
     <li>vibrate - vibrate Android device</li>
@@ -1179,7 +1179,7 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
     <li>setAPSSID - set WLAN AccesPoint SSID to prevent WLAN sleeps (Automagic only)</li>
     <li>setNotifySndFilePath - set systempath to notifyfile (default /storage/emulated/0/Notifications/</li>
     <li>setTtsMsgSpeed - set speaking speed for TTS (For Automagic: Value between 0.5 - 4.0, 0.5 Step, default: 1.0)(For Tasker: Value between 1 - 10, 1 Step, default: 5)</li>
-    <li>setTtsMsgLang - set speaking language for TTS, de or en (default is de)</li>
+    <li>setTtsMsgLang - set speaking language for TTS, de_DE or en_US or fr_FR (default is de_DE)</li>
     <li>setTtsMsgVol - is set, change automatically the media audio end set it back</li>
     <li>set setTakePictureResolution - set the camera resolution for takePicture action (800x600,1024x768,1280x720,1600x1200,1920x1080)</li>
     <li>setTakePictureCamera - which camera do you use (Back,Front).</li>
@@ -1338,7 +1338,7 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
     <li>startDaydream - startet den Daydream</li>
     <li>statusRequest - Fordert einen neuen Statusreport beim Device an. Es k&ouml;nnen nicht von allen Readings per statusRequest die Daten geholt werden. Einige wenige geben nur bei Status&auml;nderung ihren Status wieder.</li>
     <li>timer - setzt einen Timer innerhalb der als Standard definierten ClockAPP auf dem Device. Es k&ouml;nnen nur Minuten angegeben werden.</li>
-    <li>ttsMsg - versendet eine Nachricht welche als Sprachnachricht ausgegeben wird (um die Sprache für diese eine Durchsage zu ändern setze vor Deinem eigentlichen Text &en; oder &de;)</li>
+    <li>ttsMsg - versendet eine Nachricht welche als Sprachnachricht ausgegeben wird (um die Sprache für diese eine Durchsage zu ändern setze vor Deinem eigentlichen Text &en_US; oder &de_DE; oder &fr_FR;)</li>
     <li>userFlowState - aktiviert oder deaktiviert einen oder mehrere Flows/Tasker-Profile,<b><i>set Nexus7Wohnzimmer Badezimmer vorheizen:inactive</i> oder <i>set Nexus7Wohnzimmer Badezimmer vorheizen,Nachtlicht Steven:inactive</i></b></li>
     <li>userFlowRun - führt den angegebenen Flow/Task aus</li>
     <li>vibrate - l&auml;sst das Androidger&auml;t vibrieren</li>
@@ -1369,7 +1369,7 @@ sub AMADDevice_CreateChangeBtDeviceValue($$) {
   <ul>
     <li>setNotifySndFilePath - setzt den korrekten Systempfad zur Notifydatei (default ist /storage/emulated/0/Notifications/</li>
     <li>setTtsMsgSpeed - setzt die Sprachgeschwindigkeit bei der Sprachausgabe(Für Automagic: Werte zwischen 0.5 bis 4.0 in 0.5er Schritten, default:1.0)(Für Tasker: Werte zwischen 1 bis 10 in 1er Schritten, default:5)</li>
-    <li>setTtsMsgLang - setzt die Sprache bei der Sprachausgabe, de oder en (default ist de)</li>
+    <li>setTtsMsgLang - setzt die Sprache bei der Sprachausgabe, de_DE oder en_US oder fr_FR (default ist de_DE)</li>
     <li>setTtsMsgVol - wenn gesetzt wird der Wert als neues Media Volume f&uuml; die Sprachansage verwendet und danach wieder der alte Wert eingestellt</li>
     <li>setVolUpDownStep - setzt den Step f&uuml;r volumeUp und volumeDown</li>
     <li>setVolMax - setzt die maximale Volume Gr&uoml;e f&uuml;r den Slider</li>

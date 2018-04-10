@@ -1076,7 +1076,7 @@ irname=getString("name")</extras>
   <condition type="expression">
     <useDefaultName>true</useDefaultName>
     <name>Expression: trigger == "Benachrichtigung in Statusbar angezeigt: ch.gridvision.ppam.androidautomagic" or trigger == "Benachrichtigung in Statusbar entfernt: ch.gridvision.ppam.androidautomagic" or trigger == "HTTP Request: /fhem-amad/deviceInfo/"</name>
-    <expression>trigger == "Benachrichtigung in Statusbar angezeigt: ch.gridvision.ppam.androidautomagic" 
+    <expression>trigger == "Benachrichtigung in Statusbar angezeigt: ch.gridvision.ppam.androidautomagic"
  or trigger == "Benachrichtigung in Statusbar entfernt: ch.gridvision.ppam.androidautomagic"
  or trigger == "HTTP Request: /fhem-amad/deviceInfo/"</expression>
   </condition>
@@ -1257,11 +1257,6 @@ or trigger == "HTTP Request: /fhem-amad/deviceInfo/"</expression>
     <useDefaultName>false</useDefaultName>
     <name>Expression: ttsMsg"</name>
     <expression>request_path == "/fhem-amad/setCommands/ttsMsg"</expression>
-  </condition>
-  <condition type="expression">
-    <useDefaultName>false</useDefaultName>
-    <name>Expression: ttsMsgLang"</name>
-    <expression>param_msglang == "en"</expression>
   </condition>
   <condition type="expression">
     <useDefaultName>true</useDefaultName>
@@ -2972,7 +2967,7 @@ fhemcmd = "setreading";</script>
     <script>if(index == 0)
 {
   sprachassi = "ja";
-} 
+}
 else if(index == 1)
 {
   sprachassi = "nein";
@@ -3879,10 +3874,10 @@ else if(param_mplayer == "MXPlayerPro")
   </action>
   <action type="speech_output">
     <useDefaultName>false</useDefaultName>
-    <name>Sprachausgabe: Deutsch</name>
+    <name>Sprachausgabe</name>
     <audioStreamType>MUSIC</audioStreamType>
     <text>{param_message}</text>
-    <locale>de_DE</locale>
+    <locale>{param_msglang}</locale>
     <usePitch>true</usePitch>
     <pitch>1.0</pitch>
     <useSpeechRate>true</useSpeechRate>
@@ -3943,22 +3938,6 @@ Auf Wiedersehen.</text>
     <speechRate>1.0</speechRate>
     <embeddedSynthesis>false</embeddedSynthesis>
     <networkSynthesis>true</networkSynthesis>
-    <showStopSpeechNotification>false</showStopSpeechNotification>
-    <requestAudioFocus>true</requestAudioFocus>
-    <audioFocusType>TRANSIENT</audioFocusType>
-  </action>
-  <action type="speech_output">
-    <useDefaultName>false</useDefaultName>
-    <name>Sprachausgabe: Englisch</name>
-    <audioStreamType>MUSIC</audioStreamType>
-    <text>{param_message}</text>
-    <locale>en_US</locale>
-    <usePitch>true</usePitch>
-    <pitch>1.0</pitch>
-    <useSpeechRate>true</useSpeechRate>
-    <speechRate>{param_msgspeed}</speechRate>
-    <embeddedSynthesis>true</embeddedSynthesis>
-    <networkSynthesis>false</networkSynthesis>
     <showStopSpeechNotification>false</showStopSpeechNotification>
     <requestAudioFocus>true</requestAudioFocus>
     <audioFocusType>TRANSIENT</audioFocusType>
@@ -4530,7 +4509,7 @@ Soll der Assistent gelöscht werden?</actioncontainer>
     <connection from="t14" to="t2" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t15" to="t34" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t15" to="t49" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t16" to="t148" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t16" to="t152" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t16" to="t147" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t17" to="t16" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t18" to="t50" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
@@ -5011,12 +4990,10 @@ Soll der Assistent gelöscht werden?</actioncontainer>
     <actioncontainer id="t145" x="-6265.0" y="892.5">Lautstärken setzen param_ringsoundvolume</actioncontainer>
     <actioncontainer id="t146" x="3395.0" y="892.5">Setze Timer</actioncontainer>
     <conditioncontainer id="t147" x="-1330.0" y="-122.5">Expression: ttsMsg"</conditioncontainer>
-    <conditioncontainer id="t148" x="-1330.0" y="367.5">Expression: ttsMsgLang"</conditioncontainer>
     <actioncontainer id="t149" x="-1400.0" y="157.5">Medianlautstärken Speichern</actioncontainer>
     <actioncontainer id="t150" x="-1400.0" y="262.5">Lautstärke einstellen: Medien auf Level {param_msgvol}</actioncontainer>
     <conditioncontainer id="t151" x="-1330.0" y="52.5">Expression: param_msgvol == "none"</conditioncontainer>
-    <actioncontainer id="t152" x="-1435.0" y="892.5">Sprachausgabe: Englisch</actioncontainer>
-    <actioncontainer id="t153" x="-1225.0" y="892.5">Sprachausgabe: Deutsch</actioncontainer>
+    <actioncontainer id="t152" x="-1330.0" y="892.5">Sprachausgabe</actioncontainer>
     <conditioncontainer id="t154" x="-1330.0" y="1032.5">Expression: param_msgvol == "none"</conditioncontainer>
     <actioncontainer id="t155" x="-1330.0" y="1172.5">Medienlautstärke Wiederherstellen</actioncontainer>
     <conditioncontainer id="t156" x="4025.0" y="-122.5">Expression: flowState"</conditioncontainer>
@@ -5211,11 +5188,9 @@ Soll der Assistent gelöscht werden?</actioncontainer>
     <connection from="t142" to="t137" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t144" to="t145" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t147" to="t151" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t148" to="t152" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t148" to="t153" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t149" to="t150" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t150" to="t148" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
-    <connection from="t151" to="t148" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t150" to="t152" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
+    <connection from="t151" to="t152" type="TRUE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t151" to="t149" type="FALSE" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t152" to="t154" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
     <connection from="t153" to="t154" type="NORMAL" sourcePosition="SOUTH" targetPosition="NORTH" />
