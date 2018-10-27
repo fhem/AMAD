@@ -906,7 +906,8 @@ sub AMADCommBridge_ResponseProcessing($$) {
  
             if( AttrVal( $bname, 'enableSubCalls', 0 ) == 1 ) {
 
-                $response = AnalyzeCommand($bhash, '{'.$fhemCmd.'}');
+                #$response = AnalyzeCommand($bhash, '{'.$fhemCmd.'}');
+                $response = AnalyzePerlCommand($bhash, '{'.$fhemCmd.'}');   # AnalyzePerlCommand is new https://forum.fhem.de/index.php/topic,89619.msg820964.html#msg820964
                     
             } else {
             
