@@ -76,8 +76,8 @@ eval "use JSON;1" or $missingModul .= "JSON ";
 
 
 
-my $modulversion = "4.2.3";
-my $flowsetversion = "4.2.5";
+my $modulversion = "4.4.0";
+my $flowsetversion = "4.4.0";
 
 
 
@@ -235,13 +235,9 @@ sub AMADCommBridge_Set($@) {
     } elsif( $cmd eq 'close' ) {
     
         AMADCommBridge_Close($hash);
-        
-    } elsif( $cmd eq 'fhemServerIP' ) {
-    
-        readingsSingleUpdate($hash,$cmd,$arg,1);
     
     } else {
-        my $list = "open:noArg close:noArg fhemServerIP";
+        my $list = "open:noArg close:noArg";
         return "Unknown argument $cmd, choose one of $list";
     }
 }
@@ -1068,7 +1064,6 @@ sub AMADCommBridge_ParseMsg($$) {
   <ul><br>
     <li>JSON_ERROR - JSON Error message reported by Perl</li>
     <li>JSON_ERROR_STRING - The string that caused the JSON error message</li>
-    <li>fhemServerIP - The IP address of the FHEM server, is set by the module based on the JSON string from the installation wizard. Can also be set by user using set command</li>
     <li>receiveFhemCommand - is set the fhemControlMode attribute to trigger, the reading is set as soon as an FHEM command is sent. A notification can then be triggered.</br>
     If set instead of trigger setControl as value for fhemControlMode, the reading is not executed but the set command executed immediately.</li>
     <li>receiveVoiceCommand - The speech control is activated by AMAD (set DEVICE activateVoiceInput), the last recognized voice command is written into this reading.</li>
@@ -1141,7 +1136,6 @@ sub AMADCommBridge_ParseMsg($$) {
   <ul><br>
     <li>JSON_ERROR - JSON Fehlermeldung welche von Perl gemeldet wird</li>
     <li>JSON_ERROR_STRING - der String welcher die JSON Fehlermeldung verursacht hat</li>
-    <li>fhemServerIP - die Ip-Adresse des FHEM Servers, wird vom Modul auf Basis des JSON Strings vom Installationsassistenten gesetzt. Kann aber auch mittels set Befehles vom User gesetzt werden</li>
     <li>receiveFhemCommand - ist das Attribut fhemControlMode auf trigger gestellt, wird das Reading gesetzt sobald ein FHEM Befehl übersendet wird. Hierauf kann dann ein Notify triggern.</br>
     Wird anstelle von trigger setControl als Wert für fhemControlMode eingestellt, wird das Reading nicht gestzt sondern der set Befehl sofort ausgeführt.</li>
     <li>receiveVoiceCommand - wird die Sprachsteuerung von AMAD aktiviert (set DEVICE activateVoiceInput) so wird der letzte erkannten Sprachbefehle in dieses Reading geschrieben.</li>
