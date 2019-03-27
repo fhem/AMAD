@@ -130,11 +130,13 @@ BEGIN {
           modules
           Log3
           CommandAttr
+          CommandDelete
           attr
           AttrVal
           ReadingsVal
           init_done
           urlEncode
+          Dispatch
           HttpUtils_NonblockingGet
           TcpServer_Open
           TcpServer_Close
