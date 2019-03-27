@@ -114,6 +114,8 @@ use warnings;
 use POSIX;
 use FHEM::Meta;
 
+use Data::Dumper;    #only for Debugging
+
 use GPUtils qw(GP_Import)
   ;    # wird für den Import der FHEM Funktionen aus der fhem.pl benötigt
 
@@ -236,6 +238,8 @@ sub Define($$) {
 "AMADDevice ($name) - defined with AMAD_ID: $amad_id on port $hash->{PORT}"
     );
 
+    $hash->{NOTIFYDEV} .= ',' . $iodev
+      if ( defined($iodev) );
     $modules{AMADDevice}{defptr}{$amad_id} = $hash;
 
     return undef;
@@ -380,9 +384,11 @@ sub Notify($$) {
             @{$events}
             or grep /^ATTR.$name.setUserFlowState.*/,
             @{$events}
+            or grep /^ATTR.$hash->{IODev}->{NAME}.fhemServerIP.*/,
+            @{$events}
         )
-        and $init_done
         and $devname eq 'global'
+        and $init_done
       );
 
     GetUpdate($hash)
@@ -426,8 +432,8 @@ sub GetUpdate($) {
         $init_done
         and (  ReadingsVal( $name, 'deviceState', 'unknown' ) eq 'unknown'
             or ReadingsVal( $name, 'deviceState', 'online' ) eq 'online' )
-        and AttrVal( $name, 'disable', 0 ) ne 1
-        and ReadingsVal( $bname, 'fhemServerIP', 'not set' ) ne 'not set'
+        and AttrVal( $name,  'disable',      0 ) ne 1
+        and AttrVal( $bname, 'fhemServerIP', 'not set' ) ne 'not set'
       )
     {
 
@@ -461,7 +467,7 @@ sub statusRequest($) {
     my $activetask    = AttrVal( $name, 'checkActiveTask',  'none' );
     my $userFlowState = AttrVal( $name, 'setUserFlowState', 'none' );
     my $apssid        = AttrVal( $name, 'setAPSSID',        'none' );
-    my $fhemip = ReadingsVal( $hash->{IODev}->{NAME}, 'fhemServerIP', 'none' );
+    my $fhemip = AttrVal( $hash->{IODev}->{NAME}, 'fhemServerIP', 'none' );
     my $fhemCtlMode =
       AttrVal( $hash->{IODev}->{NAME}, 'fhemControlMode', 'none' );
     my $bport = $hash->{IODev}->{PORT};

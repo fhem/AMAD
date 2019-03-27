@@ -89,6 +89,7 @@ sub AMADCommBridge_Initialize($) {
       . 'enableSubCalls:0,1 '
       . 'disable:1 '
       . 'allowfrom '
+      . 'fhemServerIP '
       . $readingFnAttributes;
 
     foreach my $d ( sort keys %{ $modules{AMADCommBridge}{defptr} } ) {
@@ -189,10 +190,10 @@ sub Undef($$) {
 
     my ( $hash, $arg ) = @_;
 
+    TcpServer_Close($hash);
     delete $modules{AMADCommBridge}{defptr}{BRIDGE}
       if ( defined( $modules{AMADCommBridge}{defptr}{BRIDGE} )
         and $hash->{BRIDGE} );
-    TcpServer_Close($hash);
 
     return undef;
 }
@@ -732,8 +733,8 @@ sub ErrorHandling($$$) {
 }
 
 sub Open($) {
-
     my $hash = shift;
+
     my $name = $hash->{NAME};
     my $port = $hash->{PORT};
 
@@ -753,7 +754,6 @@ sub Open($) {
         Log3( $name, 3, "AMADCommBridge ($name) - Socket opened." );
 
         return $ret;
-
     }
     else {
 
@@ -764,12 +764,10 @@ sub Open($) {
 }
 
 sub Close($) {
-
     my $hash = shift;
 
     my $name = $hash->{NAME};
 
-    delete $modules{AMADCommBridge}{defptr}{BRIDGE};
     TcpServer_Close($hash);
 
     if ( not defined( $hash->{FD} ) ) {
@@ -1027,8 +1025,10 @@ sub ResponseProcessing($$) {
 
             Dispatch( $bhash, $json, undef );
             Log3( $bname, 4, "AMADCommBridge ($bname) - call Dispatcher" );
-            readingsSingleUpdate( $bhash, 'fhemServerIP',
-                $decode_json->{firstrun}{'fhemserverip'}, 1 )
+            CommandAttr( undef,
+                    $bname
+                  . ' fhemServerIP '
+                  . $decode_json->{firstrun}{'fhemserverip'} )
               if ( defined( $decode_json->{firstrun}{'fhemserverip'} ) );
 
             $response =
