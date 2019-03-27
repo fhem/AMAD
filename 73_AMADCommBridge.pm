@@ -131,6 +131,7 @@ BEGIN {
           Log3
           CommandAttr
           CommandDelete
+          CommandSet
           attr
           AttrVal
           ReadingsVal

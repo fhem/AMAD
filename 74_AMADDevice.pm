@@ -142,6 +142,7 @@ BEGIN {
           deviceEvents
           init_done
           gettimeofday
+          getUniqueId
           InternalTimer
           RemoveInternalTimer
           IOWrite
