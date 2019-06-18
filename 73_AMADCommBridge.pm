@@ -223,8 +223,8 @@ sub Initialize($) {
     foreach my $d ( sort keys %{ $modules{AMADCommBridge}{defptr} } ) {
 
         my $hash = $modules{AMADCommBridge}{defptr}{$d};
-        $hash->{VERSIONMODUL}   = $modulversion;
-        $hash->{VERSIONFLOWSET} = $flowsetversion;
+        $hash->{VERSIONMODUL}   = $MODULVERSION;
+        $hash->{VERSIONFLOWSET} = $FLOWSETVERSION;
     }
 
     return FHEM::Meta::InitMod( __FILE__, $hash );
@@ -253,8 +253,8 @@ sub Define($$) {
 
     $hash->{BRIDGE}         = 1;
     $hash->{PORT}           = $port;
-    $hash->{VERSIONMODUL}   = $modulversion;
-    $hash->{VERSIONFLOWSET} = $flowsetversion;
+    $hash->{VERSIONMODUL}   = $MODULVERSION;
+    $hash->{VERSIONFLOWSET} = $FLOWSETVERSION;
 
     CommandAttr( undef, $name . ' room AMAD' )
       if ( AttrVal( $name, 'room', 'none' ) eq 'none' );
@@ -911,7 +911,7 @@ sub ProcessRead($$) {
     if ( $data =~ /currentFlowsetUpdate.xml/ ) {
 
         $response =
-qx(cat $fhempath/FHEM/lib/74_AMADautomagicFlowset_$flowsetversion.xml);
+qx(cat $fhempath/FHEM/lib/74_AMADautomagicFlowset_$FLOWSETVERSION.xml);
         $c = $hash->{CD};
         print $c "HTTP/1.1 200 OK\r\n",
           "Content-Type: text/plain\r\n",
@@ -925,7 +925,7 @@ qx(cat $fhempath/FHEM/lib/74_AMADautomagicFlowset_$flowsetversion.xml);
     elsif ( $data =~ /currentTaskersetUpdate.prj.xml/ ) {
 
         $response =
-          qx(cat $fhempath/FHEM/lib/74_AMADtaskerset_$flowsetversion.prj.xml);
+          qx(cat $fhempath/FHEM/lib/74_AMADtaskerset_$FLOWSETVERSION.prj.xml);
         $c = $hash->{CD};
         print $c "HTTP/1.1 200 OK\r\n",
           "Content-Type: text/plain\r\n",
