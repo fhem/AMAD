@@ -240,11 +240,11 @@ sub Define($$) {
     my $amad_id      = $a[3];
     my $remoteServer = $a[4];
 
-    $hash->{HOST}           = $host;
-    $hash->{AMAD_ID}        = $amad_id;
-    $hash->{VERSION}        = version->parse($VERSION)->normal;
-    $hash->{NOTIFYDEV}      = 'global,' . $name;
-    $hash->{MODEL}          = $remoteServer;
+    $hash->{HOST}      = $host;
+    $hash->{AMAD_ID}   = $amad_id;
+    $hash->{VERSION}   = version->parse($VERSION)->normal;
+    $hash->{NOTIFYDEV} = 'global,' . $name;
+    $hash->{MODEL}     = $remoteServer;
 
     $hash->{PORT} = 8090 if ( $remoteServer eq 'Automagic' );
     $hash->{PORT} = 1817 if ( $remoteServer eq 'Autoremote' );
@@ -276,6 +276,7 @@ sub Define($$) {
     }
 
     $iodev = $hash->{IODev}->{NAME};
+
 #     $hash->{VERSIONFLOWSET} = FHEM::Meta::Get( $defs{$iodev}, 'x_flowsetversion' );
     $hash->{VERSIONFLOWSET} = $defs{$iodev}->{VERSIONFLOWSET};
 
@@ -1679,7 +1680,7 @@ sub CreateChangeBtDeviceValue($$) {
   ],
   "release_status": "stable",
   "license": "GPL_2",
-  "version": "v4.4.2",
+  "version": "v4.4.3",
   "author": [
     "Marko Oldenburg <leongaultier@gmail.com>"
   ],

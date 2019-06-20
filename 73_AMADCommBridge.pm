@@ -876,6 +876,8 @@ sub ProcessRead($$) {
 
     my ( $hash, $buf ) = @_;
     my $name = $hash->{NAME};
+    my $flowsetversion =
+      $modules{AMADCommBridge}{defptr}{BRIDGE}->{VERSIONFLOWSET};
 
     my @data   = split( '\R\R', $buf );
     my $data   = $data[0];
@@ -892,7 +894,7 @@ sub ProcessRead($$) {
     if ( $data =~ /currentFlowsetUpdate.xml/ ) {
 
         $response =
-qx(cat $fhempath/FHEM/lib/74_AMADautomagicFlowset_$hash->{VERSIONFLOWSET}.xml);
+qx(cat $fhempath/FHEM/lib/74_AMADautomagicFlowset_$flowsetversion.xml);
         $c = $hash->{CD};
         print $c "HTTP/1.1 200 OK\r\n",
           "Content-Type: text/plain\r\n",
@@ -906,7 +908,7 @@ qx(cat $fhempath/FHEM/lib/74_AMADautomagicFlowset_$hash->{VERSIONFLOWSET}.xml);
     elsif ( $data =~ /currentTaskersetUpdate.prj.xml/ ) {
 
         $response =
-          qx(cat $fhempath/FHEM/lib/74_AMADtaskerset_$hash->{VERSIONFLOWSET}.prj.xml);
+          qx(cat $fhempath/FHEM/lib/74_AMADtaskerset_$flowsetversion.prj.xml);
         $c = $hash->{CD};
         print $c "HTTP/1.1 200 OK\r\n",
           "Content-Type: text/plain\r\n",
@@ -1460,8 +1462,8 @@ sub ParseMsg($$) {
   ],
   "release_status": "stable",
   "license": "GPL_2",
-  "version": "v4.4.2",
-  "x_flowsetversion": "4.1.1",
+  "version": "v4.4.3",
+  "x_flowsetversion": "4.4.1",
   "author": [
     "Marko Oldenburg <leongaultier@gmail.com>"
   ],
