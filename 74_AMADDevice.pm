@@ -1435,7 +1435,7 @@ sub CreateChangeBtDeviceValue($$) {
   <a name="AMADDeviceattribut"></a>
   <b>Attribut</b>
   <ul>
-    <li>setAPSSID - set WLAN AccesPoint SSID to prevent WLAN sleeps (Automagic only)</li>
+    <li>setAPSSID - set WLAN AccesPoint SSID('s) to prevent WLAN sleeps (Automagic only), more than one ssid can comma seperate</li>
     <li>setNotifySndFilePath - set systempath to notifyfile (default /storage/emulated/0/Notifications/</li>
     <li>setTtsMsgSpeed - set speaking speed for TTS (For Automagic: Value between 0.5 - 4.0, 0.5 Step, default: 1.0)(For Tasker: Value between 1 - 10, 1 Step, default: 5)</li>
     <li>setTtsMsgLang - set speaking language for TTS, de or en (default is de)</li>
@@ -1633,7 +1633,7 @@ sub CreateChangeBtDeviceValue($$) {
     <li>setVolMax - setzt die maximale Volume Gr&uoml;e f&uuml;r den Slider</li>
     <li>setNotifyVolMax - setzt den maximalen Lautst&auml;rkewert für Benachrichtigungslautst&auml;rke f&uuml;r den Slider</li>
     <li>setRingSoundVolMax - setzt den maximalen Lautst&auml;rkewert für Klingellautst&auml;rke f&uuml;r den Slider</li>
-    <li>setAPSSID - setzt die AccessPoint SSID um ein WLAN sleep zu verhindern (nur Automagic)</li>
+    <li>setAPSSID - setzt die AccessPoint SSID('s) um ein WLAN sleep zu verhindern (nur Automagic), mehrere SSIDs k&ouml;nnen durch Komma getrennt angegeben werden.</li>
     <li>setTakePictureResolution - welche Kameraauflösung soll verwendet werden? (800x600,1024x768,1280x720,1600x1200,1920x1080)</li>
     <li>setTakePictureCamera - welche Kamera soll verwendet werden (Back,Front).</li>
     <br>
