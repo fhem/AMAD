@@ -783,15 +783,15 @@ sub Set($$@) {
         my $openurl = join( ' ', @args );
         my $browser = AttrVal( $name, 'setOpenUrlBrowser',
             'com.android.chrome|com.google.android.apps.chrome.Main' );
-        my @browserapp = split( /\|/, $browser );
+        my ($bapp,$bappclass) = split( /\|/, $browser );
 
         $path .=
             'openURL?url='
           . $openurl
           . '&browserapp='
-          . $browserapp[0]
+          . $bapp
           . '&browserappclass='
-          . $browserapp[1];
+          . $bappclass;
         $method = 'POST';
     }
 
@@ -817,9 +817,17 @@ sub Set($$@) {
     }
 
     elsif ( lc $cmd eq 'openapp' ) {
-        my $app = join( ' ', @args );
+#         my $app = join( ' ', @args );
+        my ($app,$appclass) = split( /\|/, $args[0] );
 
-        $path .= 'openApp?app=' . $app;
+        $path .=
+            'openApp?app='
+          . $app;
+        $path .=
+            '&appclass='
+          . $appclass
+          if ( defined($appclass) );
+
         $method = 'POST';
     }
 
@@ -1680,7 +1688,7 @@ sub CreateChangeBtDeviceValue($$) {
   ],
   "release_status": "stable",
   "license": "GPL_2",
-  "version": "v4.4.6",
+  "version": "v4.4.7",
   "author": [
     "Marko Oldenburg <leongaultier@gmail.com>"
   ],
