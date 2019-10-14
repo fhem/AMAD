@@ -358,6 +358,7 @@ sub Attr(@) {
                     "AMADDevice ($name) - set remoteServer to other" );
             }
 
+            $hash->{MODEL}  = $attrVal;
             $hash->{DEF} =
               $hash->{HOST} . ' ' . $hash->{AMAD_ID} . ' ' . $attrVal;
         }
