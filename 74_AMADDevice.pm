@@ -277,7 +277,6 @@ sub Define($$) {
 
     $iodev = $hash->{IODev}->{NAME};
 
-#     $hash->{VERSIONFLOWSET} = FHEM::Meta::Get( $defs{$iodev}, 'x_flowsetversion' );
     $hash->{VERSIONFLOWSET} = $defs{$iodev}->{VERSIONFLOWSET};
 
     my $d = $modules{AMADDevice}{defptr}{$amad_id};
@@ -509,6 +508,11 @@ sub GetUpdate($) {
         statusRequest($hash);
         checkDeviceState($hash);
 
+    }
+    elsif ( AttrVal( $bname, 'fhemServerIP', 'not set' ) ne 'not set' ) {
+    
+        Log3( $name, 1,
+            "AMADDevice ($name) - GetUpdate, attribut fhemServerIP not set in bridge device" );
     }
     else {
 
@@ -818,7 +822,6 @@ sub Set($$@) {
     }
 
     elsif ( lc $cmd eq 'openapp' ) {
-#         my $app = join( ' ', @args );
         my ($app,$appclass) = split( /\|/, $args[0] );
 
         $path .=
@@ -1689,7 +1692,7 @@ sub CreateChangeBtDeviceValue($$) {
   ],
   "release_status": "stable",
   "license": "GPL_2",
-  "version": "v4.4.7",
+  "version": "v4.4.8",
   "author": [
     "Marko Oldenburg <leongaultier@gmail.com>"
   ],
