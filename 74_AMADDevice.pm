@@ -357,7 +357,7 @@ sub Attr(@) {
                     "AMADDevice ($name) - set remoteServer to other" );
             }
 
-            $hash->{MODEL}  = $attrVal;
+            $hash->{MODEL} = $attrVal;
             $hash->{DEF} =
               $hash->{HOST} . ' ' . $hash->{AMAD_ID} . ' ' . $attrVal;
         }
@@ -510,9 +510,10 @@ sub GetUpdate($) {
 
     }
     elsif ( AttrVal( $bname, 'fhemServerIP', 'not set' ) ne 'not set' ) {
-    
+
         Log3( $name, 1,
-            "AMADDevice ($name) - GetUpdate, attribut fhemServerIP not set in bridge device" );
+"AMADDevice ($name) - GetUpdate, attribut fhemServerIP not set in bridge device"
+        );
     }
     else {
 
@@ -788,7 +789,7 @@ sub Set($$@) {
         my $openurl = join( ' ', @args );
         my $browser = AttrVal( $name, 'setOpenUrlBrowser',
             'com.android.chrome|com.google.android.apps.chrome.Main' );
-        my ($bapp,$bappclass) = split( /\|/, $browser );
+        my ( $bapp, $bappclass ) = split( /\|/, $browser );
 
         $path .=
             'openURL?url='
@@ -822,14 +823,10 @@ sub Set($$@) {
     }
 
     elsif ( lc $cmd eq 'openapp' ) {
-        my ($app,$appclass) = split( /\|/, $args[0] );
+        my ( $app, $appclass ) = split( /\|/, $args[0] );
 
-        $path .=
-            'openApp?app='
-          . $app;
-        $path .=
-            '&appclass='
-          . $appclass
+        $path .= 'openApp?app=' . $app;
+        $path .= '&appclass=' . $appclass
           if ( defined($appclass) );
 
         $method = 'POST';
